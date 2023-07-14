@@ -46,6 +46,20 @@ class Application:
             }
         )
 
+    def create_chatbot_route(self, app, component):
+        @app.route("/chat/<message>", methods=["POST"])
+        def inference(message):
+            try:
+                output = component["component"].model(message)
+                return {
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": message,
+                    "answer": output,
+                }
+            except Exception as ex:
+                return {"log": f"Inference failed: {ex}", "status": "500"}
+
     def run(self):
         app = Flask(__name__)
         CORS(app)  # Allows cross-origin requests
@@ -72,19 +86,7 @@ class Application:
 
         for component in self.components:
             if component["svelte_component"] == "Chatbot":
-
-                @app.route("/chat/<message>", methods=["POST"])
-                def inference(message):
-                    try:
-                        output = component["component"].model(message)
-                        return {
-                            "log": "Inference complete",
-                            "status": "200",
-                            "question": message,
-                            "answer": output,
-                        }
-                    except Exception as ex:
-                        return {"log": f"Inference failed: {ex}", "status": "500"}
+                self.create_chatbot_route(app, component)
 
         @app.route("/")
         def base():
