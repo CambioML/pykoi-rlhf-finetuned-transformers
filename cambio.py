@@ -77,12 +77,14 @@ class Application:
                 ]
             )
 
-        for id, data_source in self.data_sources.items():
-
+        def create_data_route(id, data_source):
             @app.route(f"/data/{id}", methods=["GET"], endpoint=id)
-            def get_data(id=id):  # Default argument to capture the current id
+            def get_data():
                 data = data_source.fetch_func()
                 return jsonify(data)
+
+        for id, data_source in self.data_sources.items():
+            create_data_route(id, data_source)
 
         for component in self.components:
             if component["svelte_component"] == "Chatbot":
