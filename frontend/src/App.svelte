@@ -14,7 +14,6 @@
     });
 </script>
 
-<p>hey</p>
 {#each $components as component}
   {#if component.svelte_component === "Chatbot"}
     <Chatbot {...component.props} />
@@ -24,3 +23,10 @@
     <Dropdown {...component.props} />
   {/if}
 {/each}
+<p class="footer-logo">Made with Cambio.</p>
+
+<style>
+  .footer-logo {
+    font-size: var(--smallText);
+  }
+</style>
