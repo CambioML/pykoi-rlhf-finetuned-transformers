@@ -120,38 +120,36 @@
 
   $: dots = ".".repeat(dotState).padEnd(3);
 
-  //   async function logVote(vote, index) {
-  //     const messageLog = $chatLog[index];
-  //     messageLog.vote = vote;
-  //     const feedbackUpdate = {
-  //       id: index,
-  //       vote: vote,
-  //     };
-  //     const response = await fetch(
-  //       "http://127.0.0.1:5000/preference_table/update",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(feedbackUpdate),
-  //       }
-  //     );
+  async function logVote(vote, index) {
+    const messageLog = $chatLog[index];
+    messageLog.vote = vote;
+    const feedbackUpdate = {
+      id: index,
+      vote: vote,
+    };
+    console.log(feedbackUpdate);
+    // const response = await fetch(
+    //   "http://127.0.0.1:5000/preference_table/update",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(feedbackUpdate),
+    //   }
+    // );
 
-  //     if (response.ok) {
-  //       console.log("update worked!", response);
-  //     } else {
-  //       const err = await response.text();
-  //       alert(err);
-  //     }
-  //   }
+    // if (response.ok) {
+    //   console.log("update worked!", response);
+    // } else {
+    //   const err = await response.text();
+    //   alert(err);
+    // }
+  }
 
   $: console.log("chat updated!", $chatLog);
 </script>
 
-{#if feedback}
-  <p>feedback</p>
-{/if}
 <section class="chatbox">
   <div class="chat-log">
     {#each $chatLog as message, index (index)}
@@ -166,14 +164,16 @@
           <div class="message-content">
             <p>Q: {message.question}</p>
             <p>A: {message.answer}</p>
-            <!-- <button
+            {#if feedback}
+              <button
                 on:click={() => logVote("good", index)}
                 class="small-button thumbs-up">👍</button
               >
               <button
                 on:click={() => logVote("bad", index)}
                 class="small-button thumbs-down">👎</button
-              > -->
+              >
+            {/if}
           </div>
         </div>
       </div>
@@ -184,7 +184,6 @@
     <form on:submit={askModel} class="chat-input-form">
       <input
         bind:value={messageplaceholder}
-        rows="1"
         class="chat-input-textarea"
         placeholder="Type Message Here"
       />
