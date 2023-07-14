@@ -11,11 +11,14 @@ def fetch_dropdown_data():
     return ["Option 1", "Option 2", "Option 3"]
 
 
-# Create a data source
-dropdown_data_source = DataSource("dropdown", fetch_dropdown_data)
+dropdown_data_source = DataSource("aaa", fetch_dropdown_data)
+dropdown = Dropdown(
+    "Dropdown",
+    dropdown_data_source,
+    value_column="Option 1",
+    data_endpoint="aaa",
+)
 
-# Create a dropdown component
-dropdown = Dropdown("Dropdown", dropdown_data_source, value_column="Option 1")
 
 # Create a chatbot component
 chatbot = Chatbot("Chatbot", uppercase_model, feedback=False)
