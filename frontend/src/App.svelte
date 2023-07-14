@@ -15,11 +15,12 @@
 </script>
 
 <p>hey</p>
+{#each $components as component}
+  {#if component.svelte_component === "Chatbot"}
+    <Chatbot />
+  {/if}
 
-{#if $components.includes("Chatbot")}
-  <Chatbot />
-{/if}
-
-{#if $components.includes("Dropdown")}
-  <Dropdown />
-{/if}
+  {#if component.svelte_component === "Dropdown"}
+    <Dropdown />
+  {/if}
+{/each}

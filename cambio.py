@@ -9,35 +9,40 @@ class DataSource:
 
 
 class Component:
-    def __init__(self, id, data_source):
+    def __init__(self, id, data_source, svelte_component):
         self.id = id
         self.data_source = data_source
+        self.svelte_component = svelte_component
 
 
 class Dropdown(Component):
     def __init__(self, id, data_source, value_column):
-        super().__init__(id, data_source)
+        super().__init__(id, data_source, "Dropdown")
         self.value_column = value_column
 
 
 class Chatbot(Component):
     def __init__(self, id, model):
-        print("id", id)
-        super().__init__(id, None)  # No data source
+        super().__init__(id, None, "Chatbot")  # No data source
         self.model = model
 
 
 class Application:
     def __init__(self):
         self.data_sources = {}
-        self.components = {}
+        self.components = []
 
     def add_data_source(self, data_source):
         self.data_sources[data_source.id] = data_source
 
     def add_component(self, component):
-        print("adding component", component)
-        self.components[component.id] = component
+        self.components.append(
+            {
+                "id": component.id,
+                "component": component,
+                "svelte_component": component.svelte_component,
+            }
+        )
 
     def run(self):
         app = Flask(__name__)
@@ -45,7 +50,15 @@ class Application:
 
         @app.route("/components", methods=["GET"])
         def get_components():
-            return jsonify(list(self.components.keys()))
+            return jsonify(
+                [
+                    {
+                        "id": component["id"],
+                        "svelte_component": component["svelte_component"],
+                    }
+                    for component in self.components
+                ]
+            )
 
         for id, data_source in self.data_sources.items():
 
@@ -54,14 +67,13 @@ class Application:
                 data = data_source.fetch_func()
                 return jsonify(data)
 
-        for id, component in self.components.items():
-            if isinstance(component, Chatbot):
+        for component in self.components:
+            if component["svelte_component"] == "Chatbot":
 
                 @app.route("/chat/<message>", methods=["POST"])
                 def inference(message):
                     try:
-                        output = component.model(message)
-                        print("6575675", output)
+                        output = component["component"].model(message)
                         return {
                             "log": "Inference complete",
                             "status": "200",
