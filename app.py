@@ -20,6 +20,20 @@ dropdown = Dropdown(
 )
 
 
+# Define a function that fetches data for dropdown
+def get_data():
+    return ["a", "b", "c"]
+
+
+ddata = DataSource("bbb", get_data)
+dropdown2 = Dropdown(
+    "Dropdown2",
+    ddata,
+    value_column="a",
+    data_endpoint="bbb",
+)
+
+
 # Create a chatbot component
 chatbot = Chatbot("Chatbot", uppercase_model, feedback=False)
 
@@ -28,10 +42,13 @@ app = Application()
 
 # Add the data source to the application
 app.add_data_source(dropdown_data_source)
+app.add_data_source(ddata)
 
 # Add the components to the application
 app.add_component(chatbot)
 app.add_component(dropdown)
+app.add_component(dropdown2)
+
 
 # Run the application
 app.run()
