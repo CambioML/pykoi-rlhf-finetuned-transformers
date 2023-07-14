@@ -9,21 +9,22 @@ class DataSource:
 
 
 class Component:
-    def __init__(self, id, data_source, svelte_component):
+    def __init__(self, id, data_source, svelte_component, **kwargs):
         self.id = id
         self.data_source = data_source
         self.svelte_component = svelte_component
+        self.props = kwargs
 
 
 class Dropdown(Component):
-    def __init__(self, id, data_source, value_column):
-        super().__init__(id, data_source, "Dropdown")
+    def __init__(self, id, data_source, value_column, **kwargs):
+        super().__init__(id, data_source, "Dropdown", **kwargs)
         self.value_column = value_column
 
 
 class Chatbot(Component):
-    def __init__(self, id, model):
-        super().__init__(id, None, "Chatbot")  # No data source
+    def __init__(self, id, model, **kwargs):
+        super().__init__(id, None, "Chatbot", **kwargs)  # No data source
         self.model = model
 
 
@@ -41,6 +42,7 @@ class Application:
                 "id": component.id,
                 "component": component,
                 "svelte_component": component.svelte_component,
+                "props": component.props,
             }
         )
 
@@ -55,6 +57,7 @@ class Application:
                     {
                         "id": component["id"],
                         "svelte_component": component["svelte_component"],
+                        "props": component["props"],
                     }
                     for component in self.components
                 ]

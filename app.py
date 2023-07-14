@@ -6,7 +6,7 @@ def uppercase_model(text):
     return text.upper()
 
 
-chatbot = Chatbot("Chatbot", uppercase_model)
+chatbot = Chatbot("Chatbot", uppercase_model, feedback=False)
 
 app = Application()
 

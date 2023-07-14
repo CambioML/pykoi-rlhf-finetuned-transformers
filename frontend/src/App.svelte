@@ -17,10 +17,10 @@
 <p>hey</p>
 {#each $components as component}
   {#if component.svelte_component === "Chatbot"}
-    <Chatbot />
+    <Chatbot {...component.props} />
   {/if}
 
   {#if component.svelte_component === "Dropdown"}
-    <Dropdown />
+    <Dropdown {...component.props} />
   {/if}
 {/each}
