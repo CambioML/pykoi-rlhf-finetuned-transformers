@@ -1,3 +1,5 @@
 node_modules
 *.todo
 package-lock.json
+
+__pycache__
