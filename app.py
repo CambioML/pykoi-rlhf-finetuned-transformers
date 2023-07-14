@@ -1,4 +1,4 @@
-from cambio import Chatbot, Application, Dropdown, DataSource
+from cambio import Chatbot, Application, Dropdown
 
 
 # Define a function that represents your model
@@ -11,12 +11,10 @@ def fetch_dropdown_data():
     return ["Option 1", "Option 2", "Option 3"]
 
 
-dropdown_data_source = DataSource("aaa", fetch_dropdown_data)
 dropdown = Dropdown(
     "Dropdown",
-    dropdown_data_source,
+    fetch_dropdown_data,
     value_column="Option 1",
-    data_endpoint="aaa",
 )
 
 
@@ -25,14 +23,11 @@ def get_data():
     return ["a", "b", "c"]
 
 
-ddata = DataSource("bbb", get_data)
 dropdown2 = Dropdown(
     "Dropdown2",
-    ddata,
+    get_data,
     value_column="a",
-    data_endpoint="bbb",
 )
-
 
 # Create a chatbot component
 chatbot = Chatbot("Chatbot", uppercase_model, feedback=False)
@@ -40,15 +35,10 @@ chatbot = Chatbot("Chatbot", uppercase_model, feedback=False)
 # Create the application
 app = Application()
 
-# Add the data source to the application
-app.add_data_source(dropdown_data_source)
-app.add_data_source(ddata)
-
 # Add the components to the application
 app.add_component(chatbot)
 app.add_component(dropdown)
 app.add_component(dropdown2)
-
 
 # Run the application
 app.run()

@@ -9,16 +9,16 @@ class DataSource:
 
 
 class Component:
-    def __init__(self, id, data_source, svelte_component, **kwargs):
+    def __init__(self, id, fetch_func, svelte_component, **kwargs):
         self.id = id
-        self.data_source = data_source
+        self.data_source = DataSource(id, fetch_func) if fetch_func else None
         self.svelte_component = svelte_component
         self.props = kwargs
 
 
 class Dropdown(Component):
-    def __init__(self, id, data_source, value_column, **kwargs):
-        super().__init__(id, data_source, "Dropdown", **kwargs)
+    def __init__(self, id, fetch_func, value_column, **kwargs):
+        super().__init__(id, fetch_func, "Dropdown", **kwargs)
         self.value_column = value_column
 
 
@@ -33,10 +33,12 @@ class Application:
         self.data_sources = {}
         self.components = []
 
-    def add_data_source(self, data_source):
-        self.data_sources[data_source.id] = data_source
-
     def add_component(self, component):
+        if component.data_source:
+            self.data_sources[component.id] = component.data_source
+            # set data_endpoint if it's a Dropdown component
+            if isinstance(component, Dropdown):
+                component.props["data_endpoint"] = component.id
         self.components.append(
             {
                 "id": component.id,
