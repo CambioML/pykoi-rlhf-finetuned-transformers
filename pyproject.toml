@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "plotano"
+version = "0.0.0"
+description = ""
+authors = ["CambioML <wanwanaiai45@gmail.com>"]
+license = "Apache"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "2.3.2"
+flask-cors = "4.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

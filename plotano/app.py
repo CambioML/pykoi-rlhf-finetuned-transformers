@@ -1,4 +1,4 @@
-from cambio import Chatbot, Application, Dropdown
+from plotano.cambio import Chatbot, Application, Dropdown
 
 
 # Define a function that represents your model

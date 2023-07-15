@@ -94,10 +94,10 @@ class Application:
 
         @app.route("/")
         def base():
-            return send_from_directory("frontend/dist", "index.html")
+            return send_from_directory("../frontend/dist", "index.html")
 
         @app.route("/<path:path>")
         def home(path):
-            return send_from_directory("frontend/dist", path)
+            return send_from_directory("../frontend/dist", path)
 
         app.run(debug=True)
