@@ -1,4 +1,9 @@
-from plotano.cambio import Chatbot, Application, Dropdown
+import os
+from plotano.cambio import (
+    Application,
+    Chatbot,
+    Dropdown)
+from plotano.llm.model_factory import ModelFactory
 
 
 # Define a function that represents your model
@@ -29,8 +34,14 @@ dropdown2 = Dropdown(
     value_column="a",
 )
 
+os.environ["OPENAI_API_KEY"] = ""
+if os.environ["OPENAI_API_KEY"] == "":
+    raise ValueError("OPENAI_API_KEY is not set")
+
 # Create a chatbot component
-chatbot = Chatbot("Chatbot", uppercase_model, feedback=False)
+chatbot = Chatbot("Chatbot",
+                  ModelFactory.create_model("openai").predict,
+                  feedback=False)
 
 # Create the application
 app = Application()
