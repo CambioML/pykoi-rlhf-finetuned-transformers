@@ -1,14 +1,27 @@
-To run:
 
-First:
+# Plotano
 
+## Setup
+```
+conda create -n plotano python=3.10
+conda activate plotano
+cd plotano
+pip3 install poetry
+poetry install --no-root
+```
+## Run
+```
+python -m plotano.app
+```
+
+## Development
+Frontend:
 ```
 cd frontend
 npm run build
 ```
 
-Then:
-
+Backend:
 ```
-python app.py
+python -m plotano.app
 ```
