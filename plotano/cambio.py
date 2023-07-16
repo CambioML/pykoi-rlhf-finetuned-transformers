@@ -1,7 +1,61 @@
 import uuid
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
+import openai
+
+# from gpt4all import GPT4All
+
+
+# class GPT4AllModel:
+#     def __init__(self, model_path, max_tokens=3):
+#         self.model = GPT4All(model_path)
+#         self.max_tokens = max_tokens
+
+#     def predict(self, message):
+#         output = self.model.generate(message, max_tokens=self.max_tokens)
+#         return output
+
+
+class FunctionModel:
+    def __init__(self, func):
+        self.func = func
+
+    def predict(self, prompt):
+        return self.func(prompt)
+
+
+class OpenAIModel:
+    def __init__(self, api_key, engine="davinci", max_tokens=100, temperature=0.5):
+        openai.api_key = api_key
+        self.engine = engine
+        self.max_tokens = max_tokens
+        self.temperature = temperature
+
+    def predict(self, message):
+        prompt = f"Question: {message}\nAnswer:"
+        response = openai.Completion.create(
+            engine=self.engine,
+            prompt=prompt,
+            max_tokens=self.max_tokens,
+            n=1,
+            stop=None,
+            temperature=self.temperature,
+        )
+        return response.choices[0].text.split("\n")[0]
+
+
+class ModelFactory:
+    @staticmethod
+    def create_model(model_type, **kwargs):
+        if model_type.lower() == "openai":
+            return OpenAIModel(**kwargs)
+        elif model_type.lower() == "gpt4all":
+            return GPT4AllModel(**kwargs)
+        elif model_type.lower() == "function":
+            return FunctionModel(**kwargs)
+        else:
+            raise ValueError(f"Unknown model type: {model_type}")
 
 
 class DataSource:
@@ -54,7 +108,8 @@ class Application:
         @app.route("/chat/<message>", methods=["POST"])
         def inference(message):
             try:
-                output = component["component"].model(message)
+                output = component["component"].model.predict(message)
+
                 return {
                     "log": "Inference complete",
                     "status": "200",
