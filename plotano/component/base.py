@@ -14,6 +14,7 @@ class Component:
         self.svelte_component = svelte_component
         self.props = kwargs
 
+
 class Dropdown(Component):
     def __init__(self, fetch_func, value_column, **kwargs):
         super().__init__(fetch_func, "Dropdown", **kwargs)
