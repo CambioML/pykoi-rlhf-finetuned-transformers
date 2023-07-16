@@ -4,7 +4,7 @@ from plotano.llm.model_factory import ModelFactory
 
 
 # enter openai api key here
-api_key = "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"
+api_key = ""
 
 # Creating an OpenAI model
 openai_model = ModelFactory.create_model(
