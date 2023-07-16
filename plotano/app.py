@@ -1,55 +1,40 @@
-import os
-from plotano.cambio import (
-    Application,
-    Chatbot,
-    Dropdown)
-from plotano.llm.model_factory import ModelFactory
+from plotano.cambio import Application, Chatbot, ModelFactory
 
+apikey = ""
 
-# Define a function that represents your model
-def uppercase_model(text):
-    return text.upper()
+# Creating an OpenAI model
+openai_model = ModelFactory.create_model("openai", api_key=apikey)
 
+# Creating a chatbot with the OpenAI model
+chatbot = Chatbot(openai_model)
 
-# Define a function that fetches data for dropdown
-def fetch_dropdown_data():
-    return ["Option 1", "Option 2", "Option 3"]
-
-
-dropdown = Dropdown(
-    "Dropdown",
-    fetch_dropdown_data,
-    value_column="Option 1",
-)
-
-
-# Define a function that fetches data for dropdown
-def get_data():
-    return ["a", "b", "c"]
-
-
-dropdown2 = Dropdown(
-    "Dropdown2",
-    get_data,
-    value_column="a",
-)
-
-os.environ["OPENAI_API_KEY"] = ""
-if os.environ["OPENAI_API_KEY"] == "":
-    raise ValueError("OPENAI_API_KEY is not set")
-
-# Create a chatbot component
-chatbot = Chatbot("Chatbot",
-                  ModelFactory.create_model("openai").predict,
-                  feedback=False)
-
+# Starting the application (assuming the app is an instance of the Application class)
 # Create the application
 app = Application()
-
-# Add the components to the application
 app.add_component(chatbot)
-app.add_component(dropdown)
-app.add_component(dropdown2)
-
-# Run the application
 app.run()
+
+
+# def uppercaseText(text):
+#     return text.upper()
+
+
+# uppercase_model = ModelFactory.create_model(uppercaseText)
+
+# uppercase_chatbot = Chatbot(uppercase_model)
+
+# app = Application()
+# app.add_component(uppercase_chatbot)
+# app.run()
+
+# Creating a GPT4All model
+# gpt4all_model = ModelFactory.create_model(
+#     "gpt4all", model_path="orca-mini-3b.ggmlv3.q4_0.bin", max_tokens=3
+# )
+
+# # Creating a chatbot with the GPT4All model
+# chatbot = Chatbot(gpt4all_model)
+
+# app = Application()
+# app.add_component(chatbot)
+# app.run()
