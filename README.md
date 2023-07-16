@@ -11,7 +11,7 @@ poetry install --no-root
 ```
 ## Run
 ```
-python -m plotano.app
+python -m example.openai_chatbot
 ```
 
 ## Development
@@ -23,5 +23,5 @@ npm run build
 
 Backend:
 ```
-python -m plotano.app
+python -m example.openai_chatbot
 ```
