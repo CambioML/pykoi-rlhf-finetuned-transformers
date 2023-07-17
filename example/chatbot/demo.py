@@ -5,7 +5,7 @@ import plotano.cambio as cb
 # # Creating an OpenAI model (requires an OpenAI API key) #
 ###########################################################
 # enter openai api key here
-api_key = ""
+api_key = "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"
 
 # Creating an OpenAI model
 model = cb.ModelFactory.create_model(
@@ -30,6 +30,6 @@ chatbot = cb.Chatbot(model)
 # Starting the application and add chatbot as a component #
 ###########################################################
 # Create the application
-app = cb.Application()
+app = cb.Application(debug=False)
 app.add_component(chatbot)
 app.run()

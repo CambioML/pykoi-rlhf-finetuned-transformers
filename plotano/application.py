@@ -4,7 +4,8 @@ from plotano.component.base import Dropdown
 
 
 class Application:
-    def __init__(self):
+    def __init__(self, debug: bool = False):
+        self._debug = debug
         self.data_sources = {}
         self.components = []
 
@@ -75,6 +76,6 @@ class Application:
         @app.route("/<path:path>")
         def home(path):
             return send_from_directory("../frontend/dist", path)
-        # TODO: debug mode should be set to False in production because
-        # it will start two processes.
-        app.run(debug=True)
+        # debug mode should be set to False in production because
+        # it will start two processes when debug mode is enabled.
+        app.run(debug=self._debug)
