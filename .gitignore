@@ -168,3 +168,6 @@ cython_debug/
 
 # ec2
 *.pem
+
+# db
+*.db
