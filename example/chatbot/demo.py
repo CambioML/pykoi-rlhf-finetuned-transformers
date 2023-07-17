@@ -5,7 +5,7 @@ import plotano.cambio as cb
 # # Creating an OpenAI model (requires an OpenAI API key) #
 ###########################################################
 # enter openai api key here
-api_key = "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"
+api_key = ""
 
 # Creating an OpenAI model
 model = cb.ModelFactory.create_model(
