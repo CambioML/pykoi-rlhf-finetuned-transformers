@@ -11,7 +11,7 @@ poetry install --no-root
 ```
 ## Run
 ```
-python -m example.openai_chatbot
+python -m example.chatbot.demo
 ```
 
 ## Development
@@ -23,5 +23,5 @@ npm run build
 
 Backend:
 ```
-python -m example.openai_chatbot
+python -m example.chatbot.demo
 ```

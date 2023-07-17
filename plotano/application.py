@@ -75,5 +75,6 @@ class Application:
         @app.route("/<path:path>")
         def home(path):
             return send_from_directory("../frontend/dist", path)
-
+        # TODO: debug mode should be set to False in production because
+        # it will start two processes.
         app.run(debug=True)
