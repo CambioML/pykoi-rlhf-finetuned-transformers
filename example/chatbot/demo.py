@@ -24,7 +24,10 @@ model = cb.ModelFactory.create_model(
 #####################################
 # Creating a chatbot with the model #
 #####################################
-chatbot = cb.Chatbot(model)
+database = cb.QuestionAnswerDatabase(debug=True)
+chatbot = cb.Chatbot(
+    model=model,
+    database=database)
 
 ###########################################################
 # Starting the application and add chatbot as a component #

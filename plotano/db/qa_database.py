@@ -1,19 +1,39 @@
 """Question answer database module"""
 import sqlite3
+import os
+import threading
 
 
 class QuestionAnswerDatabase:
     """Question Answer Database class"""
 
-    def __init__(self, db_file: str):
+    def __init__(self,
+                 db_file: str = os.path.join(os.getcwd(), 'qd.db'),
+                 debug: bool = False):
         """
         Initializes a new instance of the QuestionAnswerDatabase class.
 
         Args:
             db_file (str): The path to the SQLite database file.
+            debug (bool, optional): Whether to print debug messages. Defaults to False.
         """
-        self._conn = sqlite3.connect(db_file)
+        self._db_file = db_file
+        self._debug = debug
+        self._local = threading.local()  # Thread-local storage
+        self._lock = threading.Lock()  # Lock for concurrent write operations
         self.create_table()
+
+    def get_connection(self):
+        """Returns the thread-local database connection"""
+        if not hasattr(self._local, "connection"):
+            self._local.connection = sqlite3.connect(self._db_file)
+        return self._local.connection
+
+    def get_cursor(self):
+        """Returns the thread-local database cursor"""
+        if not hasattr(self._local, "cursor"):
+            self._local.cursor = self.get_connection().cursor()
+        return self._local.cursor
 
     def create_table(self):
         """
@@ -29,8 +49,15 @@ class QuestionAnswerDatabase:
             vote_status TEXT CHECK (vote_status IN ('up', 'down', 'n/a'))
         );
         """
-        self._conn.execute(query)
-        self._conn.commit()
+        with self._lock:
+            cursor = self.get_cursor()
+            cursor.execute(query)
+            self.get_connection().commit()
+
+        if self._debug:
+            rows = self.retrieve_all_question_answers()
+            print("Table contents after creating table:")
+            self.print_table(rows)
 
     def insert_question_answer(self, question: str, answer: str):
         """
@@ -49,9 +76,15 @@ class QuestionAnswerDatabase:
         INSERT INTO question_answer (question, answer, vote_status)
         VALUES (?, ?, 'n/a');
         """
-        cursor = self._conn.cursor()
-        cursor.execute(query, (question, answer))
-        self._conn.commit()
+        with self._lock:
+            cursor = self.get_cursor()
+            cursor.execute(query, (question, answer))
+            self.get_connection().commit()
+
+        if self._debug:
+            rows = self.retrieve_all_question_answers()
+            print("Table contents after inserting table:")
+            self.print_table(rows)
 
         return cursor.lastrowid
 
@@ -71,12 +104,18 @@ class QuestionAnswerDatabase:
         SET vote_status = ?
         WHERE id = ?;
         """
-        cursor = self._conn.cursor()
-        cursor.execute(query, (vote_status, id))
-        self._conn.commit()
+        with self._lock:
+            cursor = self.get_cursor()
+            cursor.execute(query, (vote_status, id))
+            self.get_connection().commit()
 
         if cursor.rowcount == 0:
             raise ValueError(f"Question with ID {id} does not exist.")
+
+        if self._debug:
+            rows = self.retrieve_all_question_answers()
+            print("Table contents after updating table:")
+            self.print_table(rows)
 
     def retrieve_all_question_answers(self):
         """
@@ -88,12 +127,24 @@ class QuestionAnswerDatabase:
         query = """
         SELECT * FROM question_answer;
         """
-        cursor = self._conn.execute(query)
-        rows = cursor.fetchall()
+        with self._lock:
+            cursor = self.get_cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
         return rows
 
     def close_connection(self):
         """
         Closes the connection to the database.
         """
-        self._conn.close()
+        if hasattr(self._local, "cursor"):
+            self._local.cursor.close()
+            del self._local.cursor
+        if hasattr(self._local, "connection"):
+            self._local.connection.close()
+            del self._local.connection
+
+    def print_table(self, rows):
+        for row in rows:
+            print(f"ID: {row[0]}, Question: {row[1]}, "
+                  f"Answer: {row[2]}, Vote Status: {row[3]}")
