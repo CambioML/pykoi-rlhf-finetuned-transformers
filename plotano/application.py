@@ -1,4 +1,8 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import (
+    Flask,
+    jsonify,
+    send_from_directory,
+    request)
 from flask_cors import CORS
 from plotano.component.base import Dropdown
 
@@ -29,8 +33,12 @@ class Application:
         def inference(message):
             try:
                 output = component["component"].model.predict(message)
-
+                # insert question and answer into database
+                id = component["component"].database.insert_question_answer(
+                    message,
+                    output)
                 return {
+                    "id": id,
                     "log": "Inference complete",
                     "status": "200",
                     "question": message,
@@ -38,6 +46,36 @@ class Application:
                 }
             except Exception as ex:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
+
+        @app.route("/chat/qa_table/update", methods=["POST"])
+        def update_qa_table():
+            try:
+                request_body = request.get_json()
+                component["component"].database.update_vote_status(
+                    request_body["id"], request_body["vote_status"]
+                )
+                return {"log": "Table updated", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.route("/chat/qa_table/retrieve", methods=["GET"])
+        def retrieve_qa_table():
+            try:
+                rows = component["component"].database.retrieve_all_question_answers()
+                return {"rows": rows,
+                        "log": "Table retrieved",
+                        "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table retrieval failed: {ex}", "status": "500"}
+
+        @app.route("/chat/qa_table/close", methods=["GET"])
+        def close_qa_table():
+            try:
+                component["component"].database.close_connection()
+                return {"log": "Table closed",
+                        "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table close failed: {ex}", "status": "500"}
 
     def run(self):
         app = Flask(__name__)

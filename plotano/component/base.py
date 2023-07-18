@@ -22,6 +22,7 @@ class Dropdown(Component):
 
 
 class Chatbot(Component):
-    def __init__(self, model, **kwargs):
+    def __init__(self, model, database=None, **kwargs):
         super().__init__(None, "Chatbot", **kwargs)  # No data source
         self.model = model
+        self.database = database
