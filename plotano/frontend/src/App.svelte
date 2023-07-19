@@ -3,16 +3,18 @@
   import { writable } from "svelte/store";
   import Chatbot from "./Chatbot.svelte";
   import Dropdown from "./Dropdown.svelte";
+  import Feedback from "./Feedback.svelte";
 
   const components = writable([]);
 
   fetch("/components")
     .then((response) => response.json())
     .then((data) => {
-      console.log("component", data);
       components.set(data);
     });
 </script>
+
+<!-- <Feedback /> -->
 
 {#each $components as component}
   {#if component.svelte_component === "Chatbot"}
@@ -23,10 +25,13 @@
     <Dropdown {...component.props} />
   {/if}
 {/each}
-<p class="footer-logo">Made with Cambio.</p>
+<p class="footer-logo">Made with CambioML</p>
 
 <style>
   .footer-logo {
     font-size: var(--smallText);
+    margin: auto;
+    width: 100%;
+    margin-top: 1rem;
   }
 </style>
