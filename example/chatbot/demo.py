@@ -29,6 +29,16 @@ chatbot = cb.Chatbot(model=model, database=database, feedback=True)
 # Starting the application and add chatbot as a component #
 ###########################################################
 # Create the application
-app = cb.Application(debug=False)
+
+# uncomment to launch app with sharing url
+app = cb.Application(
+    share=True,
+    debug=False)
+
+# without sharing url
+# app = cb.Application(
+#     share=False,
+#     debug=False)
+
 app.add_component(chatbot)
 app.run()

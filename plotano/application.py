@@ -1,11 +1,16 @@
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from plotano.component.base import Dropdown
+from pyngrok import ngrok
 
 
 class Application:
-    def __init__(self, debug: bool = False):
+    def __init__(
+            self,
+            share: bool = False,
+            debug: bool = False):
         self._debug = debug
+        self._share = share
         self.data_sources = {}
         self.components = []
 
@@ -110,4 +115,15 @@ class Application:
 
         # debug mode should be set to False in production because
         # it will start two processes when debug mode is enabled.
-        app.run(debug=self._debug)
+
+        # Set the ngrok tunnel if share is True
+        if self._share:
+            public_url = ngrok.connect("http://127.0.0.1:5000")
+            print('Public URL:', public_url)
+
+            app.run(debug=self._debug)
+
+            print("Stopping server...")
+            ngrok.disconnect(public_url)
+        else:
+            app.run(debug=self._debug)
