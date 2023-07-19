@@ -108,7 +108,11 @@ class RLHFConfig:
     fp16: Optional[bool] = field(default=True, metadata={"help": "Enable FP16."})
     bf16: Optional[bool] = field(default=False, metadata={"help": "Enable BF16."})
     load_in_8bit: Optional[bool] = field(default=True, metadata={"help": "Whether load the model weights in 8-bit or not."})
-    # device_map ## TODO
+    device_map: Optional[dict] = field(
+        default={"": Accelerator().process_index},
+        metadata={"help": "specify the mapping of model layers to specific devices, such as different GPUs \
+                  in a multi-GPU setup. This can be helpful for distributing the computational load of a \
+                  large model across multiple GPUs."})
     gradient_checkpointing: Optional[bool] = field(
         default=False, 
         metadata={"help": "Enable gradient checkpointing."})
@@ -139,7 +143,7 @@ class RLHFConfig:
     )
     answer_title: str = field(
         default="Answer",
-        metadata={"help": "the column name of answers from the database."} ## TODO: e.g. response_j
+        metadata={"help": "the column name of answers from the database."}
     )
     size_valid_set: int = field(
         default=4000, 
@@ -310,7 +314,7 @@ class SFT(Trainer):
         self.model = AutoModelForCausalLM.from_pretrained(
             self._rlhf_config.base_model_path, 
             load_in_8bit=self._rlhf_config.load_in_8bit, 
-            device_map={"": Accelerator().process_index} ## TODO
+            device_map=self._rlhf_config.device_map
         )
 
         self.trainer = SFTTrainer(
@@ -325,7 +329,7 @@ class SFT(Trainer):
     def train(self):
         self.trainer.train()
 
-    def merge_lora(self, output_path=None):
+    def merge_lora(self, output_path=None): #TODO
 
         """
         # assuming your base model is the model with the pretrained weights 
@@ -340,11 +344,11 @@ class SFT(Trainer):
         if self._rlhf_config.lora_config_rl.task_type == "SEQ_CLS":
             # peft is for reward model so load sequence classification
             base_model = AutoModelForSequenceClassification.from_pretrained(
-                base_model_name, num_labels=1, torch_dtype=torch.bfloat16 ## TODO
+                base_model_name, num_labels=1, torch_dtype=torch.bfloat16 
             )
         elif self._rlhf_config.lora_config_rl.task_type == "CAUSAL_LM": 
             base_model = AutoModelForCausalLM.from_pretrained(
-                base_model_name, return_dict=True, torch_dtype=torch.bfloat16 ## TODO
+                base_model_name, return_dict=True, torch_dtype=torch.bfloat16
             )
         else:
             raise ValueError("Invalid task_type in lora_config")
@@ -377,14 +381,12 @@ class SFT(Trainer):
                   merge_base_and_lora=merge_weights)
         
         
-    ## TODO: using source code from "supervised_finetuneing.py", need to rewrite to our own `utils.py`
     def prepare_sample_text(self, example):
         """Prepare the text from a sample of the dataset."""
         text = f"Question: {example[self._rlhf_config.question_title]}\n\n\
             Answer: {example[self._rlhf_config.answer_title]}"
         return text
 
-    ## TODO: using source code from "supervised_finetuneing.py", need to rewrite to our own `utils.py`
     def create_datasets(self, tokenizer, args):
         if self._rlhf_config.dataset_type == "huggingface":
             dataset = load_dataset(
@@ -400,21 +402,13 @@ class SFT(Trainer):
         else:
             raise FileNotFoundError(f"No (supported) data files or dataset script found {self._rlhf_config.dataset_type}")
 
-        # if args.streaming:
-        #     print("Loading the dataset in streaming mode")
-        #     eval_data = dataset.take(args.size_valid_set)
-        #     train_data = dataset.skip(args.size_valid_set)
-        #     # if args.train_subset > 0:
-        #     #     train_data = train_data.select(range(args.train_subset)) ## TODO
-        #     train_data = train_data.shuffle(buffer_size=args.shuffle_buffer, seed=args.seed)
-        # else:
         dataset = dataset[self._rlhf_config.split] # Convert DatasetDict to Dataset
         dataset = dataset.train_test_split(test_size=0.1, seed=args.seed)
         train_data = dataset["train"]
         eval_data = dataset["test"]
         print(f"Size of the train set: {len(train_data)}. Size of the validation set: {len(eval_data)}")
 
-        # chars_per_token = chars_token_ratio(train_data, tokenizer)
+        # chars_per_token = chars_token_ratio(train_data, tokenizer) ## TODO
         # print(f"The character to token ratio of the dataset is: {chars_per_token:.2f}")
 
         ## `ConstantLengthDataset` is used for efficient training: we concatenate a lot of 
@@ -438,3 +432,211 @@ class SFT(Trainer):
         )
         # return train_dataset, eval_dataset
         return {"train": train_dataset, "eval": eval_dataset}
+
+
+############################################################
+## Step 2: Reward Trainer
+############################################################
+
+
+# We need to define a special data collator that batches the ranking data.
+@dataclass
+class RewardDataCollatorWithPadding:
+    def __init__(self, tokenizer, max_length):
+        self.tokenizer=tokenizer
+        self.max_length: Optional[int] = max_length
+        self.padding = True
+        self.pad_to_multiple_of: Optional[int] = None
+        self.return_tensors: str = "pt"
+
+    def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, Any]:
+        features_j = []
+        features_k = []
+        for feature in features:
+            features_j.append(
+                {
+                    "input_ids": feature["input_ids_j"],
+                    "attention_mask": feature["attention_mask_j"],
+                }
+            )
+            features_k.append(
+                {
+                    "input_ids": feature["input_ids_k"],
+                    "attention_mask": feature["attention_mask_k"],
+                }
+            )
+        batch_j = self.tokenizer.pad(
+            features_j,
+            padding=self.padding,
+            max_length=self.max_length,
+            pad_to_multiple_of=self.pad_to_multiple_of,
+            return_tensors=self.return_tensors,
+        )
+        batch_k = self.tokenizer.pad(
+            features_k,
+            padding=self.padding,
+            max_length=self.max_length,
+            pad_to_multiple_of=self.pad_to_multiple_of,
+            return_tensors=self.return_tensors,
+        )
+        batch = {
+            "input_ids_j": batch_j["input_ids"],
+            "attention_mask_j": batch_j["attention_mask"],
+            "input_ids_k": batch_k["input_ids"],
+            "attention_mask_k": batch_k["attention_mask"],
+            "return_loss": True,
+        }
+        return batch
+
+    
+class RewardTrainer(Trainer):
+    def __init__(self, rlhf_config: RLHFConfig):
+        self._rlhf_config = rlhf_config
+        self.args = TrainingArguments(
+            output_dir=rlhf_config.output_dir,
+            learning_rate=rlhf_config.learning_rate,
+            per_device_train_batch_size=rlhf_config.per_device_train_batch_size,
+            per_device_eval_batch_size=rlhf_config.per_device_eval_batch_size,
+            num_train_epochs=rlhf_config.num_train_epochs,
+            weight_decay=rlhf_config.weight_decay,
+            # evaluation_strategy="steps",
+            # eval_steps=500,
+            # save_strategy="steps",
+            # save_steps=500,
+            gradient_accumulation_steps=rlhf_config.gradient_accumulation_steps,
+            gradient_checkpointing=rlhf_config.gradient_checkpointing,
+            # deepspeed=rlhf_config.deepspeed, 
+            local_rank=rlhf_config.local_rank,
+            remove_unused_columns=rlhf_config.remove_unused_columns,
+            label_names=rlhf_config.label_names,
+            bf16=rlhf_config.bf16,
+            logging_strategy=rlhf_config.logging_strategy,
+            logging_steps=rlhf_config.logging_steps,
+            # optim=rlhf_config.optim,
+            # lr_scheduler_type=rlhf_config.lr_scheduler_type_rw
+        )
+        ## Load the tokenizer and the model 
+        self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.reward_model_path)
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        self.base_model = AutoModelForSequenceClassification.from_pretrained(
+            rlhf_config.reward_model_path, 
+            num_labels=1,
+            torch_dtype=torch.bfloat16, ## TODO
+            load_in_8bit=rlhf_config.load_in_8bit,
+            # device_map={"": Accelerator().process_index} ## TODO
+        )
+        self.model = get_peft_model(self.base_model, rlhf_config.lora_config_reward)
+        self.model.print_trainable_parameters()
+        self.model.config.pad_token_id = self.tokenizer.eos_token_id
+        self.model.config.use_cache = not rlhf_config.gradient_checkpointing
+        self.num_proc = self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
+        
+        self.train_dataset = self.create_datasets(rlhf_config.dataset_reward_train,
+                                                  rlhf_config.dataset_subset_reward_train)
+        self.eval_dataset = self.create_datasets(rlhf_config.dataset_reward_eval,
+                                                  rlhf_config.dataset_subset_reward_eval)
+        # self.callbacks = rlhf_config.callbacks
+        self.compute_metrics = self._compute_metrics
+        self.data_collator=RewardDataCollatorWithPadding(
+                tokenizer=self.tokenizer, 
+                max_length=self._rlhf_config.max_seq_length)
+        super().__init__(
+            model=self.model,
+            args=self.args,
+            data_collator=self.data_collator,
+            train_dataset=self.train_dataset,
+            eval_dataset=self.eval_dataset,
+            tokenizer=self.tokenizer,
+            # model_init=self.model_init,
+            compute_metrics=self.compute_metrics,
+            # callbacks=rlhf_config.callbacks,
+            # optimizers=rlhf_config.optim,
+            # preprocess_logits_for_metrics=preprocess_logits_for_metrics,
+        )
+        
+
+    def _preprocess_function(self, examples):
+        """
+        Turn the dataset into pairs of post + summaries, where text_j is the preferred 
+        question + answer and text_k is the other. Then tokenize the dataset.
+        """
+        new_examples = {
+            "input_ids_j": [],
+            "attention_mask_j": [],
+            "input_ids_k": [],
+            "attention_mask_k": [],
+        }
+        for question, response_j, response_k in zip(
+            examples["question"], examples["response_j"], examples["response_k"]):
+            tokenized_j = self.tokenizer(
+                "Question: " + question + "\n\nAnswer: " + response_j, 
+                truncation=True)
+            tokenized_k = self.tokenizer(
+                "Question: " + question + "\n\nAnswer: " + response_k, 
+                truncation=True)
+
+            new_examples["input_ids_j"].append(tokenized_j["input_ids"])
+            new_examples["attention_mask_j"].append(tokenized_j["attention_mask"])
+            new_examples["input_ids_k"].append(tokenized_k["input_ids"])
+            new_examples["attention_mask_k"].append(tokenized_k["attention_mask"])
+
+        return new_examples
+
+
+    def create_datasets(self, data_dir, num_of_data):
+        # Load the dataset for tuning the reward model
+        dataset = load_dataset(
+            self._rlhf_config.dataset_name,
+            data_dir=data_dir,
+            split=self._rlhf_config.split
+        )
+        if num_of_data > 0:
+            dataset = dataset.select(range(num_of_data))
+
+        original_columns = dataset.column_names
+
+        # Preprocess the dataset and filter out QAs that are longer than max_length
+        dataset = dataset.map(
+            self._preprocess_function,
+            batched=True,
+            num_proc=self.num_proc,
+            remove_columns=original_columns,
+        )
+        dataset = dataset.filter(
+            lambda x: len(x["input_ids_j"]) <= self._rlhf_config.max_seq_length
+                      and len(x["input_ids_k"]) <= self._rlhf_config.max_seq_length
+        )
+
+        return dataset
+    
+    # Define how to compute the reward loss. We use the InstructGPT pairwise logloss: https://arxiv.org/abs/2203.02155
+    def compute_loss(self, model, inputs, return_outputs=False):
+        rewards_j = model(input_ids=inputs["input_ids_j"], attention_mask=inputs["attention_mask_j"])[0]
+        rewards_k = model(input_ids=inputs["input_ids_k"], attention_mask=inputs["attention_mask_k"])[0]
+        loss = -torch.nn.functional.logsigmoid(rewards_j - rewards_k).mean()
+        if return_outputs:
+            return loss, {"rewards_j": rewards_j, "rewards_k": rewards_k}
+        return loss
+    
+    def _compute_metrics(self, eval_pred):
+        predictions, _ = eval_pred
+        # Here, predictions is rewards_j and rewards_k.
+        # We want to see how much of the time rewards_j > rewards_k.
+        predictions = np.argmax(predictions, axis=0)
+        labels = np.zeros(predictions.shape)
+        accuracy = evaluate.load("accuracy")
+        return accuracy.compute(predictions=predictions, references=labels)
+
+
+    def save(self, output_path=None):   
+        if output_path is None:
+            output_path = os.path.join(
+                self._rlhf_config.output_dir, 
+                self._rlhf_config.reward_merged_path)
+        self.save_model(output_path) 
+
+
+    def train_and_save(self, output_path=None):
+        self.model.train()
+        self.save(output_path)
