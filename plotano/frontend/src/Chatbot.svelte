@@ -1,6 +1,5 @@
 <script>
-  //   import logo from "$lib/images/logo.svg";
-  import { writable } from "svelte/store";
+  import { chatLog } from "./store";
   import { onMount } from "svelte";
 
   export let feedback = false;
@@ -8,63 +7,52 @@
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
-  export const chatLog = writable([
-    {
-      id: 1,
-      question: "What is this?",
-      answer: "This is the chat interface.",
-      vote: "na",
-    },
-    {
-      id: 1,
-      question: "How do I use it?",
-      answer: "Just type in a question below!",
-      vote: "na",
-    },
-  ]);
 
   onMount(() => {
-    console.log("here we go");
-    // if ($chatLog.length < 1) {
-    //   getDataFromDB();
-    // }
+    getDataFromDB();
   });
 
-  //   async function getDataFromDB() {
-  //     console.log("fetching data from db");
-  //     const response = await fetch("http://127.0.0.1:5000/preference_table/get");
-  //     const data = await response.json();
-  //     const db = data["preference_result"];
-  //     // db doesn't appear to be updating correctly...
-  //     $chatLog = [...db];
-  //     console.log("db", db);
-  //   }
+  async function getDataFromDB() {
+    console.log("fetching data from db");
+    const response = await fetch(
+      "http://127.0.0.1:5000/chat/qa_table/retrieve"
+    );
+    const data = await response.json();
+    const dbRows = data["rows"];
+    const formattedRows = dbRows.map((row) => ({
+      id: row[0],
+      question: row[1],
+      answer: row[2],
+      vote_status: row[3],
+    }));
+    $chatLog = [...formattedRows];
+  }
 
   // insert entry into database
-  //   async function insertToDatabase(entry) {
-  //     console.log("INSERT");
-  //     console.log("entry", entry);
-  //     const response = await fetch(
-  //       "http://127.0.0.1:5000/preference_table/insert",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(entry),
-  //       }
-  //     );
-
-  //     if (response.ok) {
-  //       console.log("ok! data inserted", response);
-  //       console.log("entry", entry);
-  //       // update chatlog
-  //       // $chatLog = [...$chatLog, entry];
-  //     } else {
-  //       const err = await response.text();
-  //       alert(err);
+  // async function insertToDatabase(entry) {
+  //   console.log("INSERT");
+  //   console.log("entry", entry);
+  //   const response = await fetch(
+  //     "http://127.0.0.1:5000/preference_table/insert",
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(entry),
   //     }
+  //   );
+
+  //   if (response.ok) {
+  //     console.log("ok! data inserted", response);
+  //     console.log("entry", entry);
+  //     // update chatlog
+  //     // $chatLog = [...$chatLog, entry];
+  //   } else {
+  //     const err = await response.text();
+  //     alert(err);
   //   }
+  // }
 
   const askModel = async (event) => {
     event.preventDefault(); // Prevents page refresh
@@ -75,7 +63,7 @@
       id: $chatLog.length + 1,
       question: mymessage,
       answer: "Loading...",
-      vote: "na",
+      vote_status: "na",
     };
     console.log("adding to log here");
     $chatLog = [...$chatLog, currentEntry];
@@ -125,26 +113,23 @@
     messageLog.vote = vote;
     const feedbackUpdate = {
       id: index,
-      vote: vote,
+      vote_status: vote,
     };
     console.log(feedbackUpdate);
-    // const response = await fetch(
-    //   "http://127.0.0.1:5000/preference_table/update",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(feedbackUpdate),
-    //   }
-    // );
+    const response = await fetch("http://127.0.0.1:5000/chat/qa_table/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(feedbackUpdate),
+    });
 
-    // if (response.ok) {
-    //   console.log("update worked!", response);
-    // } else {
-    //   const err = await response.text();
-    //   alert(err);
-    // }
+    if (response.ok) {
+      console.log("update worked!", response);
+    } else {
+      const err = await response.text();
+      alert(err);
+    }
   }
 
   $: console.log("chat updated!", $chatLog);
@@ -166,11 +151,11 @@
             <p>A: {message.answer}</p>
             {#if feedback}
               <button
-                on:click={() => logVote("good", index)}
+                on:click={() => logVote("up", index)}
                 class="small-button thumbs-up">👍</button
               >
               <button
-                on:click={() => logVote("bad", index)}
+                on:click={() => logVote("down", index)}
                 class="small-button thumbs-down">👎</button
               >
             {/if}
