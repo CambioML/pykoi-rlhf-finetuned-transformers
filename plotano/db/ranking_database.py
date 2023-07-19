@@ -1,21 +1,21 @@
-"""Question answer database module"""
+# This file contains the RankingDatabase class which is used to store and retrieve
 import csv
 import os
 import sqlite3
 import threading
 
 
-CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status')
+CSV_HEADER = ('ID', 'Question', 'Answer', 'Ranking')
 
 
-class QuestionAnswerDatabase:
-    """Question Answer Database class"""
+class RankingDatabase:
+    """Ranking Database class"""
 
     def __init__(self,
-                 db_file: str = os.path.join(os.getcwd(), 'qd.db'),
+                 db_file: str = os.path.join(os.getcwd(), 'ranking.db'),
                  debug: bool = False):
         """
-        Initializes a new instance of the QuestionAnswerDatabase class.
+        Initializes a new instance of the RankingDatabase class.
 
         Args:
             db_file (str): The path to the SQLite database file.
@@ -41,16 +41,16 @@ class QuestionAnswerDatabase:
 
     def create_table(self):
         """
-        Creates the question_answer table if it does not already exist in the database.
-        The table has four columns: id (primary key), question, answer, and vote_status.
-        vote_status is a text field that can only have the values 'up', 'down', or 'n/a'.
+        Creates the ranking table if it does not already exist in the database.
+        The table has four columns: id (primary key), question, answer, and ranking.
+        The ranking column is constrained to only allow the values 1 and 2.
         """
         query = """
-        CREATE TABLE IF NOT EXISTS question_answer (
+        CREATE TABLE IF NOT EXISTS ranking (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             question TEXT,
             answer TEXT,
-            vote_status TEXT CHECK (vote_status IN ('up', 'down', 'n/a'))
+            ranking INTEGER CHECK (ranking IN (1, 2))
         );
         """
         with self._lock:
@@ -63,63 +63,33 @@ class QuestionAnswerDatabase:
             print("Table contents after creating table:")
             self.print_table(rows)
 
-    def insert_question_answer(self, question: str, answer: str):
+    def insert_ranking(self, question: str, answer: str, ranking: int):
         """
-        Inserts a new question-answer pair into the database with the given question and answer.
-        The vote_status field is set to 'n/a' by default.
-        Returns the ID of the newly inserted row.
+        Inserts a new ranking entry into the database with the given question, answer, and ranking.
 
         Args:
-            question (str): The question to insert.
-            answer (str): The answer to insert.
+            question (str): The question of the ranking entry.
+            answer (str): The answer of the ranking entry.
+            ranking (int): The ranking value, should be either 1 or 2.
 
         Returns:
             int: The ID of the newly inserted row.
         """
         query = """
-        INSERT INTO question_answer (question, answer, vote_status)
-        VALUES (?, ?, 'n/a');
+        INSERT INTO ranking (question, answer, ranking)
+        VALUES (?, ?, ?);
         """
         with self._lock:
             cursor = self.get_cursor()
-            cursor.execute(query, (question, answer))
+            cursor.execute(query, (question, answer, ranking))
             self.get_connection().commit()
 
         if self._debug:
             rows = self.retrieve_all_question_answers()
-            print("Table contents after inserting table:")
+            print("Table contents after inserting entry:")
             self.print_table(rows)
 
         return cursor.lastrowid
-
-    def update_vote_status(self, id, vote_status):
-        """
-        Updates the vote status of a question-answer pair with the given ID.
-
-        Args:
-            id (int): The ID of the question-answer pair to update.
-            vote_status (str): The new vote status to set. Must be one of 'up', 'down', or 'n/a'.
-
-        Raises:
-            ValueError: If the question with the given ID does not exist.
-        """
-        query = """
-        UPDATE question_answer
-        SET vote_status = ?
-        WHERE id = ?;
-        """
-        with self._lock:
-            cursor = self.get_cursor()
-            cursor.execute(query, (vote_status, id))
-            self.get_connection().commit()
-
-        if cursor.rowcount == 0:
-            raise ValueError(f"Question with ID {id} does not exist.")
-
-        if self._debug:
-            rows = self.retrieve_all_question_answers()
-            print("Table contents after updating table:")
-            self.print_table(rows)
 
     def retrieve_all_question_answers(self):
         """
@@ -129,7 +99,7 @@ class QuestionAnswerDatabase:
             list: A list of tuples representing the question-answer pairs.
         """
         query = """
-        SELECT * FROM question_answer;
+        SELECT * FROM ranking;
         """
         with self._lock:
             cursor = self.get_cursor()
@@ -154,29 +124,29 @@ class QuestionAnswerDatabase:
 
         Args:
             rows (list): A list of tuples where each tuple represents a row in the table.
-                         Each tuple contains four elements: ID, Question, Answer, and Vote Status.
+                         Each tuple contains four elements: ID, Question, Answer, and Ranking.
         """
         for row in rows:
             print(f"ID: {row[0]}, Question: {row[1]}, "
-                  f"Answer: {row[2]}, Vote Status: {row[3]}")
+                  f"Answer: {row[2]}, Ranking: {row[3]}")
 
-    def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
+    def save_to_csv(self, csv_file_name="ranking_data.csv"):
         """
-        This method saves the contents of the question_answer table into a CSV file.
+        Saves the contents of the ranking table into a CSV file.
 
         Args:
-            csv_file_name (str, optional): The name of the CSV file to which the data will be written. 
-            Defaults to "question_answer_votes.csv".
+            csv_file_name (str, optional): The name of the CSV file to which the data will be written.
+            Defaults to "ranking_data.csv".
 
-        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the 
-        CSV file corresponds to a row in the question_answer table.
+        The CSV file will have the following columns: ID, Question, Answer, Ranking. Each row in the
+        CSV file corresponds to a row in the ranking table.
 
-        This method first retrieves all question-answer pairs from the database by calling the 
+        This method retrieves all ranking entries from the database by calling the
         retrieve_all_question_answers method. It then writes this data to the CSV file.
         """
-        my_sql_data = self.retrieve_all_question_answers()
+        ranking_data = self.retrieve_all_question_answers()
 
         with open(csv_file_name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(CSV_HEADER)
-            writer.writerows(my_sql_data)
+            writer.writerows(ranking_data)
