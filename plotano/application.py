@@ -1,8 +1,4 @@
-from flask import (
-    Flask,
-    jsonify,
-    send_from_directory,
-    request)
+from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from plotano.component.base import Dropdown
 
@@ -35,8 +31,8 @@ class Application:
                 output = component["component"].model.predict(message)
                 # insert question and answer into database
                 id = component["component"].database.insert_question_answer(
-                    message,
-                    output)
+                    message, output
+                )
                 return {
                     "id": id,
                     "log": "Inference complete",
@@ -62,9 +58,7 @@ class Application:
         def retrieve_qa_table():
             try:
                 rows = component["component"].database.retrieve_all_question_answers()
-                return {"rows": rows,
-                        "log": "Table retrieved",
-                        "status": "200"}
+                return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
@@ -72,8 +66,7 @@ class Application:
         def close_qa_table():
             try:
                 component["component"].database.close_connection()
-                return {"log": "Table closed",
-                        "status": "200"}
+                return {"log": "Table closed", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
@@ -114,6 +107,7 @@ class Application:
         @app.route("/<path:path>")
         def home(path):
             return send_from_directory("frontend/dist", path)
+
         # debug mode should be set to False in production because
         # it will start two processes when debug mode is enabled.
         app.run(debug=self._debug)

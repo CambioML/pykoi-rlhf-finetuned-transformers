@@ -9,7 +9,7 @@
   fetch("/components")
     .then((response) => response.json())
     .then((data) => {
-      console.log("data", data);
+      console.log("component", data);
       components.set(data);
     });
 </script>
