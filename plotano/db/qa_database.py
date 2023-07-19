@@ -1,7 +1,11 @@
 """Question answer database module"""
-import sqlite3
+import csv
 import os
+import sqlite3
 import threading
+
+
+csv_header = ('ID', 'Question', 'Answer', 'Vote Status')
 
 
 class QuestionAnswerDatabase:
@@ -148,3 +152,14 @@ class QuestionAnswerDatabase:
         for row in rows:
             print(f"ID: {row[0]}, Question: {row[1]}, "
                   f"Answer: {row[2]}, Vote Status: {row[3]}")
+            
+    def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
+        """
+        Save the question_answer table to a csv file.
+        """
+        my_sql_data = self.retrieve_all_question_answers()
+
+        with open(csv_file_name, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(csv_header)
+            writer.writerows(my_sql_data)
