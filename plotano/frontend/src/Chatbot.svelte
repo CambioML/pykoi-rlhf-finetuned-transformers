@@ -112,9 +112,10 @@
     const messageLog = $chatLog[index];
     messageLog.vote = vote;
     const feedbackUpdate = {
-      id: index,
+      id: index + 1, // increment bc sqlite 1-indexed
       vote_status: vote,
     };
+    console.log(feedbackUpdate);
     console.log(feedbackUpdate);
     const response = await fetch("http://127.0.0.1:5000/chat/qa_table/update", {
       method: "POST",

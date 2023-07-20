@@ -1,92 +1,3 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  /* margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  border: 10px solid hotpink; */
-  margin: auto;
-  width: 100%;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-
-
-
-
-
 @import url('https://fonts.googleapis.com/css?family=Work+Sans:400|Lato:400|Inconsolata:400');
 
 :root {
@@ -104,13 +15,13 @@ button:focus-visible {
 /* color intentions */
 --primary: var(--yellow);
 --danger: var(--red);
---background: var(--lightGrey);
+--background: var(--white);
 --textColor: var(--black);
 --lineColor: var(--grey);
 --cardBg: var(--white);
 --headerBackground: var(--white);
---footerBackground: var(--darkBlue);
---footerTextColor: var(--lightGrey);
+--footerBackground: var(--green);
+--footerTextColor: var(--black);
 --headerTextColor: var(--black);
 --buttonColor: var(--primary);
 --buttonTextColor: var(--textColor);
@@ -123,7 +34,7 @@ button:focus-visible {
 
 /* Typography */
 --headingFont: 'Lato', monospace;
---bodyFont: 'Inconsolata', sans-serif;
+--bodyFont: 'Work Sans', sans-serif;
 --baseFontSize: 100%;
 /* font sizes */
 --h1: 3.052em;
@@ -144,6 +55,7 @@ button:focus-visible {
 --headerHeight: 3rem;
 /* --borderRadius: 10px; */
 --borderRadius: 0px;
+--height: height: calc(100vh - var(--headerHeight));
 
 /* Media Queries (not supported yet) */
 /* --xsmall: 340;
@@ -176,14 +88,16 @@ body {
 
 header {
     color: var(--headerTextColor);
-    position: fixed;
+    /* position: fixed;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 100%; */
+    margin-top: 1%;
     height: var(--headerHeight);
     background: var(--headerBackground);
+    font-size: var(--h5);
     /* box-shadow: var(--shadow-md); */
-    border-bottom: var(--line);
+    /* border-bottom: var(--line); */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -204,7 +118,7 @@ footer {
     background-color: var(--footerBackground);
     padding: calc(var(--headerHeight) * .75) var(--containerPadding);
     text-align: center;
-    position: absolute;
+    /* position: absolute; */
     bottom: 0;
     width: 100%;
 }
@@ -285,6 +199,12 @@ textarea {
     color: var(--grey);
 }
 
+::selection, .highlight {
+    background: #ffb7b7; /* Your highlight color */
+    background: var(--red); /* Your highlight color */
+    color: var(--white); /* Your color for the highlighted text */
+  }
+
 select {
     border: var(--line);
 }
@@ -299,7 +219,7 @@ button {
     background-color: var(--white);
     border: var(--line);
     border-radius: var(--borderRadius);
-    padding: 5px 25px;
+    padding: 10px 25px;
     box-shadow: var(--shadow-s);
     transition: 0.3s ease-in-out box-shadow;
 }
@@ -407,7 +327,7 @@ button.small {
     --background: var(--black);
     --textColor: var(--lightGrey);
     --headerBackground: var(--darkGrey);
-    --footerBackground: var(--darkGrey);
+    --footerBackground: var(--yellow);
     --cardBg: var(--darkGrey);
     --buttonTextColor: var(--black);
 }
@@ -440,7 +360,7 @@ button.small {
         --cardBg: var(--white);
         --headerBackground: var(--darkBlue);
         --footerBackground: var(--darkBlue);
-        --footerTextColor: var(--lightGrey);
+        --footerTextColor: var(--black);
         --buttonColor: var(--primary);
         --buttonTextColor: var(--textColor);
     
@@ -484,7 +404,7 @@ button.small {
 
 
 :root {
-	--left: 300px;
+	--left: 25px;
   }
   
   .grid-sidemenu {
