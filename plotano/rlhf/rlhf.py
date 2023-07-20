@@ -90,9 +90,6 @@ class RLHFConfig:
     evaluation_strategy: Optional[str] = field(
         default="steps",
         metadata={"help": "The evaluation strategy to adopt during training."})
-    max_steps: Optional[int] = field(
-        default=1000, 
-        metadata={"help": "Maximum number of training steps."})
     # batch_size: int = field(
     #     default=8, 
     #     metadata={"help": "Batch size."})
@@ -135,6 +132,9 @@ class RLHFConfig:
         default=False, metadata={"help": "Whether push to Huggingface Hub or not."})
     
     ## Step 1 SFT parameters
+    max_steps: Optional[int] = field(
+        default=1000, 
+        metadata={"help": "Maximum number of training steps."})
     dataset_subset_sft: Optional[str] = field(
         default="data/finetune", 
         metadata={"help": "Subset folder of the dataset to use."})
@@ -202,7 +202,7 @@ class RLHFConfig:
         default=1000, 
         metadata={"help": "The size of the subset of the training data to use."})
     max_seq_length_reward: Optional[int] = field(
-        default=1024, 
+        default=512, 
         metadata={"help": "Maximum sequence length."})
     # dataset_subset_reward_eval: Optional[int] = field(
     #     default=400, 
@@ -643,5 +643,5 @@ class RewardTrainer(Trainer):
 
 
     def train_and_save(self, output_path=None):
-        self.model.train()
+        self.train()
         self.save(output_path)
