@@ -1,4 +1,4 @@
-# This file contains the RankingDatabase class which is used to store and retrieve
+"""This file contains the RankingDatabase class which is used to store and retrieve"""
 import csv
 import os
 import sqlite3
