@@ -1,11 +1,11 @@
 <script>
-  //   import HorizontalStackedBar from "./lib/DashboardFeedback/HorizontalStackedBar.svelte";
-  //   import QATable from "./lib/DashboardFeedback/QATable.svelte";
-  //   import ColumnChart from "./lib/DashboardFeedback/ColumnChart.svelte";
-  //   import HistogramAnswer from "./lib/DashboardFeedback/HistogramAnswer.svelte";
-  //   import HistogramQuestion from "./lib/DashboardFeedback/HistogramQuestion.svelte";
-  //   import MetricCardAbsolute from "./lib/DashboardFeedback/MetricCardAbsolute.svelte";
-  //   import MetricCardPercentage from "./lib/DashboardFeedback/MetricCardPercentage.svelte";
+  import HorizontalStackedBar from "./lib/DashboardFeedback/HorizontalStackedBar.svelte";
+  import QATable from "./lib/DashboardFeedback/QATable.svelte";
+  import ColumnChart from "./lib/DashboardFeedback/ColumnChart.svelte";
+  import HistogramAnswer from "./lib/DashboardFeedback/HistogramAnswer.svelte";
+  import HistogramQuestion from "./lib/DashboardFeedback/HistogramQuestion.svelte";
+  import MetricCardAbsolute from "./lib/DashboardFeedback/MetricCardAbsolute.svelte";
+  import MetricCardPercentage from "./lib/DashboardFeedback/MetricCardPercentage.svelte";
 
   import { onMount } from "svelte";
   import { chatLog } from "./store";
@@ -35,23 +35,23 @@
   <div class="feedback-left">
     <div class="left-text">
       <div class="card-1">
-        <!-- <MetricCardAbsolute /> -->
+        <MetricCardAbsolute />
       </div>
       <div class="card-2">
-        <!-- <MetricCardPercentage /> -->
+        <MetricCardPercentage />
       </div>
     </div>
     <div class="left-confidence">
-      <!-- <HorizontalStackedBar /> -->
+      <HorizontalStackedBar />
     </div>
     <div class="left-question">
-      <!-- <ColumnChart feedback={"Bad"} /> -->
+      <ColumnChart feedback={"Bad"} />
     </div>
     <div class="left-filter">
-      <!-- <HistogramQuestion /> -->
+      <HistogramQuestion />
     </div>
     <div class="left-filter2">
-      <!-- <HistogramAnswer /> -->
+      <HistogramAnswer />
     </div>
   </div>
   <div class="feedback-right">
@@ -60,7 +60,7 @@
       <div class="right-chart-2" />
     </div>
     <div class="right-table">
-      <!-- <QATable /> -->
+      <QATable />
     </div>
   </div>
 </div>
@@ -94,7 +94,7 @@
     border-bottom: var(--line);
     border-right: var(--line);
     display: grid;
-    grid-template-rows: 25% 75%;
+    grid-template-rows: 40% 55%;
   }
   .left-question {
     border-bottom: var(--line);

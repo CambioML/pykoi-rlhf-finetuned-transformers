@@ -14,7 +14,7 @@
     });
 </script>
 
-<!-- <Feedback /> -->
+<Feedback />
 
 {#each $components as component}
   {#if component.svelte_component === "Chatbot"}
