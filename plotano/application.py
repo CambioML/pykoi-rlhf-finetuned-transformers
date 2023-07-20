@@ -1,17 +1,36 @@
+"""Application module."""
+from typing import Any, Dict
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
-from plotano.component.base import Dropdown
 from pyngrok import ngrok
+
+from plotano.component.base import Dropdown
 
 
 class Application:
+    """
+    The Application class.
+    """
     def __init__(self, share: bool = False, debug: bool = False):
+        """
+        Initialize the Application.
+
+        Args:
+            share (bool, optional): If True, the application will be shared via ngrok. Defaults to False.
+            debug (bool, optional): If True, the application will run in debug mode. Defaults to False.
+        """
         self._debug = debug
         self._share = share
         self.data_sources = {}
         self.components = []
 
-    def add_component(self, component):
+    def add_component(self, component: Any):
+        """
+        Add a component to the application.
+
+        Args:
+            component (Any): The component to be added.
+        """
         if component.data_source:
             self.data_sources[component.id] = component.data_source
             # set data_endpoint if it's a Dropdown component
@@ -26,9 +45,16 @@ class Application:
             }
         )
 
-    def create_chatbot_route(self, app, component):
+    def create_chatbot_route(self, app: Flask, component: Dict[str, Any]):
+        """
+        Create chatbot routes for the application.
+
+        Args:
+            app (Flask): The Flask application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
         @app.route("/chat/<message>", methods=["POST"])
-        def inference(message):
+        def inference(message: str):
             try:
                 output = component["component"].model.predict(message)
                 # insert question and answer into database
@@ -73,6 +99,9 @@ class Application:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
     def run(self):
+        """
+        Run the application.
+        """
         app = Flask(__name__)
         CORS(app)  # Allows cross-origin requests
 
@@ -89,7 +118,14 @@ class Application:
                 ]
             )
 
-        def create_data_route(id, data_source):
+        def create_data_route(id: str, data_source: Any):
+            """
+            Create data route for the application.
+
+            Args:
+                id (str): The id of the data source.
+                data_source (Any): The data source.
+            """
             @app.route(f"/data/{id}", methods=["GET"], endpoint=id)
             def get_data():
                 data = data_source.fetch_func()
@@ -110,7 +146,7 @@ class Application:
             return send_from_directory("frontend/dist", "index.html")
 
         @app.route("/<path:path>")
-        def home(path):
+        def home(path: str):
             return send_from_directory("frontend/dist", path)
 
         # debug mode should be set to False in production because
