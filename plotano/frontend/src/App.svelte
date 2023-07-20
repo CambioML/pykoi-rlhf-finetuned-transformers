@@ -16,6 +16,7 @@
 </script>
 
 <RankedChatbot />
+
 <!-- 
 {#each $components as component}
   {#if component.svelte_component === "Feedback"}
@@ -29,7 +30,6 @@
     <Dropdown {...component.props} />
   {/if}
 {/each} -->
-<p class="footer-logo">Made with CambioML</p>
 
 <style>
   .footer-logo {
