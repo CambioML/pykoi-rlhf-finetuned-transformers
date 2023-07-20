@@ -3,9 +3,9 @@ import csv
 import os
 import sqlite3
 import threading
+import datetime
 
-
-CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status')
+CSV_HEADER = ('ID', 'Question', 'Answer', 'Timestamp', 'Vote Status')
 
 
 class QuestionAnswerDatabase:
@@ -50,6 +50,7 @@ class QuestionAnswerDatabase:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             question TEXT,
             answer TEXT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             vote_status TEXT CHECK (vote_status IN ('up', 'down', 'n/a'))
         );
         """
@@ -76,13 +77,14 @@ class QuestionAnswerDatabase:
         Returns:
             int: The ID of the newly inserted row.
         """
+        timestamp = datetime.datetime.now()
         query = """
-        INSERT INTO question_answer (question, answer, vote_status)
-        VALUES (?, ?, 'n/a');
+        INSERT INTO question_answer (question, answer, timestamp, vote_status)
+        VALUES (?, ?, ?, 'n/a');
         """
         with self._lock:
             cursor = self.get_cursor()
-            cursor.execute(query, (question, answer))
+            cursor.execute(query, (question, answer, timestamp))
             self.get_connection().commit()
 
         if self._debug:
@@ -154,11 +156,11 @@ class QuestionAnswerDatabase:
 
         Args:
             rows (list): A list of tuples where each tuple represents a row in the table.
-                         Each tuple contains four elements: ID, Question, Answer, and Vote Status.
+                        Each tuple contains five elements: ID, Question, Answer, Timestamp, and Vote Status.
         """
         for row in rows:
             print(f"ID: {row[0]}, Question: {row[1]}, "
-                  f"Answer: {row[2]}, Vote Status: {row[3]}")
+                  f"Answer: {row[2]}, Timestamp: {row[3]}, Vote Status: {row[4]}")
 
     def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
         """
