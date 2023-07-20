@@ -4,8 +4,16 @@ import os
 import sqlite3
 import threading
 
-CSV_HEADER = ('ID', 'Question', 'Up Ranking Answer', 'Low Ranking Answer')
-
+CSV_HEADER_ID = 'ID'
+CSV_HEADER_QUESTION = 'Question'
+RANKING_CSV_HEADER_UP_RANKING_ANSWER = 'Up Ranking Answer'
+RANKING_CSV_HEADER_LOW_RANKING_ANSWER = 'Low Ranking Answer'
+RANKING_CSV_HEADER = (
+    CSV_HEADER_ID, 
+    CSV_HEADER_QUESTION, 
+    RANKING_CSV_HEADER_UP_RANKING_ANSWER, 
+    RANKING_CSV_HEADER_LOW_RANKING_ANSWER
+    )
 
 class RankingDatabase:
     """Ranking Database class"""
