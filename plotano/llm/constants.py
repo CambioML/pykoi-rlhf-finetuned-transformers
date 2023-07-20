@@ -3,6 +3,12 @@ from enum import Enum
 
 
 class LlmName(Enum):
-    """Enumeration of the available LLMs."""
+    """
+    This class is an enumeration for the available Language Learning Models (LLMs).
+
+    Attributes:
+        OPENAI (str): Represents the OpenAI model.
+        HUGGINGFACE (str): Represents the HuggingFace model.
+    """
     OPENAI = "openai"
     HUGGINGFACE = "huggingface"

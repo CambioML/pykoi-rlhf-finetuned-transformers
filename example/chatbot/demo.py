@@ -1,3 +1,4 @@
+"""Demo for the chatbot application."""
 import plotano.cambio as cb
 
 
