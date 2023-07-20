@@ -43,17 +43,18 @@ from transformers import (
     logging, 
     pipeline,
     set_seed
-    )
+)
 from transformers.utils import PushToHubMixin
 from trl import (
     AutoModelForCausalLMWithValueHead, 
     PPOConfig, 
     PPOTrainer, 
-    SFTTrainer
-    )
+    SFTTrainer)
     
 from trl.core import LengthSampler
 from trl.trainer.utils import ConstantLengthDataset, PeftSavingCallback
+
+
 
 
 def read_json_file(file_path):
@@ -73,11 +74,6 @@ class RLHFConfig:
     dataset_name: Optional[str] = field(
         default="lvwerra/stack-exchange-paired", 
         metadata={"help": "Huggingface dataset name or a local path to the dataset."})
-    train_test_split_ratio: Optional[float] = field(
-        default=0.1,
-        metadata={"help": "The ratio represents the proportion of the test dataset to \
-                  include in the train and test split."}
-    )
     streaming: Optional[bool] = field(
         default=False, 
         metadata={"help": "Whether to use streaming."})
@@ -164,10 +160,10 @@ class RLHFConfig:
     lr_scheduler_type_sft: Optional[str] = field(
         default="cosine", 
         metadata={"help": "Type of learning rate scheduler."})
-    num_warmup_steps: Optional[int] = field(
+    num_warmup_steps: Optional[str][int] = field(
         default=100, 
         metadata={"help": "Number of warmup steps for the scheduler."})
-    lora_config_rl: Optional[LoraConfig] = field(
+    lora_config_rl: Optional[str][LoraConfig] = field(
         default=LoraConfig(
             r=32,
             lora_alpha=64,
@@ -192,21 +188,18 @@ class RLHFConfig:
         default=False,
         metadata={"help": "If you want to resume training where it left off."},
     )
-    dataset_reward_folder: Optional[str] = field(
+    dataset_reward_train: Optional[str] = field(
         default="data/reward", 
         metadata={"help": "Subset folder of the reward dataset to use."})
-    dataset_eval_folder: Optional[str] = field(
+    dataset_reward_eval: Optional[str] = field(
         default="data/evaluation", 
         metadata={"help": "Subset folder of the evaluation dataset to use."})
-    reward_num_of_data: Optional[int] = field(
+    dataset_subset_reward_train: Optional[int] = field(
         default=1000, 
         metadata={"help": "The size of the subset of the training data to use."})
-    max_seq_length_reward: Optional[int] = field(
-        default=1024, 
-        metadata={"help": "Maximum sequence length."})
-    # dataset_subset_reward_eval: Optional[int] = field(
-    #     default=400, 
-    #     metadata={"help": "The size of the subset of the validation/eval data to use."})
+    dataset_subset_reward_eval: Optional[int] = field(
+        default=400, 
+        metadata={"help": "The size of the subset of the validation/eval data to use."})
     num_train_epochs: Optional[int] = field(
         default=1, metadata={"help": "The number of training epochs."})
     # deepspeed: Optional[str] = field(
@@ -298,12 +291,11 @@ class SFT(Trainer):
         self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.base_model_path)
         self.num_proc = self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         self.dataset = self.create_datasets(self.tokenizer, self._rlhf_config)
-        self.torch_dtype = torch.bfloat16 if self._rlhf_config.bf16 else torch.float16
-        # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
+
         self.training_args = TrainingArguments(
             output_dir=self._rlhf_config.output_dir,
             dataloader_drop_last=True,
-            evaluation_strategy=self._rlhf_config.evaluation_strategy,
+            evaluation_strategy="steps",
             max_steps=self._rlhf_config.max_steps,
             eval_steps=self._rlhf_config.eval_freq,
             save_steps=self._rlhf_config.save_freq,
@@ -337,53 +329,59 @@ class SFT(Trainer):
             packing=True,
         )
 
-
     def train(self):
         self.trainer.train()
 
+    def merge_lora(self, output_path=None): #TODO
 
-    def load_lora(self, base_model_path=None, lora_model_path=None):
+        """
+        # assuming your base model is the model with the pretrained weights 
+        # and lora_model is the adapter model to be merged
+        """
 
-        if base_model_path is None:
-            base_model_path = self._rlhf_config.base_model_path
-
-        ## Load lora config    
-        if lora_model_path is None:
-            lora_config = self.trainer.model.config
-        else:
-            lora_config = PeftConfig.from_pretrained(lora_model_path)
+        ## Load the base model and tokenizer:
+        base_model_name = self._rlhf_config.base_model_path
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
         
-        ## Load the base tokenizer and model
-        tokenizer = AutoTokenizer.from_pretrained(base_model_path)
-        if lora_config.task_type == "SEQ_CLS":
+        # peft_config = PeftConfig.from_pretrained(lora_model)
+        if self._rlhf_config.lora_config_rl.task_type == "SEQ_CLS":
             # peft is for reward model so load sequence classification
             base_model = AutoModelForSequenceClassification.from_pretrained(
-                base_model_path, num_labels=1, torch_dtype=self._rlhf_config.torch_dtype
+                base_model_name, num_labels=1, torch_dtype=torch.bfloat16 
             )
-        elif lora_config.task_type == "CAUSAL_LM": 
+        elif self._rlhf_config.lora_config_rl.task_type == "CAUSAL_LM": 
             base_model = AutoModelForCausalLM.from_pretrained(
-                base_model_path, return_dict=True, torch_dtype=self._rlhf_config.torch_dtype
+                base_model_name, return_dict=True, torch_dtype=torch.bfloat16
             )
         else:
             raise ValueError("Invalid task_type in lora_config")
-        
+
+
         # Merge the base model and the Lora model
-        model = PeftModel.from_pretrained(base_model, lora_config)
-        return model, tokenizer
+        model = PeftModel.from_pretrained(base_model, self.trainer.model.config)
+        # model.eval()
+        model = model.merge_and_unload()
+
+        model.save_pretrained(output_path)
+        tokenizer.save_pretrained(output_path)
+                
+        if self._rlhf_config.push_to_hub:
+            model.push_to_hub(output_path, use_temp_dir=False)
 
 
-    def save(self, output_path=None):    
+    def save(self, output_path=None, merge_base_and_lora=False):    
 
         if output_path is None:
             output_path = os.path.join(
                 self._rlhf_config.output_dir, 
                 self._rlhf_config.sft_lora_path)
+        # self.trainer.model.save_pretrained(output_path) ## only save "adapter_config.json" and "adapter_model.bin"
         self.trainer.save_model(output_path)
 
-
-    def train_and_save(self, output_path=None):
+    def train_and_save(self, output_path=None, merge_weights=False):
         self.trainer.train()
-        self.save(output_path)
+        self.save(output_path, 
+                  merge_base_and_lora=merge_weights)
         
         
     def prepare_sample_text(self, example):
@@ -392,9 +390,8 @@ class SFT(Trainer):
             Answer: {example[self._rlhf_config.answer_title]}"
         return text
 
-
     def create_datasets(self, tokenizer, args):
-        if args.dataset_type == "huggingface":
+        if self._rlhf_config.dataset_type == "huggingface":
             dataset = load_dataset(
                 args.dataset_name,
                 data_dir=args.dataset_subset_sft,
@@ -403,20 +400,26 @@ class SFT(Trainer):
                 num_proc=self.num_proc,
                 streaming=args.streaming,
             )
-        elif args.dataset_type == "csv":
+        elif self._rlhf_config.dataset_type == "csv":
             dataset = load_dataset('csv', data_files=args.dataset_name) 
         else:
-            raise FileNotFoundError(f"No (supported) data files or dataset script found {args.dataset_type}")
+            raise FileNotFoundError(f"No (supported) data files or dataset script found {self._rlhf_config.dataset_type}")
 
-        dataset = dataset[args.split] # Convert DatasetDict to Dataset
-        dataset = dataset.train_test_split(test_size=args.train_test_split_ratio, 
-                                           seed=args.seed)
-        print(f"Size of the train set: {len(dataset['train'])}. \
-              Size of the validation set: {len(dataset['eval'])}")
+        dataset = dataset[self._rlhf_config.split] # Convert DatasetDict to Dataset
+        dataset = dataset.train_test_split(test_size=0.1, seed=args.seed)
+        train_data = dataset["train"]
+        eval_data = dataset["test"]
+        print(f"Size of the train set: {len(train_data)}. Size of the validation set: {len(eval_data)}")
 
+        # chars_per_token = chars_token_ratio(train_data, tokenizer) ## TODO
+        # print(f"The character to token ratio of the dataset is: {chars_per_token:.2f}")
+
+        ## `ConstantLengthDataset` is used for efficient training: we concatenate a lot of 
+        ## texts with a EOS token in between and cut chunks of the context size to fill 
+        ## the batch without any padding.
         train_dataset = ConstantLengthDataset(
             tokenizer,
-            dataset['train'],
+            train_data,
             formatting_func=self.prepare_sample_text,
             infinite=True,
             seq_length=args.max_seq_length,
@@ -424,7 +427,7 @@ class SFT(Trainer):
         )
         eval_dataset = ConstantLengthDataset(
             tokenizer,
-            dataset['eval'],
+            eval_data,
             formatting_func=self.prepare_sample_text,
             infinite=False,
             seq_length=args.max_seq_length,
@@ -437,17 +440,6 @@ class SFT(Trainer):
 ## Step 2: Reward Trainer
 ############################################################
 
-## TODO: LOAD FROM THE DATABASE.PY FILE
-RANKING_CSV_HEADER_ID = 'ID'
-RANKING_CSV_HEADER_QUESTION = 'Question'
-RANKING_CSV_HEADER_UP_RANKING_ANSWER = 'Up Ranking Answer'
-RANKING_CSV_HEADER_LOW_RANKING_ANSWER = 'Low Ranking Answer'
-RANKING_CSV_HEADER = (
-    RANKING_CSV_HEADER_ID, 
-    RANKING_CSV_HEADER_QUESTION, 
-    RANKING_CSV_HEADER_UP_RANKING_ANSWER, 
-    RANKING_CSV_HEADER_LOW_RANKING_ANSWER
-    )
 
 # We need to define a special data collator that batches the ranking data.
 @dataclass
@@ -460,27 +452,43 @@ class RewardDataCollatorWithPadding:
         self.return_tensors: str = "pt"
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, Any]:
-        def extract_and_pad(key_ids, key_mask):
-            extracted_features = [{"input_ids": f[key_ids], 
-                                   "attention_mask": f[key_mask]} for f in features]
-            return self.tokenizer.pad(
-                extracted_features, 
-                padding=self.padding, 
-                max_length=self.max_length, 
-                pad_to_multiple_of=self.pad_to_multiple_of, 
-                return_tensors=self.return_tensors
-                )
-
-        batch_x = extract_and_pad("input_ids_x", "attention_mask_x")
-        batch_y = extract_and_pad("input_ids_y", "attention_mask_y")
-
-        return {
-            "input_ids_x": batch_x["input_ids"],
-            "attention_mask_x": batch_x["attention_mask"],
-            "input_ids_y": batch_y["input_ids"],
-            "attention_mask_y": batch_y["attention_mask"],
+        features_j = []
+        features_k = []
+        for feature in features:
+            features_j.append(
+                {
+                    "input_ids": feature["input_ids_j"],
+                    "attention_mask": feature["attention_mask_j"],
+                }
+            )
+            features_k.append(
+                {
+                    "input_ids": feature["input_ids_k"],
+                    "attention_mask": feature["attention_mask_k"],
+                }
+            )
+        batch_j = self.tokenizer.pad(
+            features_j,
+            padding=self.padding,
+            max_length=self.max_length,
+            pad_to_multiple_of=self.pad_to_multiple_of,
+            return_tensors=self.return_tensors,
+        )
+        batch_k = self.tokenizer.pad(
+            features_k,
+            padding=self.padding,
+            max_length=self.max_length,
+            pad_to_multiple_of=self.pad_to_multiple_of,
+            return_tensors=self.return_tensors,
+        )
+        batch = {
+            "input_ids_j": batch_j["input_ids"],
+            "attention_mask_j": batch_j["attention_mask"],
+            "input_ids_k": batch_k["input_ids"],
+            "attention_mask_k": batch_k["attention_mask"],
             "return_loss": True,
         }
+        return batch
 
     
 class RewardTrainer(Trainer):
@@ -493,8 +501,10 @@ class RewardTrainer(Trainer):
             per_device_eval_batch_size=rlhf_config.per_device_eval_batch_size,
             num_train_epochs=rlhf_config.num_train_epochs,
             weight_decay=rlhf_config.weight_decay,
-            evaluation_strategy=rlhf_config.evaluation_strategy,
-            save_strategy=rlhf_config.evaluation_strategy,
+            # evaluation_strategy="steps",
+            # eval_steps=500,
+            # save_strategy="steps",
+            # save_steps=500,
             gradient_accumulation_steps=rlhf_config.gradient_accumulation_steps,
             gradient_checkpointing=rlhf_config.gradient_checkpointing,
             # deepspeed=rlhf_config.deepspeed, 
@@ -507,9 +517,6 @@ class RewardTrainer(Trainer):
             # optim=rlhf_config.optim,
             # lr_scheduler_type=rlhf_config.lr_scheduler_type_rw
         )
-        self.torch_dtype = torch.bfloat16 if rlhf_config.bf16 else torch.float16
-        # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
-
         ## Load the tokenizer and the model 
         self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.reward_model_path)
         self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -517,7 +524,7 @@ class RewardTrainer(Trainer):
         self.base_model = AutoModelForSequenceClassification.from_pretrained(
             rlhf_config.reward_model_path, 
             num_labels=1,
-            torch_dtype=self.torch_dtype,
+            torch_dtype=torch.bfloat16, ## TODO
             load_in_8bit=rlhf_config.load_in_8bit,
             # device_map={"": Accelerator().process_index} ## TODO
         )
@@ -527,19 +534,21 @@ class RewardTrainer(Trainer):
         self.model.config.use_cache = not rlhf_config.gradient_checkpointing
         self.num_proc = self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         
-        self.dataset = self.create_datasets()
-
+        self.train_dataset = self.create_datasets(rlhf_config.dataset_reward_train,
+                                                  rlhf_config.dataset_subset_reward_train)
+        self.eval_dataset = self.create_datasets(rlhf_config.dataset_reward_eval,
+                                                  rlhf_config.dataset_subset_reward_eval)
         # self.callbacks = rlhf_config.callbacks
         self.compute_metrics = self._compute_metrics
         self.data_collator=RewardDataCollatorWithPadding(
                 tokenizer=self.tokenizer, 
-                max_length=self._rlhf_config.max_seq_length_reward)
+                max_length=self._rlhf_config.max_seq_length)
         super().__init__(
             model=self.model,
             args=self.args,
             data_collator=self.data_collator,
-            train_dataset=self.dataset['train'],
-            eval_dataset=self.dataset['eval'],
+            train_dataset=self.train_dataset,
+            eval_dataset=self.eval_dataset,
             tokenizer=self.tokenizer,
             # model_init=self.model_init,
             compute_metrics=self.compute_metrics,
@@ -548,86 +557,74 @@ class RewardTrainer(Trainer):
             # preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         )
         
+
     def _preprocess_function(self, examples):
         """
-        Turn the dataset into pairs of question and answer, where 
-        "text_x = question + preferred answer" and "text_y = question + not preferred answer". 
-        Then tokenize the dataset.
+        Turn the dataset into pairs of post + summaries, where text_j is the preferred 
+        question + answer and text_k is the other. Then tokenize the dataset.
         """
-        def tokenize_and_store(question, answer, key_ids, key_mask):
-            tokenized = self.tokenizer(f"Question: {question}\n\nAnswer: {answer}", truncation=True)
-            new_examples[key_ids].append(tokenized["input_ids"])
-            new_examples[key_mask].append(tokenized["attention_mask"])
+        new_examples = {
+            "input_ids_j": [],
+            "attention_mask_j": [],
+            "input_ids_k": [],
+            "attention_mask_k": [],
+        }
+        for question, response_j, response_k in zip(
+            examples["question"], examples["response_j"], examples["response_k"]):
+            tokenized_j = self.tokenizer(
+                "Question: " + question + "\n\nAnswer: " + response_j, 
+                truncation=True)
+            tokenized_k = self.tokenizer(
+                "Question: " + question + "\n\nAnswer: " + response_k, 
+                truncation=True)
 
-        new_examples = {"input_ids_x": [], "attention_mask_x": [], 
-                        "input_ids_y": [], "attention_mask_y": []}
-        
-        for question, better_answer, worse_answer in zip(
-            examples[RANKING_CSV_HEADER_QUESTION], 
-            examples[RANKING_CSV_HEADER_UP_RANKING_ANSWER], 
-            examples[RANKING_CSV_HEADER_LOW_RANKING_ANSWER]):
-            tokenize_and_store(question, better_answer, "input_ids_x", "attention_mask_x")
-            tokenize_and_store(question, worse_answer, "input_ids_y", "attention_mask_y")
+            new_examples["input_ids_j"].append(tokenized_j["input_ids"])
+            new_examples["attention_mask_j"].append(tokenized_j["attention_mask"])
+            new_examples["input_ids_k"].append(tokenized_k["input_ids"])
+            new_examples["attention_mask_k"].append(tokenized_k["attention_mask"])
 
         return new_examples
 
-    def create_datasets(self):
 
-        ## based on dataset_type (e.g. "huggingface", "csv", etc.), load the data
-        if self._rlhf_config.dataset_type == "huggingface":
-            dataset = load_dataset(
-                self._rlhf_config.dataset_name,
-                data_dir=self._rlhf_config.dataset_reward_folder,
-                split=self._rlhf_config.split,
-                use_auth_token=True,
-                num_proc=self._rlhf_config.num_proc,
-                streaming=self._rlhf_config.streaming,
-            )
-        elif self._rlhf_config.dataset_type == "csv":
-            dataset = load_dataset('csv', data_files=self._rlhf_config.dataset_name) 
-        else:
-            raise FileNotFoundError(f"No (supported) data files or dataset script found {self._rlhf_config.dataset_type}")
+    def create_datasets(self, data_dir, num_of_data):
+        # Load the dataset for tuning the reward model
+        dataset = load_dataset(
+            self._rlhf_config.dataset_name,
+            data_dir=data_dir,
+            split=self._rlhf_config.split
+        )
+        if num_of_data > 0:
+            dataset = dataset.select(range(num_of_data))
+
+        original_columns = dataset.column_names
 
         # Preprocess the dataset and filter out QAs that are longer than max_length
         dataset = dataset.map(
             self._preprocess_function,
             batched=True,
             num_proc=self.num_proc,
-            # remove_columns=dataset.column_names,
+            remove_columns=original_columns,
         )
         dataset = dataset.filter(
-            lambda x: len(x["input_ids_x"]) <= self._rlhf_config.max_seq_length_reward
-                      and len(x["input_ids_y"]) <= self._rlhf_config.max_seq_length_reward
+            lambda x: len(x["input_ids_j"]) <= self._rlhf_config.max_seq_length
+                      and len(x["input_ids_k"]) <= self._rlhf_config.max_seq_length
         )
 
-        dataset = dataset[self._rlhf_config.split] # Convert DatasetDict to Dataset
-        ## load desired amount of data
-        if self._rlhf_config.reward_num_of_data > 0:
-            dataset = dataset.select(range(min(self._rlhf_config.reward_num_of_data, len(dataset))))
-
-        ## split to train and test datasets
-        dataset = dataset.train_test_split(test_size=self._rlhf_config.train_test_split_ratio, 
-                                           seed=self._rlhf_config.seed)
-        print(f"Size of the train set: {len(dataset['train'])}. \
-              Size of the validation set: {len(dataset['test'])}")
-
-        return {"train": dataset['train'], "eval": dataset['test']}
+        return dataset
     
-
-    # Define how to compute the reward loss. We use the InstructGPT pairwise logloss: 
-    # https://arxiv.org/abs/2203.02155
+    # Define how to compute the reward loss. We use the InstructGPT pairwise logloss: https://arxiv.org/abs/2203.02155
     def compute_loss(self, model, inputs, return_outputs=False):
-        rewards_x = model(input_ids=inputs["input_ids_x"], attention_mask=inputs["attention_mask_x"])[0]
-        rewards_y = model(input_ids=inputs["input_ids_y"], attention_mask=inputs["attention_mask_y"])[0]
-        loss = -torch.nn.functional.logsigmoid(rewards_x - rewards_y).mean()
+        rewards_j = model(input_ids=inputs["input_ids_j"], attention_mask=inputs["attention_mask_j"])[0]
+        rewards_k = model(input_ids=inputs["input_ids_k"], attention_mask=inputs["attention_mask_k"])[0]
+        loss = -torch.nn.functional.logsigmoid(rewards_j - rewards_k).mean()
         if return_outputs:
-            return loss, {"rewards_x": rewards_x, "rewards_y": rewards_y}
+            return loss, {"rewards_j": rewards_j, "rewards_k": rewards_k}
         return loss
     
     def _compute_metrics(self, eval_pred):
         predictions, _ = eval_pred
-        # Here, predictions is rewards_x and rewards_y.
-        # We want to see how much of the time rewards_x > rewards_y.
+        # Here, predictions is rewards_j and rewards_k.
+        # We want to see how much of the time rewards_j > rewards_k.
         predictions = np.argmax(predictions, axis=0)
         labels = np.zeros(predictions.shape)
         accuracy = evaluate.load("accuracy")
