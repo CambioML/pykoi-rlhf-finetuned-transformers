@@ -69,21 +69,24 @@ class RLHFConfig:
         default="meta-llama/Llama-2-7b-hf", 
         metadata={"help": "Huggingface model name or a local path to the base model."})
     dataset_type: Optional[str] = field(
-        default="csv",
+        default="csv", ## TODO
         metadata={"help": "choose from 'csv', 'huggingface' to load the dataset."})
-    dataset_name: str = field(
+    dataset_name: Optional[str] = field(
         default="lvwerra/stack-exchange-paired", 
         metadata={"help": "Huggingface dataset name or a local path to the dataset."})
-    streaming: bool = field(
+    streaming: Optional[bool] = field(
         default=False, 
         metadata={"help": "Whether to use streaming."})
-    shuffle_buffer: int = field(
+    shuffle_buffer: Optional[int] = field(
         default=5000, 
         metadata={"help": "Size of the shuffle buffer."})
-    max_seq_length: int = field(
+    max_seq_length: Optional[int] = field(
         default=512, 
         metadata={"help": "Maximum sequence length."})
-    max_steps: int = field(
+    evaluation_strategy: Optional[str] = field(
+        default="steps",
+        metadata={"help": "The evaluation strategy to adopt during training."})
+    max_steps: Optional[int] = field(
         default=1000, 
         metadata={"help": "Maximum number of training steps."})
     # batch_size: int = field(
@@ -93,10 +96,10 @@ class RLHFConfig:
         default=2, metadata={"help": "Batch size per device for training."})
     per_device_eval_batch_size: Optional[int] = field(
         default=8, metadata={"help": "Batch size per device for evaluation."})
-    gradient_accumulation_steps: int = field(
+    gradient_accumulation_steps: Optional[int] = field(
         default=4, 
         metadata={"help": "Number of steps for gradient accumulation."})
-    eos_token_id: int = field(
+    eos_token_id: Optional[int] = field(
         default=49152, 
         metadata={"help": "End-of-sequence token ID."})
     learning_rate: Optional[float] = field(
@@ -128,39 +131,39 @@ class RLHFConfig:
         default=False, metadata={"help": "Whether push to Huggingface Hub or not."})
     
     ## Step 1 SFT parameters
-    dataset_subset_sft: str = field(
+    dataset_subset_sft: Optional[str] = field(
         default="data/finetune", 
         metadata={"help": "Subset folder of the dataset to use."})
     dataset_subset_sft_train: Optional[int] = field(
         default=10000, 
         metadata={"help": "The size of the subset of the training data to use."})
-    split: str = field(
+    split: Optional[str] = field(
         default="train", 
         metadata={"help": "Dataset split to use."})
-    question_title: str = field(
+    question_title: Optional[str] = field(
         default="Question",
         metadata={"help": "the column name of questions from the database."}
     )
-    answer_title: str = field(
+    answer_title: Optional[str] = field(
         default="Answer",
         metadata={"help": "the column name of answers from the database."}
     )
-    size_valid_set: int = field(
+    size_valid_set: Optional[int] = field(
         default=4000, 
         metadata={"help": "Size of the validation/eval set."})
-    sft_lora_path: str = field(
+    sft_lora_path: Optional[str] = field(
         default="step1_supervised_finetuning_lora_final/", 
         metadata={"help": "Output directory for step 1 supervised finetuning's Lora weights."})
-    sft_merged_path: str = field(
+    sft_merged_path: Optional[str] = field(
         default="step1_supervised_finetuning_merged/", 
         metadata={"help": "Output directory for step 1 supervised finetuning's merged weights."})
-    lr_scheduler_type_sft: str = field(
+    lr_scheduler_type_sft: Optional[str] = field(
         default="cosine", 
         metadata={"help": "Type of learning rate scheduler."})
-    num_warmup_steps: int = field(
+    num_warmup_steps: Optional[str][int] = field(
         default=100, 
         metadata={"help": "Number of warmup steps for the scheduler."})
-    lora_config_rl: LoraConfig = field(
+    lora_config_rl: Optional[str][LoraConfig] = field(
         default=LoraConfig(
             r=32,
             lora_alpha=64,
@@ -175,10 +178,10 @@ class RLHFConfig:
     reward_model_path: Optional[str] = field(
         default="databricks/dolly-v2-3b", 
         metadata={"help": "Huggingface model name or a local path to the reward model."})
-    reward_lora_path: str = field(
+    reward_lora_path: Optional[str] = field(
         default="step1_supervised_finetuning_lora_final/", 
         metadata={"help": "Output directory for step 1 supervised finetuning's Lora weights."})
-    reward_merged_path: str = field(
+    reward_merged_path: Optional[str] = field(
         default="step1_supervised_finetuning_merged/", 
         metadata={"help": "Output directory for step 1 supervised finetuning's merged weights."})
     resume_from_checkpoint: Optional[bool] = field(
@@ -222,7 +225,7 @@ class RLHFConfig:
     # lr_scheduler_type_rw: str = field(
     #     default="linear", 
     #     metadata={"help": "Type of learning rate scheduler."})
-    lora_config_reward: LoraConfig = field(
+    lora_config_reward: Optional[LoraConfig] = field(
         default=LoraConfig(
             r=16,
             lora_alpha=32,
@@ -234,7 +237,7 @@ class RLHFConfig:
     )
 
     ## Step 3 RL parameters
-    dataset_subset_rl: str = field(
+    dataset_subset_rl: Optional[str] = field(
         default="data/finetune", 
         metadata={"help": "Subset folder of the dataset to use."})
     dataset_subset_rl_train: Optional[int] = field(
@@ -430,7 +433,6 @@ class SFT(Trainer):
             seq_length=args.max_seq_length,
             # chars_per_token=chars_per_token,
         )
-        # return train_dataset, eval_dataset
         return {"train": train_dataset, "eval": eval_dataset}
 
 
