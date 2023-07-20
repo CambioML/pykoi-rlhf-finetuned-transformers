@@ -1,14 +1,19 @@
+"""Test the QuestionAnswerDatabase class"""
+import datetime
 import unittest
 import os
 import sqlite3
+
 from plotano.db.qa_database import QuestionAnswerDatabase
-import datetime
 
 # Define a temporary database file for testing
 TEST_DB_FILE = "test_qd.db"
 
-class TestQuestionAnswerDatabase(unittest.TestCase):
 
+class TestQuestionAnswerDatabase(unittest.TestCase):
+    """
+    Test the QuestionAnswerDatabase class.
+    """
     def setUp(self):
         # Create a temporary database for testing
         self.qadb = QuestionAnswerDatabase(db_file=TEST_DB_FILE, debug=True)
@@ -19,6 +24,9 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
         os.remove(TEST_DB_FILE)
 
     def test_create_table(self):
+        """
+        Test whether the table is created correctly.
+        """
         # Test whether the table is created correctly
         conn = sqlite3.connect(TEST_DB_FILE)
         cursor = conn.cursor()
@@ -33,7 +41,9 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
         conn.close()
 
     def test_insert_and_retrieve_question_answer(self):
-        # Test inserting and retrieving a question-answer pair
+        """
+        Test inserting and retrieving a question-answer pair
+        """
         question = "What is the meaning of life?"
         answer = "42"
 
@@ -51,7 +61,9 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
         self.assertEqual(rows[0][3], "n/a")  # Default vote status
 
     def test_update_vote_status(self):
-        # Test updating the vote status of a question-answer pair
+        """
+        Test updating the vote status of a question-answer pair.
+        """
         question = "What is the meaning of life?"
         answer = "42"
 
@@ -71,7 +83,9 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
         self.assertEqual(rows[0][3], new_vote_status)
 
     def test_save_to_csv(self):
-        # Test saving data to a CSV file
+        """
+        Test saving data to a CSV file
+        """
         question1 = "What is the meaning of life?"
         answer1 = "42"
         question2 = "What is the best programming language?"
@@ -92,14 +106,19 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
             lines = file.readlines()
 
         # Verify the CSV file content
-        timestamp_trim =  10# Trim 10 characters from the timestamp
+        timestamp_trim = 10  # Trim 10 characters from the timestamp
         self.assertEqual(len(lines), 3)  # Header + 2 rows
         self.assertEqual(lines[0].strip(), "ID,Question,Answer,Vote Status,Timestamp")
-        self.assertEqual(lines[1].strip()[:-timestamp_trim], f"1,{question1},{answer1},n/a,{timestamp}"[:-timestamp_trim])  # Default vote status
-        self.assertEqual(lines[2].strip()[:-timestamp_trim], f"2,{question2},{answer2},n/a,{timestamp}"[:-timestamp_trim])  # Default vote status
+        self.assertEqual(
+            lines[1].strip()[:-timestamp_trim],
+            f"1,{question1},{answer1},n/a,{timestamp}"[:-timestamp_trim])  # Default vote status
+        self.assertEqual(
+            lines[2].strip()[:-timestamp_trim],
+            f"2,{question2},{answer2},n/a,{timestamp}"[:-timestamp_trim])  # Default vote status
 
         # Clean up
         os.remove("test_csv_file.csv")
+
 
 if __name__ == "__main__":
     unittest.main()
