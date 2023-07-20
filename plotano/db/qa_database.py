@@ -5,7 +5,7 @@ import sqlite3
 import threading
 import datetime
 
-CSV_HEADER = ('ID', 'Question', 'Answer', 'Timestamp', 'Vote Status')
+CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status', 'Timestamp')
 
 
 class QuestionAnswerDatabase:
@@ -50,8 +50,8 @@ class QuestionAnswerDatabase:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             question TEXT,
             answer TEXT,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            vote_status TEXT CHECK (vote_status IN ('up', 'down', 'n/a'))
+            vote_status TEXT CHECK (vote_status IN ('up', 'down', 'n/a')),
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """
         with self._lock:
@@ -79,8 +79,8 @@ class QuestionAnswerDatabase:
         """
         timestamp = datetime.datetime.now()
         query = """
-        INSERT INTO question_answer (question, answer, timestamp, vote_status)
-        VALUES (?, ?, ?, 'n/a');
+        INSERT INTO question_answer (question, answer, vote_status, timestamp)
+        VALUES (?, ?, 'n/a', ?);
         """
         with self._lock:
             cursor = self.get_cursor()
@@ -160,7 +160,7 @@ class QuestionAnswerDatabase:
         """
         for row in rows:
             print(f"ID: {row[0]}, Question: {row[1]}, "
-                  f"Answer: {row[2]}, Timestamp: {row[3]}, Vote Status: {row[4]}")
+                  f"Answer: {row[2]}, Vote Status: {row[3]}, Timestamp: {row[4]}")
 
     def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
         """
