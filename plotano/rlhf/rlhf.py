@@ -66,7 +66,7 @@ def read_json_file(file_path):
 @dataclass
 class RLHFConfig:
     base_model_path: str = field(
-        default="elinas/llama-7b-hf-transformers-4.29", 
+        default="meta-llama/Llama-2-7b-hf", 
         metadata={"help": "Huggingface model name or a local path to the base model."})
     dataset_type: Optional[str] = field(
         default="csv",
@@ -109,7 +109,7 @@ class RLHFConfig:
     bf16: Optional[bool] = field(default=False, metadata={"help": "Enable BF16."})
     load_in_8bit: Optional[bool] = field(default=True, metadata={"help": "Whether load the model weights in 8-bit or not."})
     device_map: Optional[dict] = field(
-        default={"": Accelerator().process_index},
+        default_factory=lambda: {"": Accelerator().process_index},
         metadata={"help": "specify the mapping of model layers to specific devices, such as different GPUs \
                   in a multi-GPU setup. This can be helpful for distributing the computational load of a \
                   large model across multiple GPUs."})
