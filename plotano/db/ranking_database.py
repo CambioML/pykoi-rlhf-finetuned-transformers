@@ -4,8 +4,7 @@ import os
 import sqlite3
 import threading
 
-
-CSV_HEADER = ('ID', 'Question', 'Answer', 'Ranking')
+CSV_HEADER = ('ID', 'Question', 'Up Ranking Answer', 'Low Ranking Answer')
 
 
 class RankingDatabase:
@@ -42,15 +41,14 @@ class RankingDatabase:
     def create_table(self):
         """
         Creates the ranking table if it does not already exist in the database.
-        The table has four columns: id (primary key), question, answer, and ranking.
-        The ranking column is constrained to only allow the values 1 and 2.
+        The table has four columns: id (primary key), question, up_ranking_answer, and low_ranking_answer.
         """
         query = """
         CREATE TABLE IF NOT EXISTS ranking (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             question TEXT,
-            answer TEXT,
-            ranking INTEGER CHECK (ranking IN (1, 2))
+            up_ranking_answer TEXT,
+            low_ranking_answer TEXT
         );
         """
         with self._lock:
@@ -63,25 +61,26 @@ class RankingDatabase:
             print("Table contents after creating table:")
             self.print_table(rows)
 
-    def insert_ranking(self, question: str, answer: str, ranking: int):
+    def insert_ranking(self, question: str, up_ranking_answer: str, low_ranking_answer: str):
         """
-        Inserts a new ranking entry into the database with the given question, answer, and ranking.
+        Inserts a new ranking entry into the database with the given question, up_ranking_answer,
+        and low_ranking_answer.
 
         Args:
             question (str): The question of the ranking entry.
-            answer (str): The answer of the ranking entry.
-            ranking (int): The ranking value, should be either 1 or 2.
+            up_ranking_answer (str): The higher ranked answer of the ranking entry.
+            low_ranking_answer (str): The lower ranked answer of the ranking entry.
 
         Returns:
             int: The ID of the newly inserted row.
         """
         query = """
-        INSERT INTO ranking (question, answer, ranking)
+        INSERT INTO ranking (question, up_ranking_answer, low_ranking_answer)
         VALUES (?, ?, ?);
         """
         with self._lock:
             cursor = self.get_cursor()
-            cursor.execute(query, (question, answer, ranking))
+            cursor.execute(query, (question, up_ranking_answer, low_ranking_answer))
             self.get_connection().commit()
 
         if self._debug:
@@ -124,11 +123,11 @@ class RankingDatabase:
 
         Args:
             rows (list): A list of tuples where each tuple represents a row in the table.
-                         Each tuple contains four elements: ID, Question, Answer, and Ranking.
+                         Each tuple contains four elements: ID, Question, Up_Ranking_Answer, Low_Ranking_Answer.
         """
         for row in rows:
             print(f"ID: {row[0]}, Question: {row[1]}, "
-                  f"Answer: {row[2]}, Ranking: {row[3]}")
+                  f"Up_Ranking_Answer: {row[2]}, Low_Ranking_Answer: {row[3]}")
 
     def save_to_csv(self, csv_file_name="ranking_data.csv"):
         """
@@ -138,8 +137,8 @@ class RankingDatabase:
             csv_file_name (str, optional): The name of the CSV file to which the data will be written.
             Defaults to "ranking_data.csv".
 
-        The CSV file will have the following columns: ID, Question, Answer, Ranking. Each row in the
-        CSV file corresponds to a row in the ranking table.
+        The CSV file will have the following columns: ID, Question, Up_Ranking_Answer, Low_Ranking_Answer.
+        Each row in the CSV file corresponds to a row in the ranking table.
 
         This method retrieves all ranking entries from the database by calling the
         retrieve_all_question_answers method. It then writes this data to the CSV file.
