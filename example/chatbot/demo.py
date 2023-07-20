@@ -5,7 +5,7 @@ import plotano.cambio as cb
 # # Creating an OpenAI model (requires an OpenAI API key) #
 ###########################################################
 # enter openai api key here
-api_key = "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"
+api_key = ""
 
 # Creating an OpenAI model
 model = cb.ModelFactory.create_model(model_name="openai", api_key=api_key)
@@ -24,6 +24,7 @@ model = cb.ModelFactory.create_model(model_name="openai", api_key=api_key)
 #####################################
 database = cb.QuestionAnswerDatabase(debug=True)
 chatbot = cb.Chatbot(model=model, database=database, feedback=True)
+dashboard = cb.Dashboard(database=database)
 
 ###########################################################
 # Starting the application and add chatbot as a component #
@@ -31,14 +32,16 @@ chatbot = cb.Chatbot(model=model, database=database, feedback=True)
 # Create the application
 
 # uncomment to launch app with sharing url
-app = cb.Application(
-    share=True,
-    debug=False)
+# app = cb.Application(
+#     share=True,
+#     debug=False)
 
 # without sharing url
 # app = cb.Application(
 #     share=False,
 #     debug=False)
 
-app.add_component(chatbot)
+# app.add_component(chatbot)
+app = cb.Application(debug=False)
+app.add_component(dashboard)
 app.run()
