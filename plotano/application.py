@@ -5,10 +5,7 @@ from pyngrok import ngrok
 
 
 class Application:
-    def __init__(
-            self,
-            share: bool = False,
-            debug: bool = False):
+    def __init__(self, share: bool = False, debug: bool = False):
         self._debug = debug
         self._share = share
         self.data_sources = {}
@@ -102,7 +99,10 @@ class Application:
             create_data_route(id, data_source)
 
         for component in self.components:
-            if component["svelte_component"] == "Chatbot":
+            if (
+                component["svelte_component"] == "Chatbot"
+                or component["svelte_component"] == "Feedback"
+            ):
                 self.create_chatbot_route(app, component)
 
         @app.route("/")
@@ -119,7 +119,7 @@ class Application:
         # Set the ngrok tunnel if share is True
         if self._share:
             public_url = ngrok.connect("http://127.0.0.1:5000")
-            print('Public URL:', public_url)
+            print("Public URL:", public_url)
 
             app.run(debug=self._debug)
 
