@@ -68,8 +68,8 @@ class RLHFConfig:
         default="meta-llama/Llama-2-7b-hf", 
         metadata={"help": "Huggingface model name or a local path to the base model."})
     dataset_type: Optional[str] = field(
-        default="csv", ## TODO
-        metadata={"help": "choose from 'csv', 'huggingface' to load the dataset."})
+        default="csv",
+        metadata={"help": "'csv':load from a local csv path; 'huggingface': load a huggingface dataset."})
     dataset_name: Optional[str] = field(
         default="lvwerra/stack-exchange-paired", 
         metadata={"help": "Huggingface dataset name or a local path to the dataset."})
@@ -207,11 +207,11 @@ class RLHFConfig:
     # dataset_subset_reward_eval: Optional[int] = field(
     #     default=400, 
     #     metadata={"help": "The size of the subset of the validation/eval data to use."})
-    num_train_epochs: Optional[int] = field(
-        default=1, metadata={"help": "The number of training epochs."})
-    # deepspeed: Optional[str] = field(
-    #     default= "/home/ubuntu/peel-test/peel/peelml/rlhf/deepspeed_config.json", ## None, ## TODO
-    #     metadata={"help": "Path to deepspeed config if using deepspeed."})
+    reward_epochs: Optional[int] = field(
+        default=10, metadata={"help": "The number of training epochs for reward modeling."})
+    deepspeed: Optional[str] = field(
+        default=None, ## TODO
+        metadata={"help": "Path to deepspeed config if using deepspeed."})
     remove_unused_columns: Optional[bool] = field(
         default=False, 
         metadata={"help": "Whether to remove unused columns from the dataset."})
@@ -271,7 +271,7 @@ class RLHFConfig:
     ppo_epochs: Optional[int] = field(
         default=4, metadata={"help": "the number of ppo epochs"})
     total_ppo_epochs: Optional[int] = field(
-        default=20000, metadata={"help": "number of epochs"}) 
+        default=20000, metadata={"help": "number of total epochs"}) 
     ## TODO: differences between total_ppo_epochs and ppo_epochs
     early_stopping: Optional[bool] = field(
         default=False, metadata={"help": "whether to early stop"})
@@ -491,7 +491,7 @@ class RewardTrainer(Trainer):
             learning_rate=rlhf_config.learning_rate,
             per_device_train_batch_size=rlhf_config.per_device_train_batch_size,
             per_device_eval_batch_size=rlhf_config.per_device_eval_batch_size,
-            num_train_epochs=rlhf_config.num_train_epochs,
+            num_train_epochs=rlhf_config.reward_epochs,
             weight_decay=rlhf_config.weight_decay,
             evaluation_strategy=rlhf_config.evaluation_strategy,
             save_strategy=rlhf_config.evaluation_strategy,
@@ -519,7 +519,7 @@ class RewardTrainer(Trainer):
             num_labels=1,
             torch_dtype=self.torch_dtype,
             load_in_8bit=rlhf_config.load_in_8bit,
-            # device_map={"": Accelerator().process_index} ## TODO
+            device_map=rlhf_config.device_map
         )
         self.model = get_peft_model(self.base_model, rlhf_config.lora_config_reward)
         self.model.print_trainable_parameters()
