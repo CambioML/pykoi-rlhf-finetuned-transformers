@@ -5,8 +5,19 @@ import sqlite3
 import threading
 import datetime
 
-CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status', 'Timestamp')
-
+# QA_CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status', 'Timestamp')
+QA_CSV_HEADER_ID = 'ID'
+QA_CSV_HEADER_QUESTION = 'Question'
+QA_CSV_HEADER_ANSWER = 'Answer'
+QA_CSV_HEADER_VOTE_STATUS = 'Vote Status'
+QA_CSV_HEADER_TIMESTAMPS = 'Timestamp'
+QA_CSV_HEADER = (
+    QA_CSV_HEADER_ID, 
+    QA_CSV_HEADER_QUESTION, 
+    QA_CSV_HEADER_ANSWER, 
+    QA_CSV_HEADER_VOTE_STATUS,
+    QA_CSV_HEADER_TIMESTAMPS
+    )
 
 class QuestionAnswerDatabase:
     """Question Answer Database class"""

@@ -412,7 +412,7 @@ class SFT(Trainer):
         dataset = dataset.train_test_split(test_size=args.train_test_split_ratio, 
                                            seed=args.seed)
         print(f"Size of the train set: {len(dataset['train'])}. \
-              Size of the validation set: {len(dataset['eval'])}")
+              Size of the validation set: {len(dataset['test'])}")
 
         train_dataset = ConstantLengthDataset(
             tokenizer,
@@ -424,7 +424,7 @@ class SFT(Trainer):
         )
         eval_dataset = ConstantLengthDataset(
             tokenizer,
-            dataset['eval'],
+            dataset['test'],
             formatting_func=self.prepare_sample_text,
             infinite=False,
             seq_length=args.max_seq_length,
