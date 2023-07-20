@@ -4,6 +4,7 @@
   import Chatbot from "./Chatbot.svelte";
   import Dropdown from "./Dropdown.svelte";
   import Feedback from "./Feedback.svelte";
+  import RankedChatbot from "./RankedChatbot.svelte";
 
   const components = writable([]);
 
@@ -14,6 +15,8 @@
     });
 </script>
 
+<RankedChatbot />
+<!-- 
 {#each $components as component}
   {#if component.svelte_component === "Feedback"}
     <Feedback {...component.props} />
@@ -25,7 +28,7 @@
   {#if component.svelte_component === "Dropdown"}
     <Dropdown {...component.props} />
   {/if}
-{/each}
+{/each} -->
 <p class="footer-logo">Made with CambioML</p>
 
 <style>

@@ -44,9 +44,9 @@ h1 {
 }
 
 #app {
-  max-width: 1280px;
+  /* max-width: 1280px; */
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
   text-align: center;
 }
 
@@ -223,7 +223,7 @@ footer p {
 
 p {
     margin-bottom: 1rem;
-    max-width: 40em;
+    /* max-width: 40em; */
 }
 
 p a,
@@ -526,7 +526,7 @@ button.small {
 	box-shadow: var(--shadow-lg);
 	border-radius: var(--borderRadius);
 	font-size: var(--smallText);
-	max-width: 30em;
+	/* max-width: 30em; */
   }
   
   .card:hover {
