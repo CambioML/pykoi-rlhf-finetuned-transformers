@@ -14,9 +14,10 @@
     });
 </script>
 
-<Feedback />
-
 {#each $components as component}
+  {#if component.svelte_component === "Feedback"}
+    <Feedback {...component.props} />
+  {/if}
   {#if component.svelte_component === "Chatbot"}
     <Chatbot {...component.props} />
   {/if}
