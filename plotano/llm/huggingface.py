@@ -1,5 +1,4 @@
-import torch
-
+"""Hubbingface model for Language Model (LLM)."""
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer)
@@ -8,7 +7,10 @@ from plotano.llm.abs_llm import AbsLlm
 
 
 class HuggingfaceModel(AbsLlm):
-    """Huggingface model wrapper for LLMChain."""
+    """
+    This class is a wrapper for the Huggingface model for Language Model (LLM) Chain.
+    It inherits from the abstract base class AbsLlm.
+    """
 
     def __init__(self,
                  pretrained_model_name_or_path: str,
@@ -16,7 +18,16 @@ class HuggingfaceModel(AbsLlm):
                  load_in_8bit: bool = True,
                  max_length: int = 100,
                  device_map: str = "auto"):
-        """Initialize the Huggingface model."""
+        """
+        Initialize the Huggingface model.
+
+        Args:
+            pretrained_model_name_or_path (str): The name or path of the pretrained model.
+            trust_remote_code (bool): Whether to trust the remote code. Default is True.
+            load_in_8bit (bool): Whether to load the model in 8-bit. Default is True.
+            max_length (int): The maximum length for the model. Default is 100.
+            device_map (str): The device map for the model. Default is "auto".
+        """
         # running on cpu can be slow!!!
         print("[HuggingfaceModel] loading model...")
         self._model = AutoModelForCausalLM.from_pretrained(
@@ -35,7 +46,15 @@ class HuggingfaceModel(AbsLlm):
 
     def predict(self,
                 message: str):
-        """Predict the next word."""
+        """
+        Predict the next word based on the input message.
+
+        Args:
+            message (str): The input message for the model.
+
+        Returns:
+            str: The predicted next word.
+        """
         print("HuggingfaceModel] encode...")
         input_ids = self._tokenizer.encode(message,
                                            return_tensors="pt")
