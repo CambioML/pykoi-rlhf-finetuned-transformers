@@ -29,10 +29,10 @@ class TestDataSource(unittest.TestCase):
         def fetch_func():
             return "data"
 
-        ds = DataSource("test_id", fetch_func)
+        data_source = DataSource("test_id", fetch_func)
 
-        self.assertEqual(ds.id, "test_id")
-        self.assertEqual(ds.fetch_func(), "data")
+        self.assertEqual(data_source.id, "test_id")
+        self.assertEqual(data_source.fetch_func(), "data")
 
 
 class TestComponent(unittest.TestCase):
