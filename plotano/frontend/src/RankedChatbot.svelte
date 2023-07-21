@@ -1,9 +1,7 @@
 <script>
-  import { chatLog } from "./store";
   import { onMount } from "svelte";
   import { select } from "d3-selection";
-
-  export let feedback = false;
+  import { rankChatLog } from "./store";
 
   let mymessage = "";
   let messageplaceholder = "";
@@ -16,32 +14,33 @@
   async function getDataFromDB() {
     console.log("fetching data from db");
     const response = await fetch(
-      "http://127.0.0.1:5000/chat/qa_table/retrieve"
+      "http://127.0.0.1:5000/chat/ranking_table/retrieve"
     );
     const data = await response.json();
     const dbRows = data["rows"];
+    console.log(dbRows);
     const formattedRows = dbRows.map((row) => ({
       id: row[0],
       question: row[1],
-      answer: row[2],
-      vote_status: row[3],
+      up_ranking_answer: row[2],
+      low_ranking_answer: row[3],
     }));
-    $chatLog = [...formattedRows];
+    $rankChatLog = [...formattedRows];
   }
 
   const askModel = async (event) => {
     event.preventDefault(); // Prevents page refresh
     mymessage = messageplaceholder;
+    console.log("message", mymessage);
     messageplaceholder = "";
     chatLoading = true;
     let currentEntry = {
-      id: $chatLog.length + 1,
       question: mymessage,
-      answer: "Loading...",
-      vote_status: "na",
+      up_ranking_answer: "Loading...",
+      low_ranking_answer: "bbb...",
     };
     console.log("adding to log here");
-    $chatLog = [...$chatLog, currentEntry];
+    $rankChatLog = [...$rankChatLog, currentEntry];
 
     const response = await fetch(`/chat/${mymessage}`, {
       method: "POST",
@@ -55,9 +54,10 @@
 
     if (response.ok) {
       const data = await response.json();
-      currentEntry["answer"] = data["answer"];
-      // $chatLog[$chatLog.length - 1] = currentEntry;
-      chatLog.update((state) => {
+      console.log("ANSWER!!", data);
+      currentEntry["up_ranking_answer"] = data["answer"];
+      currentEntry["low_ranking_answer"] = data["answer"];
+      rankChatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
       });
@@ -83,24 +83,20 @@
 
   $: dots = ".".repeat(dotState).padEnd(3);
 
-  $: console.log("chat updated!", $chatLog);
+  $: console.log("chat updated!", $rankChatLog);
 
-  async function logVote(vote, index) {
-    const messageLog = $chatLog[index];
-    messageLog.vote = vote;
-    const feedbackUpdate = {
-      id: index + 1, // increment bc sqlite 1-indexed
-      vote_status: vote,
-    };
-    console.log(feedbackUpdate);
-    console.log(feedbackUpdate);
-    const response = await fetch("http://127.0.0.1:5000/chat/qa_table/update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(feedbackUpdate),
-    });
+  async function insertRanking(rankingUpdate) {
+    console.log("adding to db: ", rankingUpdate);
+    const response = await fetch(
+      "http://127.0.0.1:5000/chat/ranking_table/update",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(rankingUpdate),
+      }
+    );
 
     if (response.ok) {
       console.log("update worked!", response);
@@ -110,14 +106,31 @@
     }
   }
 
-  function handleClick() {
-    select(this.parentNode)
+  function handleClick(event, msg, questionIndex, answerIndex) {
+    // insert message[index] as good
+    const currQuestion = $rankChatLog[questionIndex];
+
+    const id2answer = {
+      1: "up_ranking_answer",
+      2: "low_ranking_answer",
+    };
+
+    const rankingUpdate = {
+      question: currQuestion.question,
+      up_ranking_answer: currQuestion[id2answer[answerIndex]],
+      low_ranking_answer: currQuestion[id2answer[(answerIndex % 2) + 1]],
+    };
+
+    // add to db
+    insertRanking(rankingUpdate);
+
+    select(event.currentTarget.parentNode)
       .selectAll("div")
       .style("outline", "2px solid var(--red)")
-      .style("border", "1px solid var(--red");
-    select(this)
+      .style("border", "1px solid var(--red)");
+    select(event.currentTarget)
       .style("outline", "2px solid var(--green)")
-      .style("border", "1px solid var(--green");
+      .style("border", "1px solid var(--green)");
   }
 </script>
 
@@ -135,10 +148,10 @@
   <div class="ranked-chat">
     <section class="chatbox">
       <div class="chat-log">
-        {#each $chatLog as message, index (index)}
+        {#each $rankChatLog as message, index (index)}
           <div
             class="chat-message"
-            use:scrollToView={index === $chatLog.length - 1}
+            use:scrollToView={index === $rankChatLog.length - 1}
           >
             <div class="chat-message-center">
               <div class="avatar">
@@ -152,19 +165,21 @@
                 <div class="answers">
                   <div
                     class="answer"
-                    on:click={handleClick}
-                    on:keydown={handleClick}
+                    on:click={(event) => handleClick(event, message, index, 1)}
+                    on:keydown={(event) =>
+                      handleClick(event, message, index, 1)}
                   >
                     <h5 class="bold underline">Response 1:</h5>
-                    <p>{message.answer}</p>
+                    <p>{message.up_ranking_answer}</p>
                   </div>
                   <div
                     class="answer"
-                    on:click={handleClick}
-                    on:keydown={handleClick}
+                    on:click={(event) => handleClick(event, message, index, 2)}
+                    on:keydown={(event) =>
+                      handleClick(event, message, index, 2)}
                   >
                     <h5 class="bold underline">Response 2:</h5>
-                    <p>{message.answer}</p>
+                    <p>{message.low_ranking_answer}</p>
                   </div>
                 </div>
               </div>
