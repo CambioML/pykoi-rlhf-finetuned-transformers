@@ -45,24 +45,32 @@ class HuggingfaceModel(AbsLlm):
         super().__init__()
 
     def predict(self,
-                message: str):
+                message: str,
+                num_of_response: int = 1):
         """
         Predict the next word based on the input message.
 
         Args:
             message (str): The input message for the model.
+            num_of_response (int): The number of response to generate. Default is 1.
 
         Returns:
-            str: The predicted next word.
+            List[str]: List of response.
         """
-        print("HuggingfaceModel] encode...")
+        print("[HuggingfaceModel] encode...")
         input_ids = self._tokenizer.encode(message,
                                            return_tensors="pt")
-        print("HuggingfaceModel] generate...")
+        input_ids = input_ids.to('cuda')
+        print("[HuggingfaceModel] generate...")
         output_ids = self._model.generate(input_ids,
-                                          max_length=self._max_length)
-        print("HuggingfaceModel] decode...")
-        response = self._tokenizer.decode(
-            output_ids[0],
-            skip_special_tokens=True)
+                                          max_length=self._max_length,
+                                          num_return_sequences=num_of_response,
+                                          do_sample=True,
+                                          temperature=0.3)
+        print("[HuggingfaceModel] decode...")
+        response = [self._tokenizer.decode(
+            ids, skip_special_tokens=True) for ids in output_ids]
+
+        response = [resp.split("\n")[1] for resp in response if "\n" in resp]
+
         return response
