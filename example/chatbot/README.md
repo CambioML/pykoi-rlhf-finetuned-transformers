@@ -40,7 +40,6 @@ pip3 install einops
 pip install accelerate
 pip install --upgrade bitsandbytes
 pip install scipy
-pip install pyngrok
 ```
 #### 2.1.2 Edit
 uncomment the following lines in chatbot_demo.py and put your api_key in the variable
