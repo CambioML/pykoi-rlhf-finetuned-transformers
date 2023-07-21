@@ -49,6 +49,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="plotano.component.html">plotano.component package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="plotano.db.html">plotano.db package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html">plotano.llm package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="plotano.rlhf.html">plotano.rlhf package</a></li>
 </ul>
 </li>
@@ -131,6 +132,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.component.html#module-plotano.component.chatbot_database_factory">plotano.component.chatbot_database_factory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.component.html#plotano.component.chatbot_database_factory.ChatbotDatabaseFactory"><code class="docutils literal notranslate"><span class="pre">ChatbotDatabaseFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.component.html#plotano.component.chatbot_database_factory.ChatbotDatabaseFactory.create"><code class="docutils literal notranslate"><span class="pre">ChatbotDatabaseFactory.create()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.component.html#module-plotano.component.constants">plotano.component.constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.component.html#plotano.component.constants.FeedbackType"><code class="docutils literal notranslate"><span class="pre">FeedbackType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.component.html#plotano.component.constants.FeedbackType.RANK"><code class="docutils literal notranslate"><span class="pre">FeedbackType.RANK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.component.html#plotano.component.constants.FeedbackType.VOTE"><code class="docutils literal notranslate"><span class="pre">FeedbackType.VOTE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="plotano.component.html#module-plotano.component">Module contents</a></li>
 </ul>
 </li>
@@ -166,6 +182,53 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="plotano.db.html#module-plotano.db">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plotano.llm.html">plotano.llm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#module-plotano.llm.abs_llm">plotano.llm.abs_llm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.llm.html#plotano.llm.abs_llm.AbsLlm"><code class="docutils literal notranslate"><span class="pre">AbsLlm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.abs_llm.AbsLlm.None"><code class="docutils literal notranslate"><span class="pre">AbsLlm.None</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.abs_llm.AbsLlm.predict"><code class="docutils literal notranslate"><span class="pre">AbsLlm.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#module-plotano.llm.constants">plotano.llm.constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.llm.html#plotano.llm.constants.LlmName"><code class="docutils literal notranslate"><span class="pre">LlmName</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.constants.LlmName.OPENAI"><code class="docutils literal notranslate"><span class="pre">LlmName.OPENAI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.constants.LlmName.HUGGINGFACE"><code class="docutils literal notranslate"><span class="pre">LlmName.HUGGINGFACE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#id0"><code class="docutils literal notranslate"><span class="pre">LlmName.HUGGINGFACE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#id1"><code class="docutils literal notranslate"><span class="pre">LlmName.OPENAI</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#module-plotano.llm.huggingface">plotano.llm.huggingface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.llm.html#plotano.llm.huggingface.HuggingfaceModel"><code class="docutils literal notranslate"><span class="pre">HuggingfaceModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.huggingface.HuggingfaceModel.predict"><code class="docutils literal notranslate"><span class="pre">HuggingfaceModel.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#module-plotano.llm.model_factory">plotano.llm.model_factory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.llm.html#plotano.llm.model_factory.ModelFactory"><code class="docutils literal notranslate"><span class="pre">ModelFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.model_factory.ModelFactory.create_model"><code class="docutils literal notranslate"><span class="pre">ModelFactory.create_model()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#module-plotano.llm.openai">plotano.llm.openai module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plotano.llm.html#plotano.llm.openai.OpenAIModel"><code class="docutils literal notranslate"><span class="pre">OpenAIModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.openai.OpenAIModel._engine"><code class="docutils literal notranslate"><span class="pre">OpenAIModel._engine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.openai.OpenAIModel._max_tokens"><code class="docutils literal notranslate"><span class="pre">OpenAIModel._max_tokens</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.openai.OpenAIModel._temperature"><code class="docutils literal notranslate"><span class="pre">OpenAIModel._temperature</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html#plotano.llm.openai.OpenAIModel.predict"><code class="docutils literal notranslate"><span class="pre">OpenAIModel.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plotano.llm.html#module-plotano.llm">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plotano.rlhf.html">plotano.rlhf package</a><ul>
