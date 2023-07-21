@@ -12,12 +12,13 @@ QA_CSV_HEADER_ANSWER = 'Answer'
 QA_CSV_HEADER_VOTE_STATUS = 'Vote Status'
 QA_CSV_HEADER_TIMESTAMPS = 'Timestamp'
 QA_CSV_HEADER = (
-    QA_CSV_HEADER_ID, 
-    QA_CSV_HEADER_QUESTION, 
-    QA_CSV_HEADER_ANSWER, 
+    QA_CSV_HEADER_ID,
+    QA_CSV_HEADER_QUESTION,
+    QA_CSV_HEADER_ANSWER,
     QA_CSV_HEADER_VOTE_STATUS,
     QA_CSV_HEADER_TIMESTAMPS
-    )
+)
+
 
 class QuestionAnswerDatabase:
     """Question Answer Database class"""
@@ -178,18 +179,18 @@ class QuestionAnswerDatabase:
         This method saves the contents of the question_answer table into a CSV file.
 
         Args:
-            csv_file_name (str, optional): The name of the CSV file to which the data will be written. 
+            csv_file_name (str, optional): The name of the CSV file to which the data will be written.
             Defaults to "question_answer_votes.csv".
 
-        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the 
+        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the
         CSV file corresponds to a row in the question_answer table.
 
-        This method first retrieves all question-answer pairs from the database by calling the 
+        This method first retrieves all question-answer pairs from the database by calling the
         retrieve_all_question_answers method. It then writes this data to the CSV file.
         """
         my_sql_data = self.retrieve_all_question_answers()
 
         with open(csv_file_name, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(CSV_HEADER)
+            writer.writerow(QA_CSV_HEADER)
             writer.writerows(my_sql_data)

@@ -9,11 +9,12 @@ CSV_HEADER_QUESTION = 'Question'
 RANKING_CSV_HEADER_UP_RANKING_ANSWER = 'Up Ranking Answer'
 RANKING_CSV_HEADER_LOW_RANKING_ANSWER = 'Low Ranking Answer'
 RANKING_CSV_HEADER = (
-    CSV_HEADER_ID, 
-    CSV_HEADER_QUESTION, 
-    RANKING_CSV_HEADER_UP_RANKING_ANSWER, 
+    CSV_HEADER_ID,
+    CSV_HEADER_QUESTION,
+    RANKING_CSV_HEADER_UP_RANKING_ANSWER,
     RANKING_CSV_HEADER_LOW_RANKING_ANSWER
-    )
+)
+
 
 class RankingDatabase:
     """Ranking Database class"""
@@ -155,5 +156,5 @@ class RankingDatabase:
 
         with open(csv_file_name, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(CSV_HEADER)
+            writer.writerow(RANKING_CSV_HEADER)
             writer.writerows(ranking_data)
