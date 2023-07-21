@@ -8,17 +8,15 @@
   let chatLoading = false;
 
   onMount(() => {
-    getDataFromDB();
+    // getDataFromDB();
   });
 
   async function getDataFromDB() {
-    console.log("fetching data from db");
     const response = await fetch(
       "http://127.0.0.1:5000/chat/ranking_table/retrieve"
     );
     const data = await response.json();
     const dbRows = data["rows"];
-    console.log(dbRows);
     const formattedRows = dbRows.map((row) => ({
       id: row[0],
       question: row[1],
@@ -31,18 +29,16 @@
   const askModel = async (event) => {
     event.preventDefault(); // Prevents page refresh
     mymessage = messageplaceholder;
-    console.log("message", mymessage);
     messageplaceholder = "";
     chatLoading = true;
     let currentEntry = {
       question: mymessage,
       up_ranking_answer: "Loading...",
-      low_ranking_answer: "bbb...",
+      low_ranking_answer: "Loading...",
     };
-    console.log("adding to log here");
     $rankChatLog = [...$rankChatLog, currentEntry];
 
-    const response = await fetch(`/chat/${mymessage}`, {
+    const response = await fetch(`/chat/ranking_table/${mymessage}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,9 +50,8 @@
 
     if (response.ok) {
       const data = await response.json();
-      console.log("ANSWER!!", data);
-      currentEntry["up_ranking_answer"] = data["answer"];
-      currentEntry["low_ranking_answer"] = data["answer"];
+      currentEntry["up_ranking_answer"] = data["answer"][0];
+      currentEntry["low_ranking_answer"] = data["answer"][1];
       rankChatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
@@ -83,10 +78,7 @@
 
   $: dots = ".".repeat(dotState).padEnd(3);
 
-  $: console.log("chat updated!", $rankChatLog);
-
   async function insertRanking(rankingUpdate) {
-    console.log("adding to db: ", rankingUpdate);
     const response = await fetch(
       "http://127.0.0.1:5000/chat/ranking_table/update",
       {
@@ -99,7 +91,6 @@
     );
 
     if (response.ok) {
-      console.log("update worked!", response);
     } else {
       const err = await response.text();
       alert(err);
