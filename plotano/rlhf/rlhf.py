@@ -21,9 +21,11 @@ from typing import Any, Dict, List, Optional
 import evaluate
 import numpy as np
 import torch
+import plotano.cambio as cb
 from accelerate import Accelerator
-from datasets import load_dataset
+from datasets import Dataset, load_dataset
 from peft import LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model
+
 from tqdm import tqdm
 from transformers import (Adafactor, AutoModelForCausalLM,
                           AutoModelForSequenceClassification, AutoTokenizer,
@@ -35,6 +37,25 @@ from trl import (AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer,
 from trl.core import LengthSampler
 from trl.trainer.utils import ConstantLengthDataset, PeftSavingCallback
 
+# from plotano.db.ranking_database import (
+#     QA_CSV_HEADER,
+#     QA_CSV_HEADER_ID,
+#     QA_CSV_HEADER_QUESTION,
+#     QA_CSV_HEADER_ANSWER,
+#     QA_CSV_HEADER_VOTE_STATUS,
+# )
+QA_CSV_HEADER_ID = 'ID'
+QA_CSV_HEADER_QUESTION = 'Question'
+QA_CSV_HEADER_ANSWER = 'Answer'
+QA_CSV_HEADER_VOTE_STATUS = 'Vote Status'
+QA_CSV_HEADER_TIMESTAMPS = 'Timestamp'
+QA_CSV_HEADER = (
+    QA_CSV_HEADER_ID,
+    QA_CSV_HEADER_QUESTION,
+    QA_CSV_HEADER_ANSWER,
+    QA_CSV_HEADER_VOTE_STATUS,
+    QA_CSV_HEADER_TIMESTAMPS
+)
 
 def read_json_file(file_path):
     """
@@ -66,15 +87,12 @@ class RLHFConfig:
         metadata={"help": "Huggingface model name or a local path to the base model."},
     )
     dataset_type: Optional[str] = field(
-        default="csv",
-        metadata={
-            "help": "'csv':load from a local csv path; 'huggingface': load a huggingface dataset."
-        },
-    )
+        default="local_db",
+        metadata={"help": "'local_db':load from your local database `qd.db` path; \
+                  'local_csv':load from a local csv path; 'huggingface': load a huggingface dataset."})
     dataset_name: Optional[str] = field(
-        default="lvwerra/stack-exchange-paired",
-        metadata={"help": "Huggingface dataset name or a local path to the dataset."},
-    )
+        default="qd.db", 
+        metadata={"help": "A local path to a csv dataset or a databse; Or a Huggingface dataset name (e.g. 'lvwerra/stack-exchange-paired')."})
     train_test_split_ratio: Optional[float] = field(
         default=0.1,
         metadata={
@@ -157,7 +175,7 @@ class RLHFConfig:
 
     ## Step 1 SFT parameters
     max_steps: Optional[int] = field(
-        default=1000, metadata={"help": "Maximum number of training steps."}
+        default=100, metadata={"help": "Maximum number of training steps."}
     )
     dataset_subset_sft: Optional[str] = field(
         default="data/finetune",
@@ -476,7 +494,19 @@ class SFT(Trainer):
         return text
 
     def create_datasets(self, tokenizer, args):
-        if args.dataset_type == "huggingface":
+        if args.dataset_type == "local_db":
+            qa_database = cb.QuestionAnswerDatabase()
+            my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
+            my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS]=="up"]
+            my_data_pd = my_data_pd[[QA_CSV_HEADER_ID,
+                                     QA_CSV_HEADER_QUESTION,
+                                     QA_CSV_HEADER_ANSWER]]
+            print("My local database has {} samples".format(my_data_pd.shape[0]))
+            dataset = Dataset.from_dict(my_data_pd)
+        elif args.dataset_type == "local_csv":
+            dataset = load_dataset('csv', data_files=args.dataset_name)
+            dataset = dataset[args.split] # Convert DatasetDict to Dataset
+        elif args.dataset_type == "huggingface":
             dataset = load_dataset(
                 args.dataset_name,
                 data_dir=args.dataset_subset_sft,
@@ -485,21 +515,14 @@ class SFT(Trainer):
                 num_proc=self.num_proc,
                 streaming=args.streaming,
             )
-        elif args.dataset_type == "csv":
-            dataset = load_dataset("csv", data_files=args.dataset_name)
+            dataset = dataset[args.split] # Convert DatasetDict to Dataset
         else:
-            raise FileNotFoundError(
-                f"No (supported) data files or dataset script found {args.dataset_type}"
-            )
-
-        dataset = dataset[args.split]  # Convert DatasetDict to Dataset
-        dataset = dataset.train_test_split(
-            test_size=args.train_test_split_ratio, seed=args.seed
-        )
-        print(
-            f"Size of the train set: {len(dataset['train'])}. \
-              Size of the validation set: {len(dataset['test'])}"
-        )
+            raise FileNotFoundError(f"No (supported) data files or dataset script found {args.dataset_type}")
+        
+        dataset = dataset.train_test_split(test_size=args.train_test_split_ratio, 
+                                           seed=args.seed)
+        print(f"Size of the train set: {len(dataset['train'])}. \
+              Size of the validation set: {len(dataset['test'])}")
 
         train_dataset = ConstantLengthDataset(
             tokenizer,
@@ -618,6 +641,7 @@ class RewardTrainer(Trainer):
             self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         )
 
+        self.dataset = self.create_datasets()
         self.dataset = self.create_datasets()
 
         self.compute_metrics = self._compute_metrics
