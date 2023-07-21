@@ -4,6 +4,7 @@ import os
 import sqlite3
 import threading
 import datetime
+import pandas as pd
 
 # QA_CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status', 'Timestamp')
 QA_CSV_HEADER_ID = 'ID'
@@ -150,6 +151,18 @@ class QuestionAnswerDatabase:
             cursor.execute(query)
             rows = cursor.fetchall()
         return rows
+    
+    def retrieve_all_question_answers_as_pandas(self):
+        """
+        Retrieves all question-answer pairs from the database as a pandas dataframe.
+
+        Returns:
+            DataFrame: A pandas dataframe.
+        """
+        rows = self.retrieve_all_question_answers()
+        rows_to_pd = pd.DataFrame(rows)
+        rows_to_pd.columns = QA_CSV_HEADER
+        return rows_to_pd
 
     def close_connection(self):
         """
