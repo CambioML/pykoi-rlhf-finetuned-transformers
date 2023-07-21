@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plotano.db package &mdash; plotano 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="plotano.rlhf package" href="plotano.rlhf.html" />
+    <link rel="prev" title="plotano.component package" href="plotano.component.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            plotano
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">plotano</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="plotano.html">plotano package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="plotano.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="plotano.component.html">plotano.component package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">plotano.db package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.rlhf.html">plotano.rlhf package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano.application">plotano.application module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano.cambio">plotano.cambio module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano.state">plotano.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">plotano</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">plotano</a></li>
+          <li class="breadcrumb-item"><a href="plotano.html">plotano package</a></li>
+      <li class="breadcrumb-item active">plotano.db package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/plotano.db.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="plotano-db-package">
+<h1>plotano.db package<a class="headerlink" href="#plotano-db-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-plotano.db.qa_database">
+<span id="plotano-db-qa-database-module"></span><h2>plotano.db.qa_database module<a class="headerlink" href="#module-plotano.db.qa_database" title="Permalink to this heading"></a></h2>
+<p>Question answer database module</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.db.qa_database.</span></span><span class="sig-name descname"><span class="pre">QuestionAnswerDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/Users/lingjiekong/Documents/github/cambioml/plotano/docs/qd.db'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Question Answer Database class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.close_connection">
+<span class="sig-name descname"><span class="pre">close_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.close_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.close_connection" title="Permalink to this definition"></a></dt>
+<dd><p>Closes the connection to the database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.create_table">
+<span class="sig-name descname"><span class="pre">create_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.create_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.create_table" title="Permalink to this definition"></a></dt>
+<dd><p>Creates the question_answer table if it does not already exist in the database.
+The table has four columns: id (primary key), question, answer, and vote_status.
+vote_status is a text field that can only have the values ‘up’, ‘down’, or ‘n/a’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.get_connection">
+<span class="sig-name descname"><span class="pre">get_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.get_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.get_connection" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the thread-local database connection</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.get_cursor">
+<span class="sig-name descname"><span class="pre">get_cursor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.get_cursor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.get_cursor" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the thread-local database cursor</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.insert_question_answer">
+<span class="sig-name descname"><span class="pre">insert_question_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">answer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.insert_question_answer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.insert_question_answer" title="Permalink to this definition"></a></dt>
+<dd><p>Inserts a new question-answer pair into the database with the given question and answer.
+The vote_status field is set to ‘n/a’ by default.
+Returns the ID of the newly inserted row.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<em>str</em>) – The question to insert.</p></li>
+<li><p><strong>answer</strong> (<em>str</em>) – The answer to insert.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ID of the newly inserted row.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.print_table">
+<span class="sig-name descname"><span class="pre">print_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.print_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.print_table" title="Permalink to this definition"></a></dt>
+<dd><p>Prints the contents of the table in a formatted manner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rows</strong> (<em>list</em>) – A list of tuples where each tuple represents a row in the table.
+Each tuple contains five elements: ID, Question, Answer, Timestamp, and Vote Status.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.retrieve_all_question_answers">
+<span class="sig-name descname"><span class="pre">retrieve_all_question_answers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.retrieve_all_question_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.retrieve_all_question_answers" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves all question-answer pairs from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of tuples representing the question-answer pairs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.save_to_csv">
+<span class="sig-name descname"><span class="pre">save_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'question_answer_votes.csv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.save_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.save_to_csv" title="Permalink to this definition"></a></dt>
+<dd><p>This method saves the contents of the question_answer table into a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_file_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the CSV file to which the data will be written.</p></li>
+<li><p><strong>&quot;question_answer_votes.csv&quot;.</strong> (<em>Defaults to</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the
+CSV file corresponds to a row in the question_answer table.</p>
+<p>This method first retrieves all question-answer pairs from the database by calling the
+retrieve_all_question_answers method. It then writes this data to the CSV file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.qa_database.QuestionAnswerDatabase.update_vote_status">
+<span class="sig-name descname"><span class="pre">update_vote_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote_status</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/qa_database.html#QuestionAnswerDatabase.update_vote_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.qa_database.QuestionAnswerDatabase.update_vote_status" title="Permalink to this definition"></a></dt>
+<dd><p>Updates the vote status of a question-answer pair with the given ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) – The ID of the question-answer pair to update.</p></li>
+<li><p><strong>vote_status</strong> (<em>str</em>) – The new vote status to set. Must be one of ‘up’, ‘down’, or ‘n/a’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the question with the given ID does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-plotano.db.ranking_database">
+<span id="plotano-db-ranking-database-module"></span><h2>plotano.db.ranking_database module<a class="headerlink" href="#module-plotano.db.ranking_database" title="Permalink to this heading"></a></h2>
+<p>This file contains the RankingDatabase class which is used to store and retrieve</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.db.ranking_database.</span></span><span class="sig-name descname"><span class="pre">RankingDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/Users/lingjiekong/Documents/github/cambioml/plotano/docs/ranking.db'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Ranking Database class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.close_connection">
+<span class="sig-name descname"><span class="pre">close_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.close_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.close_connection" title="Permalink to this definition"></a></dt>
+<dd><p>Closes the connection to the database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.create_table">
+<span class="sig-name descname"><span class="pre">create_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.create_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.create_table" title="Permalink to this definition"></a></dt>
+<dd><p>Creates the ranking table if it does not already exist in the database.
+The table has four columns: id (primary key), question, up_ranking_answer, and low_ranking_answer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.get_connection">
+<span class="sig-name descname"><span class="pre">get_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.get_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.get_connection" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the thread-local database connection</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.get_cursor">
+<span class="sig-name descname"><span class="pre">get_cursor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.get_cursor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.get_cursor" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the thread-local database cursor</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.insert_ranking">
+<span class="sig-name descname"><span class="pre">insert_ranking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">up_ranking_answer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_ranking_answer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.insert_ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.insert_ranking" title="Permalink to this definition"></a></dt>
+<dd><p>Inserts a new ranking entry into the database with the given question, up_ranking_answer,
+and low_ranking_answer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<em>str</em>) – The question of the ranking entry.</p></li>
+<li><p><strong>up_ranking_answer</strong> (<em>str</em>) – The higher ranked answer of the ranking entry.</p></li>
+<li><p><strong>low_ranking_answer</strong> (<em>str</em>) – The lower ranked answer of the ranking entry.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ID of the newly inserted row.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.print_table">
+<span class="sig-name descname"><span class="pre">print_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.print_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.print_table" title="Permalink to this definition"></a></dt>
+<dd><p>Prints the contents of the table in a formatted manner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rows</strong> (<em>list</em>) – A list of tuples where each tuple represents a row in the table.
+Each tuple contains four elements: ID, Question, Up_Ranking_Answer, Low_Ranking_Answer.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.retrieve_all_question_answers">
+<span class="sig-name descname"><span class="pre">retrieve_all_question_answers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.retrieve_all_question_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.retrieve_all_question_answers" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves all question-answer pairs from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of tuples representing the question-answer pairs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.db.ranking_database.RankingDatabase.save_to_csv">
+<span class="sig-name descname"><span class="pre">save_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ranking_data.csv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/db/ranking_database.html#RankingDatabase.save_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.db.ranking_database.RankingDatabase.save_to_csv" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the contents of the ranking table into a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_file_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the CSV file to which the data will be written.</p></li>
+<li><p><strong>&quot;ranking_data.csv&quot;.</strong> (<em>Defaults to</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p>The CSV file will have the following columns: ID, Question, Up_Ranking_Answer, Low_Ranking_Answer.
+Each row in the CSV file corresponds to a row in the ranking table.</p>
+<p>This method retrieves all ranking entries from the database by calling the
+retrieve_all_question_answers method. It then writes this data to the CSV file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-plotano.db">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-plotano.db" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="plotano.component.html" class="btn btn-neutral float-left" title="plotano.component package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="plotano.rlhf.html" class="btn btn-neutral float-right" title="plotano.rlhf package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CambioML.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

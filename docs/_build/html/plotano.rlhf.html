@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plotano.rlhf package &mdash; plotano 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="plotano.db package" href="plotano.db.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            plotano
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">plotano</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="plotano.html">plotano package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="plotano.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="plotano.component.html">plotano.component package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.db.html">plotano.db package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">plotano.rlhf package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano.application">plotano.application module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano.cambio">plotano.cambio module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano.state">plotano.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plotano.html#module-plotano">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">plotano</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">plotano</a></li>
+          <li class="breadcrumb-item"><a href="plotano.html">plotano package</a></li>
+      <li class="breadcrumb-item active">plotano.rlhf package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/plotano.rlhf.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="plotano-rlhf-package">
+<h1>plotano.rlhf package<a class="headerlink" href="#plotano-rlhf-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-plotano.rlhf.rlhf">
+<span id="plotano-rlhf-rlhf-module"></span><h2>plotano.rlhf.rlhf module<a class="headerlink" href="#module-plotano.rlhf.rlhf" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.rlhf.rlhf.</span></span><span class="sig-name descname"><span class="pre">RLHFConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_model_path:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'meta-llama/Llama-2-7b-hf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_type:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'lvwerra/stack-exchange-paired'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_test_split_ratio:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">streaming:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_buffer:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_seq_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_strategy:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'steps'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_device_train_batch_size:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_device_eval_batch_size:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient_accumulation_steps:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eos_token_id:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_decay:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_rank:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp16:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bf16:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_in_8bit:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_map:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient_checkpointing:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'./rlhf_checkpoints'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_freq:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_freq:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_freq:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push_to_hub:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steps:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_subset_sft:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'data/finetune'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_subset_sft_train:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">question_title:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'Question'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">answer_title:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'Answer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_valid_set:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">4000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sft_lora_path:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'step1_supervised_finetuning_lora_final/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sft_merged_path:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'step1_supervised_finetuning_merged/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler_type_sft:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'cosine'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_warmup_steps:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_config_rl:</span> <span class="pre">Optional[peft.tuners.lora.LoraConfig]</span> <span class="pre">=</span> <span class="pre">LoraConfig(peft_type=&lt;PeftType.LORA:</span> <span class="pre">'LORA'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_mapping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_model_name_or_path=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revision=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type=&lt;TaskType.CAUSAL_LM:</span> <span class="pre">'CAUSAL_LM'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inference_mode=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r=32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_modules=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_alpha=64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_dropout=0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fan_in_fan_out=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias='none'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modules_to_save=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_lora_weights=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers_to_transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers_pattern=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_model_path:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'databricks/dolly-v2-3b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_lora_path:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'step1_supervised_finetuning_lora_final/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_merged_path:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'step1_supervised_finetuning_merged/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resume_from_checkpoint:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_reward_folder:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'data/reward'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_eval_folder:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'data/evaluation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_num_of_data:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_seq_length_reward:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_epochs:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deepspeed:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_unused_columns:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_names:</span> <span class="pre">Optional[List[str]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_strategy:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'steps'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_steps:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_config_reward:</span> <span class="pre">Optional[peft.tuners.lora.LoraConfig]</span> <span class="pre">=</span> <span class="pre">LoraConfig(peft_type=&lt;PeftType.LORA:</span> <span class="pre">'LORA'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_mapping=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_model_name_or_path=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revision=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type=&lt;TaskType.SEQ_CLS:</span> <span class="pre">'SEQ_CLS'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inference_mode=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r=16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_modules=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_alpha=32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_dropout=0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fan_in_fan_out=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias='none'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modules_to_save=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_lora_weights=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers_to_transform=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers_pattern=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_subset_rl:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">'data/finetune'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_subset_rl_train:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adafactor:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_p:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_sample:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_max_length:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mini_batch_size:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppo_batch_size:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppo_epochs:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_ppo_epochs:</span> <span class="pre">Optional[int]</span> <span class="pre">=</span> <span class="pre">20000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_kl:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_baseline:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_kl_coef:</span> <span class="pre">Optional[float]</span> <span class="pre">=</span> <span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adap_kl_ctrl:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RLHFConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.adafactor">
+<span class="sig-name descname"><span class="pre">adafactor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.adafactor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.adap_kl_ctrl">
+<span class="sig-name descname"><span class="pre">adap_kl_ctrl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.adap_kl_ctrl" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.answer_title">
+<span class="sig-name descname"><span class="pre">answer_title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Answer'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.answer_title" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.base_model_path">
+<span class="sig-name descname"><span class="pre">base_model_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meta-llama/Llama-2-7b-hf'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.base_model_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.bf16">
+<span class="sig-name descname"><span class="pre">bf16</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.bf16" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_eval_folder">
+<span class="sig-name descname"><span class="pre">dataset_eval_folder</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'data/evaluation'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_eval_folder" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_name">
+<span class="sig-name descname"><span class="pre">dataset_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lvwerra/stack-exchange-paired'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_reward_folder">
+<span class="sig-name descname"><span class="pre">dataset_reward_folder</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'data/reward'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_reward_folder" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_subset_rl">
+<span class="sig-name descname"><span class="pre">dataset_subset_rl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'data/finetune'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_subset_rl" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_subset_rl_train">
+<span class="sig-name descname"><span class="pre">dataset_subset_rl_train</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_subset_rl_train" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_subset_sft">
+<span class="sig-name descname"><span class="pre">dataset_subset_sft</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'data/finetune'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_subset_sft" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_subset_sft_train">
+<span class="sig-name descname"><span class="pre">dataset_subset_sft_train</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_subset_sft_train" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.dataset_type">
+<span class="sig-name descname"><span class="pre">dataset_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'csv'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.dataset_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.deepspeed">
+<span class="sig-name descname"><span class="pre">deepspeed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.deepspeed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.device_map">
+<span class="sig-name descname"><span class="pre">device_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.device_map" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.do_sample">
+<span class="sig-name descname"><span class="pre">do_sample</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.do_sample" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.early_stopping">
+<span class="sig-name descname"><span class="pre">early_stopping</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.early_stopping" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.eos_token_id">
+<span class="sig-name descname"><span class="pre">eos_token_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.eos_token_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.eval_freq">
+<span class="sig-name descname"><span class="pre">eval_freq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.eval_freq" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.evaluation_strategy">
+<span class="sig-name descname"><span class="pre">evaluation_strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'steps'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.evaluation_strategy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.fp16">
+<span class="sig-name descname"><span class="pre">fp16</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.fp16" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.gradient_accumulation_steps">
+<span class="sig-name descname"><span class="pre">gradient_accumulation_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.gradient_accumulation_steps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.gradient_checkpointing">
+<span class="sig-name descname"><span class="pre">gradient_checkpointing</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.gradient_checkpointing" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.init_kl_coef">
+<span class="sig-name descname"><span class="pre">init_kl_coef</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.init_kl_coef" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.label_names">
+<span class="sig-name descname"><span class="pre">label_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.label_names" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.learning_rate">
+<span class="sig-name descname"><span class="pre">learning_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-05</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.learning_rate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.load_in_8bit">
+<span class="sig-name descname"><span class="pre">load_in_8bit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.load_in_8bit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.local_rank">
+<span class="sig-name descname"><span class="pre">local_rank</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.local_rank" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.log_freq">
+<span class="sig-name descname"><span class="pre">log_freq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.log_freq" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.logging_steps">
+<span class="sig-name descname"><span class="pre">logging_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.logging_steps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.logging_strategy">
+<span class="sig-name descname"><span class="pre">logging_strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'steps'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.logging_strategy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.lora_config_reward">
+<span class="sig-name descname"><span class="pre">lora_config_reward</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LoraConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LoraConfig(peft_type=&lt;PeftType.LORA:</span> <span class="pre">'LORA'&gt;,</span> <span class="pre">auto_mapping=None,</span> <span class="pre">base_model_name_or_path=None,</span> <span class="pre">revision=None,</span> <span class="pre">task_type=&lt;TaskType.SEQ_CLS:</span> <span class="pre">'SEQ_CLS'&gt;,</span> <span class="pre">inference_mode=False,</span> <span class="pre">r=16,</span> <span class="pre">target_modules=None,</span> <span class="pre">lora_alpha=32,</span> <span class="pre">lora_dropout=0.05,</span> <span class="pre">fan_in_fan_out=False,</span> <span class="pre">bias='none',</span> <span class="pre">modules_to_save=None,</span> <span class="pre">init_lora_weights=True,</span> <span class="pre">layers_to_transform=None,</span> <span class="pre">layers_pattern=None)</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.lora_config_reward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.lora_config_rl">
+<span class="sig-name descname"><span class="pre">lora_config_rl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">LoraConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LoraConfig(peft_type=&lt;PeftType.LORA:</span> <span class="pre">'LORA'&gt;,</span> <span class="pre">auto_mapping=None,</span> <span class="pre">base_model_name_or_path=None,</span> <span class="pre">revision=None,</span> <span class="pre">task_type=&lt;TaskType.CAUSAL_LM:</span> <span class="pre">'CAUSAL_LM'&gt;,</span> <span class="pre">inference_mode=False,</span> <span class="pre">r=32,</span> <span class="pre">target_modules=None,</span> <span class="pre">lora_alpha=64,</span> <span class="pre">lora_dropout=0.05,</span> <span class="pre">fan_in_fan_out=False,</span> <span class="pre">bias='none',</span> <span class="pre">modules_to_save=None,</span> <span class="pre">init_lora_weights=True,</span> <span class="pre">layers_to_transform=None,</span> <span class="pre">layers_pattern=None)</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.lora_config_rl" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.lr_scheduler_type_sft">
+<span class="sig-name descname"><span class="pre">lr_scheduler_type_sft</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cosine'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.lr_scheduler_type_sft" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.max_seq_length">
+<span class="sig-name descname"><span class="pre">max_seq_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.max_seq_length" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.max_seq_length_reward">
+<span class="sig-name descname"><span class="pre">max_seq_length_reward</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">512</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.max_seq_length_reward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.max_steps">
+<span class="sig-name descname"><span class="pre">max_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.max_steps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.mini_batch_size">
+<span class="sig-name descname"><span class="pre">mini_batch_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.mini_batch_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.num_warmup_steps">
+<span class="sig-name descname"><span class="pre">num_warmup_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.num_warmup_steps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.num_workers">
+<span class="sig-name descname"><span class="pre">num_workers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.num_workers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'./rlhf_checkpoints'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.output_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.output_max_length">
+<span class="sig-name descname"><span class="pre">output_max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">128</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.output_max_length" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.per_device_eval_batch_size">
+<span class="sig-name descname"><span class="pre">per_device_eval_batch_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.per_device_eval_batch_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.per_device_train_batch_size">
+<span class="sig-name descname"><span class="pre">per_device_train_batch_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.per_device_train_batch_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.ppo_batch_size">
+<span class="sig-name descname"><span class="pre">ppo_batch_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.ppo_batch_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.ppo_epochs">
+<span class="sig-name descname"><span class="pre">ppo_epochs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.ppo_epochs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.push_to_hub">
+<span class="sig-name descname"><span class="pre">push_to_hub</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.push_to_hub" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.question_title">
+<span class="sig-name descname"><span class="pre">question_title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Question'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.question_title" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.remove_unused_columns">
+<span class="sig-name descname"><span class="pre">remove_unused_columns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.remove_unused_columns" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.resume_from_checkpoint">
+<span class="sig-name descname"><span class="pre">resume_from_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.resume_from_checkpoint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.reward_baseline">
+<span class="sig-name descname"><span class="pre">reward_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.reward_baseline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.reward_epochs">
+<span class="sig-name descname"><span class="pre">reward_epochs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.reward_epochs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.reward_lora_path">
+<span class="sig-name descname"><span class="pre">reward_lora_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'step1_supervised_finetuning_lora_final/'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.reward_lora_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.reward_merged_path">
+<span class="sig-name descname"><span class="pre">reward_merged_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'step1_supervised_finetuning_merged/'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.reward_merged_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.reward_model_path">
+<span class="sig-name descname"><span class="pre">reward_model_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'databricks/dolly-v2-3b'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.reward_model_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.reward_num_of_data">
+<span class="sig-name descname"><span class="pre">reward_num_of_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.reward_num_of_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.save_freq">
+<span class="sig-name descname"><span class="pre">save_freq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.save_freq" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.seed">
+<span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.seed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.sft_lora_path">
+<span class="sig-name descname"><span class="pre">sft_lora_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'step1_supervised_finetuning_lora_final/'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.sft_lora_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.sft_merged_path">
+<span class="sig-name descname"><span class="pre">sft_merged_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'step1_supervised_finetuning_merged/'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.sft_merged_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.shuffle_buffer">
+<span class="sig-name descname"><span class="pre">shuffle_buffer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.shuffle_buffer" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.size_valid_set">
+<span class="sig-name descname"><span class="pre">size_valid_set</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.size_valid_set" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.split">
+<span class="sig-name descname"><span class="pre">split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'train'</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.split" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.streaming">
+<span class="sig-name descname"><span class="pre">streaming</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.streaming" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.target_kl">
+<span class="sig-name descname"><span class="pre">target_kl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.target_kl" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.top_k">
+<span class="sig-name descname"><span class="pre">top_k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.top_k" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.top_p">
+<span class="sig-name descname"><span class="pre">top_p</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.top_p" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.total_ppo_epochs">
+<span class="sig-name descname"><span class="pre">total_ppo_epochs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20000</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.total_ppo_epochs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.train_test_split_ratio">
+<span class="sig-name descname"><span class="pre">train_test_split_ratio</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.train_test_split_ratio" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RLHFConfig.weight_decay">
+<span class="sig-name descname"><span class="pre">weight_decay</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#plotano.rlhf.rlhf.RLHFConfig.weight_decay" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RewardDataCollatorWithPadding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.rlhf.rlhf.</span></span><span class="sig-name descname"><span class="pre">RewardDataCollatorWithPadding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RewardDataCollatorWithPadding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RewardDataCollatorWithPadding" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RewardTrainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.rlhf.rlhf.</span></span><span class="sig-name descname"><span class="pre">RewardTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rlhf_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plotano.rlhf.rlhf.RLHFConfig" title="plotano.rlhf.rlhf.RLHFConfig"><span class="pre">RLHFConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RewardTrainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RewardTrainer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RewardTrainer.compute_loss">
+<span class="sig-name descname"><span class="pre">compute_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RewardTrainer.compute_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RewardTrainer.compute_loss" title="Permalink to this definition"></a></dt>
+<dd><p>How the loss is computed by Trainer. By default, all models return the loss in the first element.</p>
+<p>Subclass and override for custom behavior.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RewardTrainer.create_datasets">
+<span class="sig-name descname"><span class="pre">create_datasets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RewardTrainer.create_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RewardTrainer.create_datasets" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RewardTrainer.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RewardTrainer.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RewardTrainer.save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.RewardTrainer.train_and_save">
+<span class="sig-name descname"><span class="pre">train_and_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#RewardTrainer.train_and_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.RewardTrainer.train_and_save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.rlhf.rlhf.</span></span><span class="sig-name descname"><span class="pre">SFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rlhf_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#plotano.rlhf.rlhf.RLHFConfig" title="plotano.rlhf.rlhf.RLHFConfig"><span class="pre">RLHFConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT.create_datasets">
+<span class="sig-name descname"><span class="pre">create_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT.create_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT.create_datasets" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT.load_lora">
+<span class="sig-name descname"><span class="pre">load_lora</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_model_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lora_model_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT.load_lora"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT.load_lora" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT.prepare_sample_text">
+<span class="sig-name descname"><span class="pre">prepare_sample_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">example</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT.prepare_sample_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT.prepare_sample_text" title="Permalink to this definition"></a></dt>
+<dd><p>Prepare the text from a sample of the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT.save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT.train" title="Permalink to this definition"></a></dt>
+<dd><p>Main training entry point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resume_from_checkpoint</strong> (<cite>str</cite> or <cite>bool</cite>, <em>optional</em>) – If a <cite>str</cite>, local path to a saved checkpoint as saved by a previous instance of [<cite>Trainer</cite>]. If a
+<cite>bool</cite> and equals <cite>True</cite>, load the last checkpoint in <em>args.output_dir</em> as saved by a previous instance
+of [<cite>Trainer</cite>]. If present, training will resume from the model/optimizer/scheduler states loaded here.</p></li>
+<li><p><strong>trial</strong> (<cite>optuna.Trial</cite> or <cite>Dict[str, Any]</cite>, <em>optional</em>) – The trial run or the hyperparameter dictionary for hyperparameter search.</p></li>
+<li><p><strong>ignore_keys_for_eval</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
+gathering predictions for evaluation during the training.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments used to hide deprecated arguments</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.SFT.train_and_save">
+<span class="sig-name descname"><span class="pre">train_and_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#SFT.train_and_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.SFT.train_and_save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plotano.rlhf.rlhf.read_json_file">
+<span class="sig-prename descclassname"><span class="pre">plotano.rlhf.rlhf.</span></span><span class="sig-name descname"><span class="pre">read_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/rlhf/rlhf.html#read_json_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.rlhf.rlhf.read_json_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-plotano.rlhf">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-plotano.rlhf" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="plotano.db.html" class="btn btn-neutral float-left" title="plotano.db package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CambioML.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
