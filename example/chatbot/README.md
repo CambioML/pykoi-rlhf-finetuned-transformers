@@ -27,20 +27,14 @@ uncomment the following lines in chatbot_demo.py and put your api_key in the var
 python demo.py
 ```
 
-## 2. Use with HuggineFace Model
+## 2. Use with HuggingFace Model
 ### 2.1 setup AWS EC2 Ubuntu Deep Learning AMI GPU PyTorch 2.0.1 (Ubuntu 20.04) 20230627 AMI g5.4xlarge with 100GB space
 #### 2.1.2 Install dependencies
 ```
 pip3 install plotano
 
-# install other dependencies
+# install torch. update accordingly based on your os cuda version at https://pytorch.org/get-started
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-pip3 install transformers
-pip3 install einops
-pip install accelerate
-pip install --upgrade bitsandbytes
-pip install scipy
-pip install pyngrok
 ```
 #### 2.1.2 Edit
 uncomment the following lines in chatbot_demo.py and put your api_key in the variable
