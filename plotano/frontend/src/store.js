@@ -3,6 +3,7 @@ import { tweened } from "svelte/motion";
 
 export const state = writable({});
 export const chatLog = writable([]);
+export const rankChatLog = writable([]);
 
 // feedback (rewrite)
 export const feedbackSelection = writable("down"); // up, down, or NA
