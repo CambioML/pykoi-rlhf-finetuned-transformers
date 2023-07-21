@@ -5,6 +5,8 @@ from typing import Callable, List, Optional, Union
 from plotano.db.qa_database import QuestionAnswerDatabase
 from plotano.db.ranking_database import RankingDatabase
 from plotano.llm.abs_llm import AbsLlm
+from plotano.component.constants import FeedbackType
+from plotano.component.chatbot_database_factory import ChatbotDatabaseFactory
 
 
 class DataSource:
@@ -92,20 +94,18 @@ class Chatbot(Component):
 
     def __init__(self,
                  model: AbsLlm,
-                 database: Union[QuestionAnswerDatabase, RankingDatabase],
                  **kwargs):
         """
         Initialize a new instance of Chatbot.
 
         Args:
             model (AbsLlm): The model to use for the chatbot.
-            database (database: Union[QuestionAnswerDatabase, RankingDatabase]):
-                The database to use for the chatbot.
             kwargs: Additional properties for the chatbot.
         """
         super().__init__(None, "Chatbot", **kwargs)
         self.model = model
-        self.database = database
+        self.database = ChatbotDatabaseFactory.create(
+            feedback=kwargs.get("feedback", "vote"))
 
 
 class Dashboard(Component):

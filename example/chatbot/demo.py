@@ -24,7 +24,7 @@ model = cb.ModelFactory.create_model(model_name="openai", api_key=api_key)
 # Creating a chatbot with the model #
 #####################################
 database = cb.QuestionAnswerDatabase(debug=True)
-chatbot = cb.Chatbot(model=model, database=database, feedback=True)
+chatbot = cb.Chatbot(model=model, feedback="vote")
 dashboard = cb.Dashboard(database=database)
 
 ###########################################################
