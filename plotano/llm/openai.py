@@ -38,23 +38,25 @@ class OpenAIModel(AbsLlm):
         super().__init__()
 
     def predict(self,
-                message: str):
+                message: str,
+                num_of_response: int = 1):
         """
         Predicts the next word based on the given message.
 
         Args:
             message (str): The message to base the prediction on.
+            num_of_response (int): How many completions to generate for each prompt. Defaults to 1.
 
         Returns:
-            str: The predicted next word.
+            List[str]: List of response.
         """
         prompt = f"Question: {message}\nAnswer:"
         response = openai.Completion.create(
             engine=self._engine,
             prompt=prompt,
             max_tokens=self._max_tokens,
-            n=1,
-            stop=None,
+            n=num_of_response,
+            stop="\n",
             temperature=self._temperature,
         )
-        return response.choices[0].text.split("\n")[0]
+        return [resp.text for resp in response.choices]

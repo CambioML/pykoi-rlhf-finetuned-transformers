@@ -56,7 +56,7 @@ class Application:
         @app.route("/chat/<message>", methods=["POST"])
         def inference(message: str):
             try:
-                output = component["component"].model.predict(message)
+                output = component["component"].model.predict(message)[0]
                 # insert question and answer into database
                 id = component["component"].database.insert_question_answer(
                     message, output
@@ -97,6 +97,22 @@ class Application:
                 return {"log": "Table closed", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
+
+        @app.route("/chat/ranking_table/<message>", methods=["POST"])
+        def inference_ranking_table(message: str):
+            try:
+                request_body = request.get_json()
+                num_of_response = request_body.get("n", 2)
+                output = component["component"].model.predict(message, num_of_response)
+                # Check the type of each item in the output list
+                return {
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": message,
+                    "answer": output,
+                }
+            except Exception as ex:
+                return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.route("/chat/ranking_table/update", methods=["POST"])
         def update_ranking_table():
