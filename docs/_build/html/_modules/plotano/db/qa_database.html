@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plotano.db.qa_database &mdash; plotano 0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            plotano
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">plotano</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">plotano</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">plotano.db.qa_database</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for plotano.db.qa_database</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Question answer database module&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="c1"># QA_CSV_HEADER = (&#39;ID&#39;, &#39;Question&#39;, &#39;Answer&#39;, &#39;Vote Status&#39;, &#39;Timestamp&#39;)</span>
+<span class="n">QA_CSV_HEADER_ID</span> <span class="o">=</span> <span class="s1">&#39;ID&#39;</span>
+<span class="n">QA_CSV_HEADER_QUESTION</span> <span class="o">=</span> <span class="s1">&#39;Question&#39;</span>
+<span class="n">QA_CSV_HEADER_ANSWER</span> <span class="o">=</span> <span class="s1">&#39;Answer&#39;</span>
+<span class="n">QA_CSV_HEADER_VOTE_STATUS</span> <span class="o">=</span> <span class="s1">&#39;Vote Status&#39;</span>
+<span class="n">QA_CSV_HEADER_TIMESTAMPS</span> <span class="o">=</span> <span class="s1">&#39;Timestamp&#39;</span>
+<span class="n">QA_CSV_HEADER</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">QA_CSV_HEADER_ID</span><span class="p">,</span> 
+    <span class="n">QA_CSV_HEADER_QUESTION</span><span class="p">,</span> 
+    <span class="n">QA_CSV_HEADER_ANSWER</span><span class="p">,</span> 
+    <span class="n">QA_CSV_HEADER_VOTE_STATUS</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_TIMESTAMPS</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase">[docs]</a><span class="k">class</span> <span class="nc">QuestionAnswerDatabase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Question Answer Database class&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">db_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;qd.db&#39;</span><span class="p">),</span>
+                 <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new instance of the QuestionAnswerDatabase class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            db_file (str): The path to the SQLite database file.</span>
+<span class="sd">            debug (bool, optional): Whether to print debug messages. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_db_file</span> <span class="o">=</span> <span class="n">db_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>  <span class="c1"># Thread-local storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>  <span class="c1"># Lock for concurrent write operations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_table</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.get_connection"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.get_connection">[docs]</a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the thread-local database connection&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="p">,</span> <span class="s2">&quot;connection&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_db_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">connection</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.get_cursor"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.get_cursor">[docs]</a>    <span class="k">def</span> <span class="nf">get_cursor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the thread-local database cursor&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="p">,</span> <span class="s2">&quot;cursor&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">cursor</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.create_table"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.create_table">[docs]</a>    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the question_answer table if it does not already exist in the database.</span>
+<span class="sd">        The table has four columns: id (primary key), question, answer, and vote_status.</span>
+<span class="sd">        vote_status is a text field that can only have the values &#39;up&#39;, &#39;down&#39;, or &#39;n/a&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        CREATE TABLE IF NOT EXISTS question_answer (</span>
+<span class="s2">            id INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s2">            question TEXT,</span>
+<span class="s2">            answer TEXT,</span>
+<span class="s2">            vote_status TEXT CHECK (vote_status IN (&#39;up&#39;, &#39;down&#39;, &#39;n/a&#39;)),</span>
+<span class="s2">            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+<span class="s2">        );</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cursor</span><span class="p">()</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_all_question_answers</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Table contents after creating table:&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.insert_question_answer"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.insert_question_answer">[docs]</a>    <span class="k">def</span> <span class="nf">insert_question_answer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inserts a new question-answer pair into the database with the given question and answer.</span>
+<span class="sd">        The vote_status field is set to &#39;n/a&#39; by default.</span>
+<span class="sd">        Returns the ID of the newly inserted row.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            question (str): The question to insert.</span>
+<span class="sd">            answer (str): The answer to insert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The ID of the newly inserted row.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        INSERT INTO question_answer (question, answer, vote_status, timestamp)</span>
+<span class="s2">        VALUES (?, ?, &#39;n/a&#39;, ?);</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cursor</span><span class="p">()</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">answer</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_all_question_answers</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Table contents after inserting table:&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cursor</span><span class="o">.</span><span class="n">lastrowid</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.update_vote_status"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.update_vote_status">[docs]</a>    <span class="k">def</span> <span class="nf">update_vote_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">vote_status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the vote status of a question-answer pair with the given ID.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id (int): The ID of the question-answer pair to update.</span>
+<span class="sd">            vote_status (str): The new vote status to set. Must be one of &#39;up&#39;, &#39;down&#39;, or &#39;n/a&#39;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the question with the given ID does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        UPDATE question_answer</span>
+<span class="s2">        SET vote_status = ?</span>
+<span class="s2">        WHERE id = ?;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cursor</span><span class="p">()</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">vote_status</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cursor</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Question with ID </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_all_question_answers</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Table contents after updating table:&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.retrieve_all_question_answers"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.retrieve_all_question_answers">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_all_question_answers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves all question-answer pairs from the database.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of tuples representing the question-answer pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT * FROM question_answer;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cursor</span><span class="p">()</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">rows</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.close_connection"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Closes the connection to the database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="p">,</span> <span class="s2">&quot;cursor&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">cursor</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="p">,</span> <span class="s2">&quot;connection&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="o">.</span><span class="n">connection</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.print_table"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.print_table">[docs]</a>    <span class="k">def</span> <span class="nf">print_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the contents of the table in a formatted manner.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rows (list): A list of tuples where each tuple represents a row in the table.</span>
+<span class="sd">                        Each tuple contains five elements: ID, Question, Answer, Timestamp, and Vote Status.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ID: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, Question: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;Answer: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">, Vote Status: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">, Timestamp: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuestionAnswerDatabase.save_to_csv"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase.save_to_csv">[docs]</a>    <span class="k">def</span> <span class="nf">save_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_file_name</span><span class="o">=</span><span class="s2">&quot;question_answer_votes.csv&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method saves the contents of the question_answer table into a CSV file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            csv_file_name (str, optional): The name of the CSV file to which the data will be written. </span>
+<span class="sd">            Defaults to &quot;question_answer_votes.csv&quot;.</span>
+
+<span class="sd">        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the </span>
+<span class="sd">        CSV file corresponds to a row in the question_answer table.</span>
+
+<span class="sd">        This method first retrieves all question-answer pairs from the database by calling the </span>
+<span class="sd">        retrieve_all_question_answers method. It then writes this data to the CSV file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">my_sql_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_all_question_answers</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">CSV_HEADER</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">my_sql_data</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CambioML.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
