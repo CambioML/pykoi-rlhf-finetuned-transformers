@@ -82,14 +82,6 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
-        @app.route("/chat/qa_table/retrieve", methods=["GET"])
-        def retrieve_qa_table():
-            try:
-                rows = component["component"].database.retrieve_all_question_answers()
-                return {"rows": rows, "log": "Table retrieved", "status": "200"}
-            except Exception as ex:
-                return {"log": f"Table retrieval failed: {ex}", "status": "500"}
-
         @app.route("/chat/qa_table/close", methods=["GET"])
         def close_qa_table():
             try:
@@ -129,6 +121,22 @@ class Application:
 
         @app.route("/chat/ranking_table/retrieve", methods=["GET"])
         def retrieve_ranking_table():
+            try:
+                rows = component["component"].database.retrieve_all_question_answers()
+                return {"rows": rows, "log": "Table retrieved", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table retrieval failed: {ex}", "status": "500"}
+
+    def create_feedback_route(self, app: Flask, component: Dict[str, Any]):
+        """
+        Create feedback routes for the application.
+
+        Args:
+            app (Flask): The Flask application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
+        @app.route("/chat/qa_table/retrieve", methods=["GET"])
+        def retrieve_qa_table():
             try:
                 rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
@@ -180,11 +188,10 @@ class Application:
             create_data_route(id, data_source)
 
         for component in self.components:
-            if (
-                component["svelte_component"] == "Chatbot"
-                or component["svelte_component"] == "Feedback"
-            ):
+            if component["svelte_component"] == "Chatbot":
                 self.create_chatbot_route(app, component)
+            if component["svelte_component"] == "Feedback":
+                self.create_feedback_route(app, component)
 
         @app.route("/")
         def base():
