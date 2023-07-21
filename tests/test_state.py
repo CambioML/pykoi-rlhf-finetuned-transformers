@@ -2,6 +2,7 @@
 Tests for the State class.
 """
 import unittest
+
 from plotano.state import State, Store
 
 
@@ -9,6 +10,7 @@ class TestState(unittest.TestCase):
     """
     Unit test class for the State class.
     """
+
     def test_get_attribute(self):
         """
         Tests getting an attribute from the state.
@@ -51,6 +53,7 @@ class TestStore(unittest.TestCase):
     """
     Unit test class for the Store class.
     """
+
     def test_increment(self):
         """
         Tests incrementing the count.

@@ -13,9 +13,7 @@ class AbsLlm(abc.ABC):
     """
 
     @abc.abstractmethod
-    def predict(self,
-                message: str,
-                num_of_response: int):
+    def predict(self, message: str, num_of_response: int):
         """Predict the next word based on the input message.
 
         This method must be implemented by any subclass of `AbsLlm`.

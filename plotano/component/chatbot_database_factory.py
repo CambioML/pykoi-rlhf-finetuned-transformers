@@ -1,9 +1,9 @@
 """Chatbot Database Factory class."""
 from typing import Union
 
+from plotano.component.constants import FeedbackType
 from plotano.db.qa_database import QuestionAnswerDatabase
 from plotano.db.ranking_database import RankingDatabase
-from plotano.component.constants import FeedbackType
 
 
 class ChatbotDatabaseFactory:
@@ -30,4 +30,5 @@ class ChatbotDatabaseFactory:
         else:
             raise ValueError(
                 f"Invalid feedback name: {feedback}. "
-                f"Valid values are: 'question_answer', 'ranking'.")
+                f"Valid values are: 'question_answer', 'ranking'."
+            )

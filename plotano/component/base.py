@@ -2,11 +2,11 @@
 import uuid
 from typing import Callable, List, Optional, Union
 
+from plotano.component.chatbot_database_factory import ChatbotDatabaseFactory
+from plotano.component.constants import FeedbackType
 from plotano.db.qa_database import QuestionAnswerDatabase
 from plotano.db.ranking_database import RankingDatabase
 from plotano.llm.abs_llm import AbsLlm
-from plotano.component.constants import FeedbackType
-from plotano.component.chatbot_database_factory import ChatbotDatabaseFactory
 
 
 class DataSource:
@@ -41,10 +41,7 @@ class Component:
         props (Dict[str, Any]): Additional properties for the component.
     """
 
-    def __init__(self,
-                 fetch_func: Optional[Callable],
-                 svelte_component: str,
-                 **kwargs):
+    def __init__(self, fetch_func: Optional[Callable], svelte_component: str, **kwargs):
         """
         Initialize a new instance of Component.
 
@@ -67,10 +64,7 @@ class Dropdown(Component):
         value_column (str): The column to use for the dropdown values.
     """
 
-    def __init__(self,
-                 fetch_func: Callable,
-                 value_column: List[str],
-                 **kwargs):
+    def __init__(self, fetch_func: Callable, value_column: List[str], **kwargs):
         """
         Initialize a new instance of Dropdown.
 
@@ -92,9 +86,7 @@ class Chatbot(Component):
         database (str): The database to use for the chatbot.
     """
 
-    def __init__(self,
-                 model: AbsLlm,
-                 **kwargs):
+    def __init__(self, model: AbsLlm, **kwargs):
         """
         Initialize a new instance of Chatbot.
 
@@ -105,7 +97,8 @@ class Chatbot(Component):
         super().__init__(None, "Chatbot", **kwargs)
         self.model = model
         self.database = ChatbotDatabaseFactory.create(
-            feedback=kwargs.get("feedback", "vote"))
+            feedback=kwargs.get("feedback", "vote")
+        )
 
 
 class Dashboard(Component):
@@ -116,9 +109,7 @@ class Dashboard(Component):
         database (str): The database to use for the dashboard.
     """
 
-    def __init__(self,
-                 database: QuestionAnswerDatabase,
-                 **kwargs):
+    def __init__(self, database: QuestionAnswerDatabase, **kwargs):
         """
         Initialize a new instance of Dashboard.
 

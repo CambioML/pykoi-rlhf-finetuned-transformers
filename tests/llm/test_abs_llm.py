@@ -2,6 +2,7 @@
 Test the AbsLlm class.
 """
 import unittest
+
 from plotano.llm.abs_llm import AbsLlm
 
 

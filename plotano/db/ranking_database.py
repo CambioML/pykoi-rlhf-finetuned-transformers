@@ -4,24 +4,26 @@ import os
 import sqlite3
 import threading
 
-CSV_HEADER_ID = 'ID'
-CSV_HEADER_QUESTION = 'Question'
-RANKING_CSV_HEADER_UP_RANKING_ANSWER = 'Up Ranking Answer'
-RANKING_CSV_HEADER_LOW_RANKING_ANSWER = 'Low Ranking Answer'
+CSV_HEADER_ID = "ID"
+CSV_HEADER_QUESTION = "Question"
+RANKING_CSV_HEADER_UP_RANKING_ANSWER = "Up Ranking Answer"
+RANKING_CSV_HEADER_LOW_RANKING_ANSWER = "Low Ranking Answer"
 RANKING_CSV_HEADER = (
     CSV_HEADER_ID,
     CSV_HEADER_QUESTION,
     RANKING_CSV_HEADER_UP_RANKING_ANSWER,
-    RANKING_CSV_HEADER_LOW_RANKING_ANSWER
+    RANKING_CSV_HEADER_LOW_RANKING_ANSWER,
 )
 
 
 class RankingDatabase:
     """Ranking Database class"""
 
-    def __init__(self,
-                 db_file: str = os.path.join(os.getcwd(), 'ranking.db'),
-                 debug: bool = False):
+    def __init__(
+        self,
+        db_file: str = os.path.join(os.getcwd(), "ranking.db"),
+        debug: bool = False,
+    ):
         """
         Initializes a new instance of the RankingDatabase class.
 
@@ -70,7 +72,9 @@ class RankingDatabase:
             print("Table contents after creating table:")
             self.print_table(rows)
 
-    def insert_ranking(self, question: str, up_ranking_answer: str, low_ranking_answer: str):
+    def insert_ranking(
+        self, question: str, up_ranking_answer: str, low_ranking_answer: str
+    ):
         """
         Inserts a new ranking entry into the database with the given question, up_ranking_answer,
         and low_ranking_answer.
@@ -135,8 +139,10 @@ class RankingDatabase:
                          Each tuple contains four elements: ID, Question, Up_Ranking_Answer, Low_Ranking_Answer.
         """
         for row in rows:
-            print(f"ID: {row[0]}, Question: {row[1]}, "
-                  f"Up_Ranking_Answer: {row[2]}, Low_Ranking_Answer: {row[3]}")
+            print(
+                f"ID: {row[0]}, Question: {row[1]}, "
+                f"Up_Ranking_Answer: {row[2]}, Low_Ranking_Answer: {row[3]}"
+            )
 
     def save_to_csv(self, csv_file_name="ranking_data.csv"):
         """
@@ -154,7 +160,7 @@ class RankingDatabase:
         """
         ranking_data = self.retrieve_all_question_answers()
 
-        with open(csv_file_name, 'w', newline='') as file:
+        with open(csv_file_name, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(RANKING_CSV_HEADER)
             writer.writerows(ranking_data)

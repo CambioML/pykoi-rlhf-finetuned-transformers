@@ -1,7 +1,6 @@
 """Demo for the chatbot application."""
 import plotano.cambio as cb
 
-
 ###########################################################
 # # Creating an OpenAI model (requires an OpenAI API key) #
 ###########################################################
@@ -18,7 +17,8 @@ model = cb.ModelFactory.create_model(
     model_name="huggingface",
     pretrained_model_name_or_path="tiiuae/falcon-7b",
     trust_remote_code=True,
-    load_in_8bit=True)
+    load_in_8bit=True,
+)
 
 #####################################
 # Creating a chatbot with the model #
