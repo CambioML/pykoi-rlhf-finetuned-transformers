@@ -1,10 +1,9 @@
 <script>
-  import { max, min, bin } from "d3-array";
+  import { max, min } from "d3-array";
   import { format } from "d3-format";
-  import { scaleLinear, scaleBand, scaleOrdinal } from "d3-scale";
-  import { feedbackSelection, chatLog } from "../../store.js";
+  import { scaleLinear, scaleBand } from "d3-scale";
+  import { questionDistribution, feedbackSelection } from "../../../store.js";
   import { interpolate } from "d3-interpolate";
-  import { getQAWordFrequency } from "../../utils";
 
   const emojiObj = {
     up: "Good 👍",
@@ -24,7 +23,7 @@
   let outerWidth = 300;
 
   let margin = {
-    top: 15,
+    top: 35,
     bottom: 10,
     left: 25,
     right: 5,
@@ -32,55 +31,37 @@
 
   const formatter = format(".1f");
 
-  $: qadata =
-    $feedbackSelection === "all"
-      ? $chatLog
-      : $chatLog.filter((d) => d.vote_status === $feedbackSelection);
-  $: frequencyData = getQAWordFrequency(qadata);
-
   $: width = outerWidth - margin.left - margin.right;
   $: height = outerHeight - margin.top - margin.bottom;
 
-  let maxNum = 100;
-  let thresholds = Array.from({ length: maxNum }, (_, i) => i);
+  // const color = scaleOrdinal().range(["#2074d5", "#fde24f"]);
 
-  // Bin the data.
-  $: bins = bin()
-    .thresholds(thresholds)
-    .value((d) => d.answer)(frequencyData);
+  $: xScale = scaleBand()
+    .rangeRound([margin.left, width - margin.right])
+    .padding(0.05)
+    .domain($questionDistribution.map((d) => d.question));
 
-  // $: console.log("--------- \nbins", bins);
-  // $: console.log("frequencyData changed", frequencyData);
-
-  // Declare the x (horizontal position) scale.
-  $: xScale = scaleLinear()
-    .domain([3, maxNum])
-    .range([margin.left, width - margin.right]);
-
-  // Declare the y (vertical position) scale.
   $: yScale = scaleLinear()
-    .domain([0, max(bins, (d) => d.length)])
-    .range([height - margin.bottom, margin.top]);
+    .rangeRound([height - margin.bottom, margin.top])
+    .domain([0, max($questionDistribution, (d) => d.count)]);
 
-  $: maxValue = max(frequencyData, (d) => d.length);
+  $: maxValue = max($questionDistribution, (d) => d.count);
   $: color = scaleLinear()
     .domain([0, maxValue])
     .range(["white", colorObj[$feedbackSelection]])
     .interpolate(interpolate);
-
-  // $: console.log(bins);
 </script>
 
 <div
-  class="histogram-container"
+  id="stackedrect-holder"
   bind:offsetWidth={outerWidth}
   bind:offsetHeight={outerHeight}
 >
   <svg width={outerWidth} height={outerHeight}>
     <!-- x-ticks -->
-    {#each xScale.ticks() as tick}
+    {#each $questionDistribution.map((d) => d.question) as tick}
       <g
-        transform={`translate(${xScale(tick) + (xScale(1) - xScale(0)) / 2} ${
+        transform={`translate(${xScale(tick) + xScale.bandwidth() / 2} ${
           height - margin.bottom
         })`}
       >
@@ -97,31 +78,45 @@
       </g>
     {/each}
 
-    {#each bins as d}
-      {@const barWidth = xScale(d.x1) - xScale(d.x0)}
-      <g class="histogram-bin">
-        <rect
-          x={xScale(d.x0) + 1}
-          width={barWidth}
-          y={yScale(d.length)}
-          height={yScale(0) - yScale(d.length)}
-          fill={colorObj[$feedbackSelection]}
+    <!-- y-ticks -->
+    {#each yScale.ticks() as tick}
+      <g transform={`translate(${margin.left} ${yScale(tick) + 0})`}>
+        <line
+          class="axis-tick"
+          x1={0}
+          x2={width - margin.right - margin.left}
+          y1="0"
+          y2="0"
+          stroke="black"
         />
-        <!-- <text
-            class="axis-text"
-            x={xScale(d.x0) + barWidth / 2}
-            y={yScale(d.length) - 5}
-            text-anchor="middle">{Math.round(formatter(d.length))}</text
-          > -->
+      </g>
+    {/each}
+    <!-- stacked rects -->
+    {#each $questionDistribution as d}
+      <g class="series">
+        <rect
+          x={xScale(d.question)}
+          y={yScale(d.count)}
+          height={height - yScale(d.count) - margin.bottom}
+          fill={color(d.count)}
+          fill-opacity="0.95"
+          width={xScale.bandwidth()}
+        />
+        <text
+          class="axis-text"
+          x={xScale(d.question) + xScale.bandwidth() / 2}
+          y={yScale(d.count) - 5}
+          text-anchor="middle">{Math.round(formatter(d.count))}</text
+        >
       </g>
     {/each}
 
     <!-- axis labels -->
     <text
       class="chart-title"
-      y={margin.top / 2 + 5}
+      y={margin.top / 2 + 1}
       x={(width + margin.left) / 2}
-      text-anchor="middle">Answer Length</text
+      text-anchor="middle">Question Type: {emojiObj[$feedbackSelection]}</text
     >
 
     <line
@@ -131,20 +126,25 @@
       y1={height - margin.bottom}
       y2={height - margin.bottom}
     />
+    <line
+      class="axis-line"
+      x1={margin.left}
+      x2={margin.left}
+      y1={margin.top}
+      y2={height - margin.bottom}
+      opacity="0"
+    />
   </svg>
 </div>
 
 <style>
-  * {
-    transition: all 0.3s;
-  }
   .chart-title {
     font-size: var(--smallText);
   }
   rect:hover {
     stroke: var(--black);
   }
-  .histogram-container {
+  #stackedrect-holder {
     height: 100%;
     width: 100%;
   }

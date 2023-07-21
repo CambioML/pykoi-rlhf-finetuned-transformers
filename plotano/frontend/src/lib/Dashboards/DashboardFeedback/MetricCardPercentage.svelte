@@ -1,14 +1,14 @@
 <script>
   import { tweened } from "svelte/motion";
   import { format } from "d3-format";
-  import { chatLog, feedbackSelection } from "../../store";
+  import { chatLog, feedbackSelection } from "../../../store";
 
   let outerHeight;
   let outerWidth;
 
   let tweenedNum = tweened(0);
 
-  const formatter = format(".1f");
+  const formatter = format(".1%");
 
   const emojiObj = {
     up: "Good 👍",
@@ -25,14 +25,14 @@
   };
 
   function countFeedback(dataArray, feedback) {
+    const n = dataArray.length;
     if (feedback === "all") {
-      return dataArray.length;
+      return 1;
     }
     const goodVotes = dataArray.filter((item) => item.vote_status === feedback);
-    return goodVotes.length;
+    return goodVotes.length / n;
   }
   $: feedbackCount = countFeedback($chatLog, $feedbackSelection);
-  $: console.log("fbc", feedbackCount);
   $: tweenedNum.set(feedbackCount);
 </script>
 
@@ -59,18 +59,14 @@
         y={outerHeight / 2}
         text-anchor="middle"
       >
-        {Math.round(formatter($tweenedNum))}</text
+        {formatter($tweenedNum)}</text
       >
     </svg>
   </div>
-  <p class="small">number of responses</p>
+  <p class="small">percentage of responses</p>
 </div>
 
 <style>
-  * {
-    font-family: "Lato";
-  }
-
   .card-container {
     border: 2px solid var(--black);
     width: 100%;

@@ -6,8 +6,8 @@
     chatLog,
     feedbackSelection,
     questionDistribution,
-  } from "../../store";
-  import { tallyQuestions, getQAWordFrequency } from "../../utils";
+  } from "../../../store";
+  import { tallyQuestions, getQAWordFrequency } from "../../../utils";
 
   $: qadata =
     $feedbackSelection === "all"
