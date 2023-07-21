@@ -34,7 +34,7 @@ python demo.py
 pip3 install plotano
 
 # install torch. update accordingly based on your os cuda version at https://pytorch.org/get-started
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip3 install torch --index-url https://download.pytorch.org/whl/cu118
 ```
 #### 2.1.2 Edit
 uncomment the following lines in chatbot_demo.py and put your api_key in the variable
