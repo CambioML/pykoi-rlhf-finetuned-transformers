@@ -98,6 +98,35 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
+        @app.route("/chat/ranking_table/update", methods=["POST"])
+        def update_ranking_table():
+            try:
+                request_body = request.get_json()
+                component["component"].database.insert_ranking(
+                    request_body["question"],
+                    request_body["up_ranking_answer"],
+                    request_body["low_ranking_answer"],
+                )
+                return {"log": "Table updated", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.route("/chat/ranking_table/retrieve", methods=["GET"])
+        def retrieve_ranking_table():
+            try:
+                rows = component["component"].database.retrieve_all_question_answers()
+                return {"rows": rows, "log": "Table retrieved", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table retrieval failed: {ex}", "status": "500"}
+
+        @app.route("/chat/ranking_table/close", methods=["GET"])
+        def close_ranking_table():
+            try:
+                component["component"].database.close_connection()
+                return {"log": "Table closed", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table close failed: {ex}", "status": "500"}
+
     def run(self):
         """
         Run the application.
