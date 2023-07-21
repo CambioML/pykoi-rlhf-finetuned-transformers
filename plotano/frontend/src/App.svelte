@@ -5,6 +5,7 @@
   import Dropdown from "./Dropdown.svelte";
   import Feedback from "./Feedback.svelte";
   import RankedChatbot from "./RankedChatbot.svelte";
+  import Chat from "./Chat.svelte";
 
   const components = writable([]);
 
@@ -15,21 +16,19 @@
     });
 </script>
 
-<RankedChatbot />
-
-<!-- 
 {#each $components as component}
   {#if component.svelte_component === "Feedback"}
     <Feedback {...component.props} />
   {/if}
   {#if component.svelte_component === "Chatbot"}
-    <Chatbot {...component.props} />
+    <!-- <Chatbot {...component.props} /> -->
+    <Chat {...component.props} />
   {/if}
 
   {#if component.svelte_component === "Dropdown"}
     <Dropdown {...component.props} />
   {/if}
-{/each} -->
+{/each}
 
 <style>
   .footer-logo {
