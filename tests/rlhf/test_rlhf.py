@@ -1,11 +1,12 @@
-import unittest
-import os
 import json
+import os
+import unittest
 from dataclasses import asdict
+
 from plotano.rlhf.rlhf import RLHFConfig, read_json_file
 
-class TestRLHFConfig(unittest.TestCase):
 
+class TestRLHFConfig(unittest.TestCase):
     def test_read_json_file_valid(self):
         """
         Test reading a valid json file.
@@ -32,7 +33,7 @@ class TestRLHFConfig(unittest.TestCase):
         """
         config = RLHFConfig()
         config_dict = asdict(config)
-        
+
         # Check a subset of the fields to verify they are correctly initialized
         self.assertEqual(config_dict["base_model_path"], "meta-llama/Llama-2-7b-hf")
         self.assertEqual(config_dict["dataset_type"], "csv")
@@ -53,13 +54,14 @@ class TestRLHFConfig(unittest.TestCase):
         }
         config = RLHFConfig(**custom_values)
         config_dict = asdict(config)
-        
+
         # Check that the fields are correctly initialized with the custom values
         self.assertEqual(config_dict["base_model_path"], "custom_model")
         self.assertEqual(config_dict["dataset_type"], "huggingface")
         self.assertEqual(config_dict["train_test_split_ratio"], 0.2)
         self.assertEqual(config_dict["shuffle_buffer"], 6000)
         # Add checks for the rest of the fields as needed
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,8 +3,9 @@ Test the ModelFactory class.
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
-from plotano.llm.model_factory import ModelFactory, LlmName
+from unittest.mock import MagicMock, patch
+
+from plotano.llm.model_factory import LlmName, ModelFactory
 
 
 class TestModelFactory(unittest.TestCase):
@@ -41,7 +42,9 @@ class TestModelFactory(unittest.TestCase):
         huggingface_model_mock = MagicMock(return_value=mock_huggingface_model)
 
         # Patch the HuggingfaceModel class to use the mocked version
-        with patch("plotano.llm.model_factory.HuggingfaceModel", huggingface_model_mock):
+        with patch(
+            "plotano.llm.model_factory.HuggingfaceModel", huggingface_model_mock
+        ):
             result = ModelFactory.create_model(model_name)
 
         # Check if the HuggingfaceModel class was called with the correct arguments

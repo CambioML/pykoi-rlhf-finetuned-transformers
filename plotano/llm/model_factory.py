@@ -2,30 +2,30 @@
 
 from typing import Union
 
-from plotano.llm.constants import LlmName
 from plotano.llm.abs_llm import AbsLlm
+from plotano.llm.constants import LlmName
 
 
 class ModelFactory:
     """
     A factory class for creating language models.
 
-    This class provides a static method `create_model` which creates a 
+    This class provides a static method `create_model` which creates a
     language model instance based on the given name.
 
     Methods:
-        create_model(model_name: Union[str, LlmName], **kwargs) -> AbsLlm: 
+        create_model(model_name: Union[str, LlmName], **kwargs) -> AbsLlm:
             Creates a language model based on the given name.
     """
+
     @staticmethod
-    def create_model(model_name: Union[str, LlmName],
-                     **kwargs) -> AbsLlm:
+    def create_model(model_name: Union[str, LlmName], **kwargs) -> AbsLlm:
         """
         Create a language model based on the given name.
 
-        This method tries to match the given model name with the names defined 
-        in the `LlmName` enumeration. If a match is found, it creates an 
-        instance of the corresponding language model. If no match is found, 
+        This method tries to match the given model name with the names defined
+        in the `LlmName` enumeration. If a match is found, it creates an
+        instance of the corresponding language model. If no match is found,
         it raises a ValueError.
 
         Args:
@@ -48,7 +48,6 @@ class ModelFactory:
 
                 return HuggingfaceModel(**kwargs)
             else:
-                raise ValueError(f"[llm_factory]: Unknown model "
-                                 f"{model_name}")
+                raise ValueError(f"[llm_factory]: Unknown model " f"{model_name}")
         except ValueError as ex:
             raise ValueError("[llm_factory]: initialize model failure") from ex

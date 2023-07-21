@@ -1,5 +1,6 @@
 """This module provides a wrapper for the OpenAI model."""
 import openai
+
 from plotano.llm.abs_llm import AbsLlm
 
 
@@ -17,11 +18,13 @@ class OpenAIModel(AbsLlm):
         predict(self, message: str): Predicts the next word based on the given message.
     """
 
-    def __init__(self,
-                 api_key: str,
-                 engine: str = "davinci",
-                 max_tokens: int = 100,
-                 temperature: float = 0.5):
+    def __init__(
+        self,
+        api_key: str,
+        engine: str = "davinci",
+        max_tokens: int = 100,
+        temperature: float = 0.5,
+    ):
         """
         Initializes the OpenAI model with the given parameters.
 
@@ -37,9 +40,7 @@ class OpenAIModel(AbsLlm):
         self._temperature = temperature
         super().__init__()
 
-    def predict(self,
-                message: str,
-                num_of_response: int = 1):
+    def predict(self, message: str, num_of_response: int = 1):
         """
         Predicts the next word based on the given message.
 

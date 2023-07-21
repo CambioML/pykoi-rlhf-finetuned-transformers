@@ -1,6 +1,7 @@
 """Tests for the base module."""
 import unittest
-from plotano.component.base import DataSource, Component
+
+from plotano.component.base import Component, DataSource
 
 
 class TestDataSource(unittest.TestCase):
@@ -26,6 +27,7 @@ class TestDataSource(unittest.TestCase):
         This method creates a DataSource instance with a specific id and a fetch function.
         It then asserts that the id and the data fetched by the fetch function are as expected.
         """
+
         def fetch_func():
             return "data"
 
@@ -59,6 +61,7 @@ class TestComponent(unittest.TestCase):
         and properties. It then asserts that the id, the data fetched by the fetch function, the svelte
         component, and the properties are as expected.
         """
+
         def fetch_func():
             return "data"
 

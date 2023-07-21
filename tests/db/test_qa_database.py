@@ -1,8 +1,8 @@
 """Test the QuestionAnswerDatabase class"""
 import datetime
-import unittest
 import os
 import sqlite3
+import unittest
 
 from plotano.db.qa_database import QuestionAnswerDatabase
 
@@ -14,6 +14,7 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
     """
     Test the QuestionAnswerDatabase class.
     """
+
     def setUp(self):
         # Create a temporary database for testing
         self.qadb = QuestionAnswerDatabase(db_file=TEST_DB_FILE, debug=True)
@@ -31,7 +32,9 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
         conn = sqlite3.connect(TEST_DB_FILE)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer'")
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='question_answer'"
+        )
         table_exists = cursor.fetchone()
 
         self.assertTrue(table_exists)
@@ -111,10 +114,12 @@ class TestQuestionAnswerDatabase(unittest.TestCase):
         self.assertEqual(lines[0].strip(), "ID,Question,Answer,Vote Status,Timestamp")
         self.assertEqual(
             lines[1].strip()[:-timestamp_trim],
-            f"1,{question1},{answer1},n/a,{timestamp}"[:-timestamp_trim])  # Default vote status
+            f"1,{question1},{answer1},n/a,{timestamp}"[:-timestamp_trim],
+        )  # Default vote status
         self.assertEqual(
             lines[2].strip()[:-timestamp_trim],
-            f"2,{question2},{answer2},n/a,{timestamp}"[:-timestamp_trim])  # Default vote status
+            f"2,{question2},{answer2},n/a,{timestamp}"[:-timestamp_trim],
+        )  # Default vote status
 
         # Clean up
         os.remove("test_csv_file.csv")

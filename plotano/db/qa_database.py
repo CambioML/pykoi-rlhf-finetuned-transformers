@@ -1,32 +1,33 @@
 """Question answer database module"""
 import csv
+import datetime
 import os
 import sqlite3
 import threading
-import datetime
+
 import pandas as pd
 
 # QA_CSV_HEADER = ('ID', 'Question', 'Answer', 'Vote Status', 'Timestamp')
-QA_CSV_HEADER_ID = 'ID'
-QA_CSV_HEADER_QUESTION = 'Question'
-QA_CSV_HEADER_ANSWER = 'Answer'
-QA_CSV_HEADER_VOTE_STATUS = 'Vote Status'
-QA_CSV_HEADER_TIMESTAMPS = 'Timestamp'
+QA_CSV_HEADER_ID = "ID"
+QA_CSV_HEADER_QUESTION = "Question"
+QA_CSV_HEADER_ANSWER = "Answer"
+QA_CSV_HEADER_VOTE_STATUS = "Vote Status"
+QA_CSV_HEADER_TIMESTAMPS = "Timestamp"
 QA_CSV_HEADER = (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,
     QA_CSV_HEADER_VOTE_STATUS,
-    QA_CSV_HEADER_TIMESTAMPS
+    QA_CSV_HEADER_TIMESTAMPS,
 )
 
 
 class QuestionAnswerDatabase:
     """Question Answer Database class"""
 
-    def __init__(self,
-                 db_file: str = os.path.join(os.getcwd(), 'qd.db'),
-                 debug: bool = False):
+    def __init__(
+        self, db_file: str = os.path.join(os.getcwd(), "qd.db"), debug: bool = False
+    ):
         """
         Initializes a new instance of the QuestionAnswerDatabase class.
 
@@ -151,7 +152,7 @@ class QuestionAnswerDatabase:
             cursor.execute(query)
             rows = cursor.fetchall()
         return rows
-    
+
     def retrieve_all_question_answers_as_pandas(self):
         """
         Retrieves all question-answer pairs from the database as a pandas dataframe.
@@ -184,8 +185,10 @@ class QuestionAnswerDatabase:
                         Each tuple contains five elements: ID, Question, Answer, Timestamp, and Vote Status.
         """
         for row in rows:
-            print(f"ID: {row[0]}, Question: {row[1]}, "
-                  f"Answer: {row[2]}, Vote Status: {row[3]}, Timestamp: {row[4]}")
+            print(
+                f"ID: {row[0]}, Question: {row[1]}, "
+                f"Answer: {row[2]}, Vote Status: {row[3]}, Timestamp: {row[4]}"
+            )
 
     def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
         """
@@ -203,7 +206,7 @@ class QuestionAnswerDatabase:
         """
         my_sql_data = self.retrieve_all_question_answers()
 
-        with open(csv_file_name, 'w', newline='') as file:
+        with open(csv_file_name, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(QA_CSV_HEADER)
             writer.writerows(my_sql_data)

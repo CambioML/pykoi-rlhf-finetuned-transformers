@@ -1,6 +1,7 @@
 """Application module."""
 from typing import Any, Dict
-from flask import Flask, jsonify, send_from_directory, request
+
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from pyngrok import ngrok
 
@@ -11,6 +12,7 @@ class Application:
     """
     The Application class.
     """
+
     def __init__(self, share: bool = False, debug: bool = False):
         """
         Initialize the Application.
@@ -53,6 +55,7 @@ class Application:
             app (Flask): The Flask application.
             component (Dict[str, Any]): The component for which the routes are being created.
         """
+
         @app.route("/chat/<message>", methods=["POST"])
         def inference(message: str):
             try:
@@ -135,6 +138,7 @@ class Application:
             app (Flask): The Flask application.
             component (Dict[str, Any]): The component for which the routes are being created.
         """
+
         @app.route("/chat/qa_table/retrieve", methods=["GET"])
         def retrieve_qa_table():
             try:
@@ -179,6 +183,7 @@ class Application:
                 id (str): The id of the data source.
                 data_source (Any): The data source.
             """
+
             @app.route(f"/data/{id}", methods=["GET"], endpoint=id)
             def get_data():
                 data = data_source.fetch_func()

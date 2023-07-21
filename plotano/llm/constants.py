@@ -10,5 +10,6 @@ class LlmName(Enum):
         OPENAI (str): Represents the OpenAI model.
         HUGGINGFACE (str): Represents the HuggingFace model.
     """
+
     OPENAI = "openai"
     HUGGINGFACE = "huggingface"

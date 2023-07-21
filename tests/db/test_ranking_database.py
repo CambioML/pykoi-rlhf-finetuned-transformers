@@ -1,9 +1,10 @@
 """
 Test the RankingDatabase class
 """
-import unittest
 import os
 import sqlite3
+import unittest
+
 from plotano.db.ranking_database import RankingDatabase
 
 # Define a temporary database file for testing
@@ -32,7 +33,8 @@ class TestRankingDatabase(unittest.TestCase):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='ranking'")
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='ranking'"
+        )
         table_exists = cursor.fetchone()
 
         self.assertTrue(table_exists)
@@ -51,7 +53,8 @@ class TestRankingDatabase(unittest.TestCase):
 
         # Insert data and get the ID
         ranking_id = self.ranking_db.insert_ranking(
-            question, up_ranking_answer, low_ranking_answer)
+            question, up_ranking_answer, low_ranking_answer
+        )
 
         # Retrieve the data
         rows = self.ranking_db.retrieve_all_question_answers()
@@ -76,9 +79,11 @@ class TestRankingDatabase(unittest.TestCase):
 
         # Insert data
         self.ranking_db.insert_ranking(
-            question1, up_ranking_answer1, low_ranking_answer1)
+            question1, up_ranking_answer1, low_ranking_answer1
+        )
         self.ranking_db.insert_ranking(
-            question2, up_ranking_answer2, low_ranking_answer2)
+            question2, up_ranking_answer2, low_ranking_answer2
+        )
 
         # Save to CSV
         self.ranking_db.save_to_csv("test_csv_file.csv")
@@ -92,11 +97,16 @@ class TestRankingDatabase(unittest.TestCase):
         # Verify the CSV file content
         self.assertEqual(len(lines), 3)  # Header + 2 rows
         self.assertEqual(
-            lines[0].strip(), "ID,Question,Up Ranking Answer,Low Ranking Answer")
+            lines[0].strip(), "ID,Question,Up Ranking Answer,Low Ranking Answer"
+        )
         self.assertEqual(
-            lines[1].strip(), f"1,{question1},{up_ranking_answer1},{low_ranking_answer1}")
+            lines[1].strip(),
+            f"1,{question1},{up_ranking_answer1},{low_ranking_answer1}",
+        )
         self.assertEqual(
-            lines[2].strip(), f"2,{question2},{up_ranking_answer2},{low_ranking_answer2}")
+            lines[2].strip(),
+            f"2,{question2},{up_ranking_answer2},{low_ranking_answer2}",
+        )
 
         # Clean up
         os.remove("test_csv_file.csv")

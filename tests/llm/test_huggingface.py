@@ -2,7 +2,8 @@
 Test the HuggingfaceModel class.
 """
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from plotano.llm.huggingface import HuggingfaceModel
 
 
@@ -29,10 +30,16 @@ class TestHuggingfaceModel(unittest.TestCase):
 
         # Check if the model and tokenizer were initialized correctly
         mock_model.from_pretrained.assert_called_once_with(
-            pretrained_model_name_or_path, trust_remote_code=True, load_in_8bit=True, device_map="auto"
+            pretrained_model_name_or_path,
+            trust_remote_code=True,
+            load_in_8bit=True,
+            device_map="auto",
         )
         mock_tokenizer.from_pretrained.assert_called_once_with(
-            pretrained_model_name_or_path, trust_remote_code=True, load_in_8bit=True, device_map="auto"
+            pretrained_model_name_or_path,
+            trust_remote_code=True,
+            load_in_8bit=True,
+            device_map="auto",
         )
         self.assertEqual(huggingface_model._model, model_instance_mock)
         self.assertEqual(huggingface_model._tokenizer, tokenizer_instance_mock)
@@ -61,9 +68,13 @@ class TestHuggingfaceModel(unittest.TestCase):
         result = huggingface_model.predict(input_message)
 
         # Check if the tokenizer and model methods were called with the correct arguments
-        mock_tokenizer.encode.assert_called_once_with(input_message, return_tensors="pt")
+        mock_tokenizer.encode.assert_called_once_with(
+            input_message, return_tensors="pt"
+        )
         mock_model.generate.assert_called_once_with([1, 2, 3, 4, 5], max_length=100)
-        mock_tokenizer.decode.assert_called_once_with([6, 7, 8, 9, 10], skip_special_tokens=True)
+        mock_tokenizer.decode.assert_called_once_with(
+            [6, 7, 8, 9, 10], skip_special_tokens=True
+        )
 
         self.assertEqual(result, output_message)
 
