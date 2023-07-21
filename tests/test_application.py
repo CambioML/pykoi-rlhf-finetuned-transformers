@@ -46,7 +46,7 @@ class TestApplication(unittest.TestCase):
         CORS_mock.assert_called_once_with(Flask_mock.return_value)
 
         # Check if routes are created correctly
-        self.assertEqual(len(Flask_mock.return_value.route.call_args_list), 13)
+        self.assertEqual(len(Flask_mock.return_value.route.call_args_list), 11)
 
         # Check if data routes are created correctly
         Flask_mock.return_value.route.assert_any_call("/data/data_source1", methods=["GET"], endpoint="data_source1")
@@ -55,7 +55,6 @@ class TestApplication(unittest.TestCase):
         # Check if chatbot routes are created correctly
         Flask_mock.return_value.route.assert_any_call("/chat/<message>", methods=["POST"])
         Flask_mock.return_value.route.assert_any_call("/chat/qa_table/update", methods=["POST"])
-        Flask_mock.return_value.route.assert_any_call("/chat/qa_table/retrieve", methods=["GET"])
         Flask_mock.return_value.route.assert_any_call("/chat/qa_table/close", methods=["GET"])
 
         # Check if the base and home routes are created correctly

@@ -563,146 +563,146 @@ class RewardTrainer(Trainer):
         self.model.config.use_cache = not rlhf_config.gradient_checkpointing
         self.num_proc = self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
 
-                self.dataset = self.create_datasets()
+        self.dataset = self.create_datasets()
 
-                self.compute_metrics = self._compute_metrics
-                self.data_collator=RewardDataCollatorWithPadding(
-                        tokenizer=self.tokenizer, 
-                        max_length=self._rlhf_config.max_seq_length_reward)
-                super().__init__(
-                    model=self.model,
-                    args=self.args,
-                    data_collator=self.data_collator,
-                    train_dataset=self.dataset['train'],
-                    eval_dataset=self.dataset['eval'],
-                    tokenizer=self.tokenizer,
-                    compute_metrics=self.compute_metrics,
-                )
-                
-            def _preprocess_function(self, examples):
-                """
-                Turn the dataset into pairs of question and answer, where 
-                "text_x = question + preferred answer" and "text_y = question + not preferred answer". 
-                Then tokenize the dataset.
+        self.compute_metrics = self._compute_metrics
+        self.data_collator=RewardDataCollatorWithPadding(
+                tokenizer=self.tokenizer, 
+                max_length=self._rlhf_config.max_seq_length_reward)
+        super().__init__(
+            model=self.model,
+            args=self.args,
+            data_collator=self.data_collator,
+            train_dataset=self.dataset['train'],
+            eval_dataset=self.dataset['eval'],
+            tokenizer=self.tokenizer,
+            compute_metrics=self.compute_metrics,
+        )
+        
+    def _preprocess_function(self, examples):
+        """
+        Turn the dataset into pairs of question and answer, where 
+        "text_x = question + preferred answer" and "text_y = question + not preferred answer". 
+        Then tokenize the dataset.
 
-                Returns:
-                    A dictionary containing the processed data.
-                """
-                def tokenize_and_store(question, answer, key_ids, key_mask):
-                    tokenized = self.tokenizer(f"Question: {question}\n\nAnswer: {answer}", truncation=True)
-                    new_examples[key_ids].append(tokenized["input_ids"])
-                    new_examples[key_mask].append(tokenized["attention_mask"])
+        Returns:
+            A dictionary containing the processed data.
+        """
+        def tokenize_and_store(question, answer, key_ids, key_mask):
+            tokenized = self.tokenizer(f"Question: {question}\n\nAnswer: {answer}", truncation=True)
+            new_examples[key_ids].append(tokenized["input_ids"])
+            new_examples[key_mask].append(tokenized["attention_mask"])
 
-                new_examples = {"input_ids_x": [], "attention_mask_x": [], 
-                                "input_ids_y": [], "attention_mask_y": []}
-                
-                for question, better_answer, worse_answer in zip(
-                    examples[RANKING_CSV_HEADER_QUESTION], 
-                    examples[RANKING_CSV_HEADER_UP_RANKING_ANSWER], 
-                    examples[RANKING_CSV_HEADER_LOW_RANKING_ANSWER]):
-                    tokenize_and_store(question, better_answer, "input_ids_x", "attention_mask_x")
-                    tokenize_and_store(question, worse_answer, "input_ids_y", "attention_mask_y")
+        new_examples = {"input_ids_x": [], "attention_mask_x": [], 
+                        "input_ids_y": [], "attention_mask_y": []}
+        
+        for question, better_answer, worse_answer in zip(
+            examples[RANKING_CSV_HEADER_QUESTION], 
+            examples[RANKING_CSV_HEADER_UP_RANKING_ANSWER], 
+            examples[RANKING_CSV_HEADER_LOW_RANKING_ANSWER]):
+            tokenize_and_store(question, better_answer, "input_ids_x", "attention_mask_x")
+            tokenize_and_store(question, worse_answer, "input_ids_y", "attention_mask_y")
 
-                return new_examples
+        return new_examples
 
-            def create_datasets(self):
-                """
-                Load the dataset and preprocess it.
+    def create_datasets(self):
+        """
+        Load the dataset and preprocess it.
 
-                Returns:
-                    A dictionary containing the train and eval datasets.
-                """
-                ## based on dataset_type (e.g. "huggingface", "csv", etc.), load the data
-                if self._rlhf_config.dataset_type == "huggingface":
-                    dataset = load_dataset(
-                        self._rlhf_config.dataset_name,
-                        data_dir=self._rlhf_config.dataset_reward_folder,
-                        split=self._rlhf_config.split,
-                        use_auth_token=True,
-                        num_proc=self._rlhf_config.num_proc,
-                        streaming=self._rlhf_config.streaming,
-                    )
-                elif self._rlhf_config.dataset_type == "csv":
-                    dataset = load_dataset('csv', data_files=self._rlhf_config.dataset_name) 
-                else:
-                    raise FileNotFoundError(f"No (supported) data files or dataset script found {self._rlhf_config.dataset_type}")
+        Returns:
+            A dictionary containing the train and eval datasets.
+        """
+        ## based on dataset_type (e.g. "huggingface", "csv", etc.), load the data
+        if self._rlhf_config.dataset_type == "huggingface":
+            dataset = load_dataset(
+                self._rlhf_config.dataset_name,
+                data_dir=self._rlhf_config.dataset_reward_folder,
+                split=self._rlhf_config.split,
+                use_auth_token=True,
+                num_proc=self._rlhf_config.num_proc,
+                streaming=self._rlhf_config.streaming,
+            )
+        elif self._rlhf_config.dataset_type == "csv":
+            dataset = load_dataset('csv', data_files=self._rlhf_config.dataset_name) 
+        else:
+            raise FileNotFoundError(f"No (supported) data files or dataset script found {self._rlhf_config.dataset_type}")
 
-                # Preprocess the dataset and filter out QAs that are longer than max_length
-                dataset = dataset.map(
-                    self._preprocess_function,
-                    batched=True,
-                    num_proc=self.num_proc,
-                )
-                dataset = dataset.filter(
-                    lambda x: len(x["input_ids_x"]) <= self._rlhf_config.max_seq_length_reward
-                              and len(x["input_ids_y"]) <= self._rlhf_config.max_seq_length_reward
-                )
+        # Preprocess the dataset and filter out QAs that are longer than max_length
+        dataset = dataset.map(
+            self._preprocess_function,
+            batched=True,
+            num_proc=self.num_proc,
+        )
+        dataset = dataset.filter(
+            lambda x: len(x["input_ids_x"]) <= self._rlhf_config.max_seq_length_reward
+                        and len(x["input_ids_y"]) <= self._rlhf_config.max_seq_length_reward
+        )
 
-                dataset = dataset[self._rlhf_config.split] # Convert DatasetDict to Dataset
-                ## load desired amount of data
-                if self._rlhf_config.reward_num_of_data > 0:
-                    dataset = dataset.select(range(min(self._rlhf_config.reward_num_of_data, len(dataset))))
+        dataset = dataset[self._rlhf_config.split] # Convert DatasetDict to Dataset
+        ## load desired amount of data
+        if self._rlhf_config.reward_num_of_data > 0:
+            dataset = dataset.select(range(min(self._rlhf_config.reward_num_of_data, len(dataset))))
 
-                ## split to train and test datasets
-                dataset = dataset.train_test_split(test_size=self._rlhf_config.train_test_split_ratio, 
-                                                   seed=self._rlhf_config.seed)
-                print(f"Size of the train set: {len(dataset['train'])}. \
-                      Size of the validation set: {len(dataset['test'])}")
+        ## split to train and test datasets
+        dataset = dataset.train_test_split(test_size=self._rlhf_config.train_test_split_ratio, 
+                                            seed=self._rlhf_config.seed)
+        print(f"Size of the train set: {len(dataset['train'])}. \
+                Size of the validation set: {len(dataset['test'])}")
 
-                return {"train": dataset['train'], "eval": dataset['test']}
-            
+        return {"train": dataset['train'], "eval": dataset['test']}
+    
 
-            # Define how to compute the reward loss. We use the InstructGPT pairwise logloss: 
-            # https://arxiv.org/abs/2203.02155
-            def compute_loss(self, model, inputs, return_outputs=False):
-                rewards_x = model(input_ids=inputs["input_ids_x"], attention_mask=inputs["attention_mask_x"])[0]
-                rewards_y = model(input_ids=inputs["input_ids_y"], attention_mask=inputs["attention_mask_y"])[0]
-                loss = -torch.nn.functional.logsigmoid(rewards_x - rewards_y).mean()
-                if return_outputs:
-                    return loss, {"rewards_x": rewards_x, "rewards_y": rewards_y}
-                return loss
-            
-            def _compute_metrics(self, eval_pred):
-                """
-                Compute the accuracy of the model.
+    # Define how to compute the reward loss. We use the InstructGPT pairwise logloss: 
+    # https://arxiv.org/abs/2203.02155
+    def compute_loss(self, model, inputs, return_outputs=False):
+        rewards_x = model(input_ids=inputs["input_ids_x"], attention_mask=inputs["attention_mask_x"])[0]
+        rewards_y = model(input_ids=inputs["input_ids_y"], attention_mask=inputs["attention_mask_y"])[0]
+        loss = -torch.nn.functional.logsigmoid(rewards_x - rewards_y).mean()
+        if return_outputs:
+            return loss, {"rewards_x": rewards_x, "rewards_y": rewards_y}
+        return loss
+    
+    def _compute_metrics(self, eval_pred):
+        """
+        Compute the accuracy of the model.
 
-                Args:
-                    eval_pred (:obj:`EvalPrediction`): The evaluation prediction.
+        Args:
+            eval_pred (:obj:`EvalPrediction`): The evaluation prediction.
 
-                Returns:
-                    A dictionary containing the accuracy.
-                """
-                predictions, _ = eval_pred
-                # Here, predictions is rewards_x and rewards_y.
-                # We want to see how much of the time rewards_x > rewards_y.
-                predictions = np.argmax(predictions, axis=0)
-                labels = np.zeros(predictions.shape)
-                accuracy = evaluate.load("accuracy")
-                return accuracy.compute(predictions=predictions, references=labels)
-
-
-            def save(self, output_path=None):   
-                """
-                Save the model.
-
-                Args:
-                    output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be
-                        saved to the default output path.
-                """
-                if output_path is None:
-                    output_path = os.path.join(
-                        self._rlhf_config.output_dir, 
-                        self._rlhf_config.reward_merged_path)
-                self.save_model(output_path) 
+        Returns:
+            A dictionary containing the accuracy.
+        """
+        predictions, _ = eval_pred
+        # Here, predictions is rewards_x and rewards_y.
+        # We want to see how much of the time rewards_x > rewards_y.
+        predictions = np.argmax(predictions, axis=0)
+        labels = np.zeros(predictions.shape)
+        accuracy = evaluate.load("accuracy")
+        return accuracy.compute(predictions=predictions, references=labels)
 
 
-            def train_and_save(self, output_path=None):
-                """
-                Train the model and save it.
+    def save(self, output_path=None):   
+        """
+        Save the model.
 
-                Args:
-                    output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be
-                        saved to the default output path.
-                """
-                self.train()
-                self.save(output_path)
+        Args:
+            output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be
+                saved to the default output path.
+        """
+        if output_path is None:
+            output_path = os.path.join(
+                self._rlhf_config.output_dir, 
+                self._rlhf_config.reward_merged_path)
+        self.save_model(output_path) 
+
+
+    def train_and_save(self, output_path=None):
+        """
+        Train the model and save it.
+
+        Args:
+            output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be
+                saved to the default output path.
+        """
+        self.train()
+        self.save(output_path)
