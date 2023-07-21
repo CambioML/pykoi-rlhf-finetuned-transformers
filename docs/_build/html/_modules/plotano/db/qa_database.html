@@ -83,12 +83,13 @@
 <span class="n">QA_CSV_HEADER_VOTE_STATUS</span> <span class="o">=</span> <span class="s1">&#39;Vote Status&#39;</span>
 <span class="n">QA_CSV_HEADER_TIMESTAMPS</span> <span class="o">=</span> <span class="s1">&#39;Timestamp&#39;</span>
 <span class="n">QA_CSV_HEADER</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">QA_CSV_HEADER_ID</span><span class="p">,</span> 
-    <span class="n">QA_CSV_HEADER_QUESTION</span><span class="p">,</span> 
-    <span class="n">QA_CSV_HEADER_ANSWER</span><span class="p">,</span> 
+    <span class="n">QA_CSV_HEADER_ID</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_QUESTION</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_ANSWER</span><span class="p">,</span>
     <span class="n">QA_CSV_HEADER_VOTE_STATUS</span><span class="p">,</span>
     <span class="n">QA_CSV_HEADER_TIMESTAMPS</span>
-    <span class="p">)</span>
+<span class="p">)</span>
+
 
 <div class="viewcode-block" id="QuestionAnswerDatabase"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase">[docs]</a><span class="k">class</span> <span class="nc">QuestionAnswerDatabase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Question Answer Database class&quot;&quot;&quot;</span>
@@ -249,20 +250,20 @@
 <span class="sd">        This method saves the contents of the question_answer table into a CSV file.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            csv_file_name (str, optional): The name of the CSV file to which the data will be written. </span>
+<span class="sd">            csv_file_name (str, optional): The name of the CSV file to which the data will be written.</span>
 <span class="sd">            Defaults to &quot;question_answer_votes.csv&quot;.</span>
 
-<span class="sd">        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the </span>
+<span class="sd">        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the</span>
 <span class="sd">        CSV file corresponds to a row in the question_answer table.</span>
 
-<span class="sd">        This method first retrieves all question-answer pairs from the database by calling the </span>
+<span class="sd">        This method first retrieves all question-answer pairs from the database by calling the</span>
 <span class="sd">        retrieve_all_question_answers method. It then writes this data to the CSV file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">my_sql_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_all_question_answers</span><span class="p">()</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">CSV_HEADER</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">QA_CSV_HEADER</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">my_sql_data</span><span class="p">)</span></div></div>
 </pre></div>
 

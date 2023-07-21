@@ -49,6 +49,7 @@
 <li class="toctree-l3 current"><a class="reference internal" href="plotano.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">plotano.component package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="plotano.db.html">plotano.db package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plotano.llm.html">plotano.llm package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="plotano.rlhf.html">plotano.rlhf package</a></li>
 </ul>
 </li>
@@ -99,7 +100,7 @@
 <p>Base classes for components.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="plotano.component.base.Chatbot">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.component.base.</span></span><span class="sig-name descname"><span class="pre">Chatbot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AbsLlm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase" title="plotano.db.qa_database.QuestionAnswerDatabase"><span class="pre">QuestionAnswerDatabase</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/component/base.html#Chatbot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.base.Chatbot" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.component.base.</span></span><span class="sig-name descname"><span class="pre">Chatbot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="plotano.llm.html#plotano.llm.abs_llm.AbsLlm" title="plotano.llm.abs_llm.AbsLlm"><span class="pre">AbsLlm</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/component/base.html#Chatbot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.base.Chatbot" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#plotano.component.base.Component" title="plotano.component.base.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a></p>
 <p>Chatbot class represents a chatbot component.</p>
 <dl class="py attribute">
@@ -128,7 +129,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="plotano.component.base.Component">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.component.base.</span></span><span class="sig-name descname"><span class="pre">Component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fetch_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svelte_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/component/base.html#Component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.base.Component" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.component.base.</span></span><span class="sig-name descname"><span class="pre">Component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fetch_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="plotano.llm.html#plotano.llm.abs_llm.AbsLlm.None" title="plotano.llm.abs_llm.AbsLlm.None"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">svelte_component</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/component/base.html#Component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.base.Component" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Component class is the base class for all components.</p>
 <dl class="py attribute">
@@ -239,6 +240,55 @@
 </dd>
 </dl>
 </dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-plotano.component.chatbot_database_factory">
+<span id="plotano-component-chatbot-database-factory-module"></span><h2>plotano.component.chatbot_database_factory module<a class="headerlink" href="#module-plotano.component.chatbot_database_factory" title="Permalink to this heading"></a></h2>
+<p>Chatbot Database Factory class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.component.chatbot_database_factory.ChatbotDatabaseFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.component.chatbot_database_factory.</span></span><span class="sig-name descname"><span class="pre">ChatbotDatabaseFactory</span></span><a class="reference internal" href="_modules/plotano/component/chatbot_database_factory.html#ChatbotDatabaseFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.chatbot_database_factory.ChatbotDatabaseFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A factory class for creating chatbot databases.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="plotano.component.chatbot_database_factory.ChatbotDatabaseFactory.create">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feedback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#plotano.component.constants.FeedbackType" title="plotano.component.constants.FeedbackType"><span class="pre">FeedbackType</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/component/chatbot_database_factory.html#ChatbotDatabaseFactory.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.chatbot_database_factory.ChatbotDatabaseFactory.create" title="Permalink to this definition"></a></dt>
+<dd><p>Create a chatbot database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>feedback</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="#plotano.component.constants.FeedbackType" title="plotano.component.constants.FeedbackType"><em>FeedbackType</em></a><em>]</em>) – The type of the chatbot.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created database.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="plotano.db.html#plotano.db.qa_database.QuestionAnswerDatabase" title="plotano.db.qa_database.QuestionAnswerDatabase">QuestionAnswerDatabase</a>, <a class="reference internal" href="plotano.db.html#plotano.db.ranking_database.RankingDatabase" title="plotano.db.ranking_database.RankingDatabase">RankingDatabase</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-plotano.component.constants">
+<span id="plotano-component-constants-module"></span><h2>plotano.component.constants module<a class="headerlink" href="#module-plotano.component.constants" title="Permalink to this heading"></a></h2>
+<p>Component constants.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="plotano.component.constants.FeedbackType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">plotano.component.constants.</span></span><span class="sig-name descname"><span class="pre">FeedbackType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotano/component/constants.html#FeedbackType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotano.component.constants.FeedbackType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Feedback type.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.component.constants.FeedbackType.RANK">
+<span class="sig-name descname"><span class="pre">RANK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rank'</span></em><a class="headerlink" href="#plotano.component.constants.FeedbackType.RANK" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="plotano.component.constants.FeedbackType.VOTE">
+<span class="sig-name descname"><span class="pre">VOTE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vote'</span></em><a class="headerlink" href="#plotano.component.constants.FeedbackType.VOTE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

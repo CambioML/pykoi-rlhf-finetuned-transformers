@@ -9,6 +9,7 @@ Subpackages
 
    plotano.component
    plotano.db
+   plotano.llm
    plotano.rlhf
 
 Submodules

@@ -80,11 +80,12 @@
 <span class="n">RANKING_CSV_HEADER_UP_RANKING_ANSWER</span> <span class="o">=</span> <span class="s1">&#39;Up Ranking Answer&#39;</span>
 <span class="n">RANKING_CSV_HEADER_LOW_RANKING_ANSWER</span> <span class="o">=</span> <span class="s1">&#39;Low Ranking Answer&#39;</span>
 <span class="n">RANKING_CSV_HEADER</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">CSV_HEADER_ID</span><span class="p">,</span> 
-    <span class="n">CSV_HEADER_QUESTION</span><span class="p">,</span> 
-    <span class="n">RANKING_CSV_HEADER_UP_RANKING_ANSWER</span><span class="p">,</span> 
+    <span class="n">CSV_HEADER_ID</span><span class="p">,</span>
+    <span class="n">CSV_HEADER_QUESTION</span><span class="p">,</span>
+    <span class="n">RANKING_CSV_HEADER_UP_RANKING_ANSWER</span><span class="p">,</span>
     <span class="n">RANKING_CSV_HEADER_LOW_RANKING_ANSWER</span>
-    <span class="p">)</span>
+<span class="p">)</span>
+
 
 <div class="viewcode-block" id="RankingDatabase"><a class="viewcode-back" href="../../../plotano.db.html#plotano.db.ranking_database.RankingDatabase">[docs]</a><span class="k">class</span> <span class="nc">RankingDatabase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ranking Database class&quot;&quot;&quot;</span>
@@ -226,7 +227,7 @@
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">CSV_HEADER</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">RANKING_CSV_HEADER</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">ranking_data</span><span class="p">)</span></div></div>
 </pre></div>
 

@@ -71,10 +71,13 @@
   <h1>Source code for plotano.component.base</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Base classes for components.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">plotano.db.qa_database</span> <span class="kn">import</span> <span class="n">QuestionAnswerDatabase</span>
+<span class="kn">from</span> <span class="nn">plotano.db.ranking_database</span> <span class="kn">import</span> <span class="n">RankingDatabase</span>
 <span class="kn">from</span> <span class="nn">plotano.llm.abs_llm</span> <span class="kn">import</span> <span class="n">AbsLlm</span>
+<span class="kn">from</span> <span class="nn">plotano.component.constants</span> <span class="kn">import</span> <span class="n">FeedbackType</span>
+<span class="kn">from</span> <span class="nn">plotano.component.chatbot_database_factory</span> <span class="kn">import</span> <span class="n">ChatbotDatabaseFactory</span>
 
 
 <div class="viewcode-block" id="DataSource"><a class="viewcode-back" href="../../../plotano.component.html#plotano.component.base.DataSource">[docs]</a><span class="k">class</span> <span class="nc">DataSource</span><span class="p">:</span>
@@ -162,19 +165,18 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">model</span><span class="p">:</span> <span class="n">AbsLlm</span><span class="p">,</span>
-                 <span class="n">database</span><span class="p">:</span> <span class="n">QuestionAnswerDatabase</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a new instance of Chatbot.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model (AbsLlm): The model to use for the chatbot.</span>
-<span class="sd">            database (QuestionAnswerDatabase): The database to use for the chatbot.</span>
 <span class="sd">            kwargs: Additional properties for the chatbot.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Chatbot&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">ChatbotDatabaseFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">feedback</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;feedback&quot;</span><span class="p">,</span> <span class="s2">&quot;vote&quot;</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="Dashboard"><a class="viewcode-back" href="../../../plotano.component.html#plotano.component.base.Dashboard">[docs]</a><span class="k">class</span> <span class="nc">Dashboard</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
