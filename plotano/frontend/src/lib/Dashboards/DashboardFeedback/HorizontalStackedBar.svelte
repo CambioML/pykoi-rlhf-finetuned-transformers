@@ -3,7 +3,7 @@
   import { format } from "d3-format";
   import { scaleLinear, scaleOrdinal, scaleBand } from "d3-scale";
   import { stack, stackOrderNone, stackOffsetNone } from "d3-shape";
-  import { chatLog, stackedData, feedbackSelection } from "../../store";
+  import { chatLog, stackedData, feedbackSelection } from "../../../store";
   import { onMount } from "svelte";
 
   let outerHeight = 300;

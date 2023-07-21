@@ -1,14 +1,14 @@
 <script>
-  import HorizontalStackedBar from "./lib/DashboardFeedback/HorizontalStackedBar.svelte";
-  import QATable from "./lib/DashboardFeedback/QATable.svelte";
-  import ColumnChart from "./lib/DashboardFeedback/ColumnChart.svelte";
-  import HistogramAnswer from "./lib/DashboardFeedback/HistogramAnswer.svelte";
-  import HistogramQuestion from "./lib/DashboardFeedback/HistogramQuestion.svelte";
-  import MetricCardAbsolute from "./lib/DashboardFeedback/MetricCardAbsolute.svelte";
-  import MetricCardPercentage from "./lib/DashboardFeedback/MetricCardPercentage.svelte";
+  import HorizontalStackedBar from "./DashboardFeedback/HorizontalStackedBar.svelte";
+  import QATable from "./DashboardFeedback/QATable.svelte";
+  import ColumnChart from "./DashboardFeedback/ColumnChart.svelte";
+  import HistogramAnswer from "./DashboardFeedback/HistogramAnswer.svelte";
+  import HistogramQuestion from "./DashboardFeedback/HistogramQuestion.svelte";
+  import MetricCardAbsolute from "./DashboardFeedback/MetricCardAbsolute.svelte";
+  import MetricCardPercentage from "./DashboardFeedback/MetricCardPercentage.svelte";
 
   import { onMount } from "svelte";
-  import { chatLog } from "./store";
+  import { chatLog } from "../../store";
 
   onMount(() => {
     getDataFromDB();

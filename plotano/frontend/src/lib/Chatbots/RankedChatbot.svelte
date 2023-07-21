@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { select } from "d3-selection";
-  import { rankChatLog } from "./store";
+  import { rankChatLog } from "../../store";
 
   let mymessage = "";
   let messageplaceholder = "";

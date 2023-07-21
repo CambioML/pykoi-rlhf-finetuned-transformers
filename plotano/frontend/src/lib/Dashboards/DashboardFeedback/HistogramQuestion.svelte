@@ -2,8 +2,8 @@
   import { max, bin } from "d3-array";
   import { format } from "d3-format";
   import { scaleLinear, scaleOrdinal } from "d3-scale";
-  import { feedbackSelection, chatLog } from "../../store.js";
-  import { getQAWordFrequency } from "../../utils.js";
+  import { feedbackSelection, chatLog } from "../../../store.js";
+  import { getQAWordFrequency } from "../../../utils.js";
 
   const emojiObj = {
     up: "Good 👍",

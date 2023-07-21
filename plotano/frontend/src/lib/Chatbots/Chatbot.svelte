@@ -1,5 +1,5 @@
 <script>
-  import { chatLog } from "./store";
+  import { chatLog } from "../../store";
   import { onMount } from "svelte";
 
   export let feedback = false;
