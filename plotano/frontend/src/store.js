@@ -6,7 +6,7 @@ export const chatLog = writable([]);
 export const rankChatLog = writable([]);
 
 // feedback (rewrite)
-export const feedbackSelection = writable("down"); // up, down, or NA
+export const feedbackSelection = writable("all"); // up, down, or NA
 
 export const examples = writable([
   {
