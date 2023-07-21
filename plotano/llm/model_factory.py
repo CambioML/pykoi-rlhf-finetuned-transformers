@@ -4,8 +4,6 @@ from typing import Union
 
 from plotano.llm.constants import LlmName
 from plotano.llm.abs_llm import AbsLlm
-from plotano.llm.openai import OpenAIModel
-from plotano.llm.huggingface import HuggingfaceModel
 
 
 class ModelFactory:
@@ -42,8 +40,12 @@ class ModelFactory:
         try:
             model_name = LlmName(model_name)
             if model_name == LlmName.OPENAI:
+                from plotano.llm.openai import OpenAIModel
+
                 return OpenAIModel(**kwargs)
             elif model_name == LlmName.HUGGINGFACE:
+                from plotano.llm.huggingface import HuggingfaceModel
+
                 return HuggingfaceModel(**kwargs)
             else:
                 raise ValueError(f"[llm_factory]: Unknown model "
