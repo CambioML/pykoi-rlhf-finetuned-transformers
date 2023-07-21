@@ -46,7 +46,7 @@ class TestApplication(unittest.TestCase):
         CORS_mock.assert_called_once_with(Flask_mock.return_value)
 
         # Check if routes are created correctly
-        self.assertEqual(len(Flask_mock.return_value.route.call_args_list), 12)
+        self.assertEqual(len(Flask_mock.return_value.route.call_args_list), 13)
 
         # Check if data routes are created correctly
         Flask_mock.return_value.route.assert_any_call("/data/data_source1", methods=["GET"], endpoint="data_source1")

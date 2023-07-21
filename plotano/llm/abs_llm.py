@@ -13,13 +13,16 @@ class AbsLlm(abc.ABC):
     """
 
     @abc.abstractmethod
-    def predict(self, message: str):
+    def predict(self,
+                message: str,
+                num_of_response: int):
         """Predict the next word based on the input message.
 
         This method must be implemented by any subclass of `AbsLlm`.
 
         Args:
             message (str): The input message used to predict the next word.
+            num_of_response (int): How many completions to generate for each prompt.
 
         Raises:
             NotImplementedError: This method must be implemented by subclasses.
