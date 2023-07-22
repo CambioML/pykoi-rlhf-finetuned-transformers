@@ -23,5 +23,5 @@ npm run build
 
 Backend:
 ```
-python -m example.chatbot.demo
+python -m example.chatbot.openai_model_demo
 ```
