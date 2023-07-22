@@ -16,6 +16,11 @@ accelerate = "0.21.0"
 bitsandbytes = "0.40.2"
 scipy = "1.11.1"
 pyngrok = "6.0.0"
+pandas = "^2.0.3"
+datasets = "2.13.1"
+evaluate = "0.4.0"
+peft = "0.4.0"
+trl = "0.4.7"
 
 
 [tool.poetry.group.dev.dependencies]
