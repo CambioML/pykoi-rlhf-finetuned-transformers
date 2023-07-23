@@ -1,4 +1,3 @@
-<!-- App.svelte -->
 <script>
   import { writable } from "svelte/store";
   import Chatbot from "./lib/Chatbots/Chatbot.svelte";
