@@ -1,12 +1,16 @@
 <script>
   import { writable } from "svelte/store";
-  import Chatbot from "./lib/Chatbots/Chatbot.svelte";
+  import Chat from "./lib/Chatbots/Chat.svelte";
   import Dropdown from "./lib/UIComponents/Dropdown.svelte";
   import Feedback from "./lib/Dashboards/Feedback.svelte";
-  import RankedChatbot from "./lib/Chatbots/RankedChatbot.svelte";
-  import Chat from "./lib/Chatbots/Chat.svelte";
 
   const components = writable([]);
+
+  const componentMap = {
+    Chatbot: Chat,
+    Dropdown: Dropdown,
+    Feedback: Feedback,
+  };
 
   fetch("/components")
     .then((response) => response.json())
@@ -16,14 +20,8 @@
 </script>
 
 {#each $components as component}
-  {#if component.svelte_component === "Feedback"}
-    <Feedback {...component.props} />
-  {/if}
-  {#if component.svelte_component === "Chatbot"}
-    <Chat {...component.props} />
-  {/if}
-
-  {#if component.svelte_component === "Dropdown"}
-    <Dropdown {...component.props} />
-  {/if}
+  <svelte:component
+    this={componentMap[component.svelte_component]}
+    {...component.props}
+  />
 {/each}
