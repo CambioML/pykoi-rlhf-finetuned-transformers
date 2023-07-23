@@ -24,8 +24,8 @@ dashboard = cb.Dashboard(database=database)
 # Starting the application and add chatbot as a component #
 ###########################################################
 # Create the application
-app = cb.Application(debug=False, share=True)
-# app = cb.Application(debug=False, share=False)
+# app = cb.Application(debug=False, share=True)
+app = cb.Application(debug=False, share=False)
 app.add_component(chatbot)
 app.add_component(dashboard)
 app.run()
