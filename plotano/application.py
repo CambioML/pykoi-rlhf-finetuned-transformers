@@ -4,8 +4,25 @@ from typing import Any, Dict
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from pyngrok import ngrok
+import socket
+from flask_ngrok import run_with_ngrok
 
 from plotano.component.base import Dropdown
+
+
+def find_free_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("", 0))  # binds to an arbitrary free port
+        return s.getsockname()[1]
+
+
+# def find_free_port():
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     s.bind(("", 0))  # binds to an arbitrary free port
+#     s.listen(1)
+#     port = s.getsockname()[1]
+#     s.close()
+#     return port
 
 
 class Application:
@@ -211,12 +228,12 @@ class Application:
 
         # Set the ngrok tunnel if share is True
         if self._share:
-            public_url = ngrok.connect("http://127.0.0.1:5000")
+            port = find_free_port()
+            public_url = ngrok.connect(port)
             print("Public URL:", public_url)
-
-            app.run(debug=self._debug)
-
+            app.run(port=port, debug=self._debug)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
-            app.run(debug=self._debug)
+            port = find_free_port()
+            app.run(port=port, debug=self._debug)
