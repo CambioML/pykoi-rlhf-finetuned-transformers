@@ -1,6 +1,7 @@
 <script>
   import { chatLog } from "../../store";
   import { onMount } from "svelte";
+  import { select } from "d3-selection";
 
   export let feedback = false;
 
@@ -13,7 +14,6 @@
   });
 
   async function getDataFromDB() {
-    console.log("fetching data from db");
     const response = await fetch(
       "http://127.0.0.1:5000/chat/qa_table/retrieve"
     );
@@ -28,32 +28,6 @@
     $chatLog = [...formattedRows];
   }
 
-  // insert entry into database
-  // async function insertToDatabase(entry) {
-  //   console.log("INSERT");
-  //   console.log("entry", entry);
-  //   const response = await fetch(
-  //     "http://127.0.0.1:5000/preference_table/insert",
-  //     {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(entry),
-  //     }
-  //   );
-
-  //   if (response.ok) {
-  //     console.log("ok! data inserted", response);
-  //     console.log("entry", entry);
-  //     // update chatlog
-  //     // $chatLog = [...$chatLog, entry];
-  //   } else {
-  //     const err = await response.text();
-  //     alert(err);
-  //   }
-  // }
-
   const askModel = async (event) => {
     event.preventDefault(); // Prevents page refresh
     mymessage = messageplaceholder;
@@ -65,7 +39,6 @@
       answer: "Loading...",
       vote_status: "na",
     };
-    console.log("adding to log here");
     $chatLog = [...$chatLog, currentEntry];
 
     const response = await fetch(`/chat/${mymessage}`, {
@@ -108,15 +81,7 @@
 
   $: dots = ".".repeat(dotState).padEnd(3);
 
-  async function logVote(vote, index) {
-    const messageLog = $chatLog[index];
-    messageLog.vote = vote;
-    const feedbackUpdate = {
-      id: index + 1, // increment bc sqlite 1-indexed
-      vote_status: vote,
-    };
-    console.log(feedbackUpdate);
-    console.log(feedbackUpdate);
+  async function insertVote(feedbackUpdate) {
     const response = await fetch("http://127.0.0.1:5000/chat/qa_table/update", {
       method: "POST",
       headers: {
@@ -126,11 +91,29 @@
     });
 
     if (response.ok) {
-      console.log("update worked!", response);
     } else {
       const err = await response.text();
       alert(err);
     }
+  }
+
+  function logVote(event, vote, index) {
+    const messageLog = $chatLog[index];
+    messageLog.vote = vote;
+    const feedbackUpdate = {
+      id: index + 1, // increment bc sqlite 1-indexed
+      vote_status: vote,
+    };
+
+    insertVote(feedbackUpdate);
+
+    select(event.currentTarget.parentNode)
+      .selectAll("button")
+      .style("border", "3px solid transparent")
+      .style("opacity", 0.65);
+    select(event.currentTarget)
+      .style("border", "3px solid var(--black)")
+      .style("opacity", 1);
   }
 </script>
 
@@ -169,11 +152,11 @@
                     {#if feedback}
                       <div class="feedback-buttons">
                         <button
-                          on:click={() => logVote("up", index)}
+                          on:click={(event) => logVote(event, "up", index)}
                           class="small-button thumbs-up">👍</button
                         >
                         <button
-                          on:click={() => logVote("down", index)}
+                          on:click={(event) => logVote(event, "down", index)}
                           class="small-button thumbs-down">👎</button
                         >
                       </div>
@@ -203,63 +186,11 @@
   </div>
 </div>
 
-<!-- 
-<section class="chatbox">
-  <div class="chat-log">
-    {#each $chatLog as message, index (index)}
-      <div
-        class="chat-message"
-        use:scrollToView={index === $chatLog.length - 1}
-      >
-        <div class="chat-message-center">
-          <div class="message-content">
-            <div class="question">
-              <h5 class="bold">Question:</h5>
-              <p>{message.question}</p>
-            </div>
-            <div class="answers">
-              <div class="answer">
-                <h5 class="bold underline">Response:</h5>
-                <p>A: {message.answer}</p>
-                {#if feedback}
-                  <button
-                    on:click={() => logVote("up", index)}
-                    class="small-button thumbs-up">👍</button
-                  >
-                  <button
-                    on:click={() => logVote("down", index)}
-                    class="small-button thumbs-down">👎</button
-                  >
-                {/if}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    {/each}
-  </div>
-
-  <div class="chat-input-holder">
-    <form on:submit={askModel} class="chat-input-form">
-      <input
-        bind:value={messageplaceholder}
-        class="chat-input-textarea"
-        placeholder="Type Message Here"
-      />
-      <button
-        class="btnyousend {messageplaceholder === '' ? '' : 'active'}"
-        type="submit">{chatLoading ? dots : "Send"}</button
-      >
-    </form>
-    <p class="message">Note - may produce inaccurate information.</p>
-  </div>
-</section> -->
-
 <style>
   .small-button {
     margin-left: 10px;
     background: none;
-    border: none;
+    border: 3px solid transparent;
     color: inherit;
     padding: 6px 10px;
     cursor: pointer;
@@ -268,11 +199,9 @@
   }
 
   .feedback-buttons {
-    /* border: 1px solid black; */
     text-align: center;
     margin: auto;
-    width: 15%;
-    /* background: var(--lightGrey); */
+    width: 20%;
   }
 
   .small-button:hover {
