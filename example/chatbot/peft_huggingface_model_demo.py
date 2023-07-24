@@ -4,11 +4,12 @@ import plotano.cambio as cb
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
 ###################################################################################
+# only run this after run rlfh/sft_demo.py to fine tune the model
+
 model = cb.ModelFactory.create_model(
-    model_name="huggingface",
-    pretrained_model_name_or_path="tiiuae/falcon-7b",
-    trust_remote_code=True,
-    load_in_8bit=True,
+    model_name="peft_huggingface",
+    base_model_path="meta-llama/Llama-2-7b-hf",
+    lora_model_path="/home/ubuntu/plotano/models/rlhf_step1_sft",
 )
 
 #####################################
