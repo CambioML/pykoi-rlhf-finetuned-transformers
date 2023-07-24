@@ -8,6 +8,15 @@ from pykoi.llm.abs_llm import AbsLlm
 
 
 class PeftHuggingfacemodel(AbsLlm):
+    """
+    This class is a wrapper for the Huggingface PEFT model for Language Model (LLM).
+
+    Attributes:
+        _model (PeftModel): The PEFT model.
+        _tokenizer (AutoTokenizer): The tokenizer for the model.
+        _max_length (int): The maximum length of the generated text.
+    """
+
     def __init__(
         self,
         base_model_path: str,
@@ -17,6 +26,17 @@ class PeftHuggingfacemodel(AbsLlm):
         max_length: int = 100,
         device_map: str = "auto",
     ):
+        """
+        The constructor for PeftHuggingfacemodel class.
+
+        Args:
+            base_model_path (str): The path to the base model.
+            lora_model_path (str): The path to the lora model.
+            trust_remote_code (bool, optional): Whether to trust remote code. Defaults to True.
+            load_in_8bit (bool, optional): Whether to load in 8bit. Defaults to True.
+            max_length (int, optional): The maximum length of the generated text. Defaults to 100.
+            device_map (str, optional): The device map. Defaults to "auto".
+        """
         print("[HuggingfaceModel] loading base model...")
         base_model = AutoModelForCausalLM.from_pretrained(
             base_model_path,
@@ -50,7 +70,7 @@ class PeftHuggingfacemodel(AbsLlm):
 
         Args:
             message (str): The input message for the model.
-            num_of_response (int): The number of response to generate. Default is 1.
+            num_of_response (int, optional): The number of response to generate. Default is 1.
 
         Returns:
             List[str]: List of response.
