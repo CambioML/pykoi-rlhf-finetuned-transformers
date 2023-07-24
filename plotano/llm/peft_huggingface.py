@@ -1,49 +1,47 @@
-"""Huggingface model for Language Model (LLM)."""
+"""Huggingface PEFT model for Language Model (LLM)."""
+import torch
+
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
 
 from plotano.llm.abs_llm import AbsLlm
 
 
-class HuggingfaceModel(AbsLlm):
-    """
-    This class is a wrapper for the Huggingface model for Language Model (LLM) Chain.
-    It inherits from the abstract base class AbsLlm.
-    """
-
+class PeftHuggingfacemodel(AbsLlm):
     def __init__(
         self,
-        pretrained_model_name_or_path: str,
+        base_model_path: str,
+        lora_model_path: str,
         trust_remote_code: bool = True,
         load_in_8bit: bool = True,
         max_length: int = 100,
         device_map: str = "auto",
     ):
-        """
-        Initialize the Huggingface model.
-
-        Args:
-            pretrained_model_name_or_path (str): The name or path of the pretrained model.
-            trust_remote_code (bool): Whether to trust the remote code. Default is True.
-            load_in_8bit (bool): Whether to load the model in 8-bit. Default is True.
-            max_length (int): The maximum length for the model. Default is 100.
-            device_map (str): The device map for the model. Default is "auto".
-        """
-        # running on cpu can be slow!!!
-        print("[HuggingfaceModel] loading model...")
-        self._model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path,
+        print("[HuggingfaceModel] loading base model...")
+        base_model = AutoModelForCausalLM.from_pretrained(
+            base_model_path,
+            return_dict=True,
+            torch_dtype=torch.float16,
             trust_remote_code=trust_remote_code,
             load_in_8bit=load_in_8bit,
             device_map=device_map,
         )
+
+        print("[HuggingfaceModel] loading perf model...")
+        self._model = PeftModel.from_pretrained(
+            model=base_model,
+            model_id=lora_model_path)
+
         print("[HuggingfaceModel] loading tokenizer...")
         self._tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path,
+            pretrained_model_name_or_path=base_model_path,
             trust_remote_code=trust_remote_code,
             load_in_8bit=load_in_8bit,
             device_map=device_map,
         )
         self._max_length = max_length
+        self._model.to("cuda")
+        self._model.eval()
         super().__init__()
 
     def predict(self, message: str, num_of_response: int = 1):
@@ -61,8 +59,9 @@ class HuggingfaceModel(AbsLlm):
         input_ids = self._tokenizer.encode(message, return_tensors="pt")
         input_ids = input_ids.to("cuda")
         print("[HuggingfaceModel] generate...")
+        print("input_ids: ", input_ids)
         output_ids = self._model.generate(
-            input_ids,
+            input_ids=input_ids,
             max_length=self._max_length,
             num_return_sequences=num_of_response,
             do_sample=True,
@@ -72,6 +71,7 @@ class HuggingfaceModel(AbsLlm):
         response = [
             self._tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids
         ]
+        print("response: ", response)
 
         response = [resp.split("\n")[1] for resp in response if "\n" in resp]
 

@@ -175,7 +175,7 @@ class RLHFConfig:
 
     ## Step 1 SFT parameters
     max_steps: Optional[int] = field(
-        default=100, metadata={"help": "Maximum number of training steps."}
+        default=5, metadata={"help": "Maximum number of training steps."}
     )
     dataset_subset_sft: Optional[str] = field(
         default="data/finetune",

@@ -47,6 +47,10 @@ class ModelFactory:
                 from plotano.llm.huggingface import HuggingfaceModel
 
                 return HuggingfaceModel(**kwargs)
+            elif model_name == LlmName.PEFT_HUGGINGFACE:
+                from plotano.llm.peft_huggingface import PeftHuggingfacemodel
+
+                return PeftHuggingfacemodel(**kwargs)
             else:
                 raise ValueError(f"[llm_factory]: Unknown model " f"{model_name}")
         except ValueError as ex:
