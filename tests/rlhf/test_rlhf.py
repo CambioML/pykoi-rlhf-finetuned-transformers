@@ -36,7 +36,7 @@ class TestRLHFConfig(unittest.TestCase):
 
         # Check a subset of the fields to verify they are correctly initialized
         self.assertEqual(config_dict["base_model_path"], "meta-llama/Llama-2-7b-hf")
-        self.assertEqual(config_dict["dataset_type"], "csv")
+        self.assertEqual(config_dict["dataset_type"], "local_db")
         self.assertEqual(config_dict["train_test_split_ratio"], 0.1)
         self.assertEqual(config_dict["shuffle_buffer"], 5000)
         # Add checks for the rest of the fields as needed
