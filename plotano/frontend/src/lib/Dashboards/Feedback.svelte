@@ -15,11 +15,9 @@
   });
 
   async function getDataFromDB() {
-    console.log("fetching data from db");
-    const response = await fetch(
-      "http://127.0.0.1:5000/chat/qa_table/retrieve"
-    );
+    const response = await fetch("/chat/qa_table/retrieve");
     const data = await response.json();
+
     const dbRows = data["rows"];
     const formattedRows = dbRows.map((row) => ({
       id: row[0],
