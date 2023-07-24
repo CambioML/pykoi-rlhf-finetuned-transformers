@@ -5,7 +5,7 @@ Test the ModelFactory class.
 import unittest
 from unittest.mock import MagicMock, patch
 
-from pykoi.llm.model_factory import LlmName, ModelFactory
+from pykoi.llm.model_factory import ModelSource, ModelFactory
 
 
 class TestModelFactory(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestModelFactory(unittest.TestCase):
         """
         Test creating an OpenAI model instance.
         """
-        model_name = LlmName.OPENAI
+        model_source = ModelSource.OPENAI
 
         # Mock the OpenAIModel behavior
         mock_openai_model = MagicMock()
@@ -25,7 +25,7 @@ class TestModelFactory(unittest.TestCase):
 
         # Patch the OpenAIModel class to use the mocked version
         with patch("pykoi.llm.model_factory.OpenAIModel", openaimodel_mock):
-            result = ModelFactory.create_model(model_name)
+            result = ModelFactory.create_model(model_source)
 
         # Check if the OpenAIModel class was called with the correct arguments
         openaimodel_mock.assert_called_once()
@@ -35,7 +35,7 @@ class TestModelFactory(unittest.TestCase):
         """
         Test creating a Huggingface model instance.
         """
-        model_name = LlmName.HUGGINGFACE
+        model_source = ModelSource.HUGGINGFACE
 
         # Mock the HuggingfaceModel behavior
         mock_huggingface_model = MagicMock()
@@ -45,7 +45,7 @@ class TestModelFactory(unittest.TestCase):
         with patch(
             "pykoi.llm.model_factory.HuggingfaceModel", huggingface_model_mock
         ):
-            result = ModelFactory.create_model(model_name)
+            result = ModelFactory.create_model(model_source)
 
         # Check if the HuggingfaceModel class was called with the correct arguments
         huggingface_model_mock.assert_called_once()
@@ -55,11 +55,11 @@ class TestModelFactory(unittest.TestCase):
         """
         Test creating a model with an invalid name.
         """
-        model_name = "invalid_model_name"
+        model_source = "invalid_model_name"
 
         # Assert that a ValueError is raised when an invalid model name is provided
         with self.assertRaises(ValueError):
-            ModelFactory.create_model(model_name)
+            ModelFactory.create_model(model_source)
 
 
 if __name__ == "__main__":

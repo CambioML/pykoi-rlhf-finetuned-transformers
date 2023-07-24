@@ -7,7 +7,7 @@ import pykoi
 # only run this after run rlfh/sft_demo.py to fine tune the model
 
 model = pykoi.ModelFactory.create_model(
-    model_name="peft_huggingface",
+    model_source="peft_huggingface",
     base_model_path="meta-llama/Llama-2-7b-hf",
     lora_model_path="/home/ubuntu/pykoi/models/rlhf_step1_sft",
 )
