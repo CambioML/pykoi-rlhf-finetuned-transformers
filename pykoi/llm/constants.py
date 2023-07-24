@@ -2,9 +2,9 @@
 from enum import Enum
 
 
-class LlmName(Enum):
+class ModelSource(Enum):
     """
-    This class is an enumeration for the available Language Learning Models (LLMs).
+    This class is an enumeration for the available model source.
 
     Attributes:
         OPENAI (str): Represents the OpenAI model.

@@ -5,10 +5,8 @@ import pykoi
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
 ###################################################################################
 model = pykoi.ModelFactory.create_model(
-    model_name="huggingface",
+    model_source="huggingface",
     pretrained_model_name_or_path="tiiuae/falcon-7b",
-    trust_remote_code=True,
-    load_in_8bit=True,
 )
 
 #####################################

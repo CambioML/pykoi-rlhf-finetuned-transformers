@@ -27,11 +27,9 @@ print(my_data_pd)
 my_data_pd = my_data_pd[[QA_CSV_HEADER_ID,
                         QA_CSV_HEADER_QUESTION,
                         QA_CSV_HEADER_ANSWER]]
-print(my_data_pd)
+
 print("My local database has {} samples".format(my_data_pd.shape[0]))
 dataset = Dataset.from_dict(my_data_pd)
-dataset
-
 
 config = pykoi.RLHFConfig(base_model_path="meta-llama/Llama-2-7b-hf", dataset_type="local_db")
 

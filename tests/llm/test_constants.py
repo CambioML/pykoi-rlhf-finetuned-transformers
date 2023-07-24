@@ -3,27 +3,27 @@ Test the constants of the LLM module.
 """
 import unittest
 
-from pykoi.llm.constants import LlmName
+from pykoi.llm.constants import ModelSource
 
 
 class TestLlmName(unittest.TestCase):
     """
-    Test the LlmName enum.
+    Test the ModelSource enum.
     """
 
     def test_enum_values(self):
         """
         Test whether the enum values are defined correctly
         """
-        self.assertEqual(LlmName.OPENAI.value, "openai")
-        self.assertEqual(LlmName.HUGGINGFACE.value, "huggingface")
+        self.assertEqual(ModelSource.OPENAI.value, "openai")
+        self.assertEqual(ModelSource.HUGGINGFACE.value, "huggingface")
 
     def test_enum_attributes(self):
         """
         Test whether the enum attributes are defined correctly
         """
-        self.assertEqual(LlmName.OPENAI.name, "OPENAI")
-        self.assertEqual(LlmName.HUGGINGFACE.name, "HUGGINGFACE")
+        self.assertEqual(ModelSource.OPENAI.name, "OPENAI")
+        self.assertEqual(ModelSource.HUGGINGFACE.name, "HUGGINGFACE")
 
 
 if __name__ == "__main__":
