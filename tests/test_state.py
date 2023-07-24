@@ -3,7 +3,7 @@ Tests for the State class.
 """
 import unittest
 
-from plotano.state import State, Store
+from pykoi.state import State, Store
 
 
 class TestState(unittest.TestCase):

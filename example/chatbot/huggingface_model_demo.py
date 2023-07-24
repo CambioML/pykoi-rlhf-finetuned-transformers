@@ -1,5 +1,5 @@
 """Demo for the chatbot application."""
-import plotano.cambio as cb
+import pykoi.cambio as cb
 
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #

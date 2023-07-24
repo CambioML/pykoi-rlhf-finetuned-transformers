@@ -2,11 +2,11 @@
 import uuid
 from typing import Callable, List, Optional, Union
 
-from plotano.component.chatbot_database_factory import ChatbotDatabaseFactory
-from plotano.component.constants import FeedbackType
-from plotano.db.qa_database import QuestionAnswerDatabase
-from plotano.db.ranking_database import RankingDatabase
-from plotano.llm.abs_llm import AbsLlm
+from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
+from pykoi.component.constants import FeedbackType
+from pykoi.db.qa_database import QuestionAnswerDatabase
+from pykoi.db.ranking_database import RankingDatabase
+from pykoi.llm.abs_llm import AbsLlm
 
 
 class DataSource:

@@ -5,7 +5,7 @@ Test the ModelFactory class.
 import unittest
 from unittest.mock import MagicMock, patch
 
-from plotano.llm.model_factory import LlmName, ModelFactory
+from pykoi.llm.model_factory import LlmName, ModelFactory
 
 
 class TestModelFactory(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestModelFactory(unittest.TestCase):
         openaimodel_mock = MagicMock(return_value=mock_openai_model)
 
         # Patch the OpenAIModel class to use the mocked version
-        with patch("plotano.llm.model_factory.OpenAIModel", openaimodel_mock):
+        with patch("pykoi.llm.model_factory.OpenAIModel", openaimodel_mock):
             result = ModelFactory.create_model(model_name)
 
         # Check if the OpenAIModel class was called with the correct arguments
@@ -43,7 +43,7 @@ class TestModelFactory(unittest.TestCase):
 
         # Patch the HuggingfaceModel class to use the mocked version
         with patch(
-            "plotano.llm.model_factory.HuggingfaceModel", huggingface_model_mock
+            "pykoi.llm.model_factory.HuggingfaceModel", huggingface_model_mock
         ):
             result = ModelFactory.create_model(model_name)
 

@@ -3,7 +3,7 @@ Test the constants of the LLM module.
 """
 import unittest
 
-from plotano.llm.constants import LlmName
+from pykoi.llm.constants import LlmName
 
 
 class TestLlmName(unittest.TestCase):

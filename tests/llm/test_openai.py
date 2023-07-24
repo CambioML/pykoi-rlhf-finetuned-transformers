@@ -4,7 +4,7 @@ Test the OpenAIModel class
 import unittest
 from unittest.mock import MagicMock, patch
 
-from plotano.llm.openai import OpenAIModel
+from pykoi.llm.openai import OpenAIModel
 
 
 class TestOpenAIModel(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestOpenAIModel(unittest.TestCase):
 
         # Patch the OpenAI.Completion.create method to use the mocked version
         with patch(
-            "plotano.llm.openai.openai.Completion.create", openai_completion_create_mock
+            "pykoi.llm.openai.openai.Completion.create", openai_completion_create_mock
         ):
             openai_model = OpenAIModel(
                 api_key="fake_api_key",

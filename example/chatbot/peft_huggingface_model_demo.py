@@ -1,5 +1,5 @@
 """Demo for the chatbot application."""
-import plotano.cambio as cb
+import pykoi.cambio as cb
 
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
@@ -9,7 +9,7 @@ import plotano.cambio as cb
 model = cb.ModelFactory.create_model(
     model_name="peft_huggingface",
     base_model_path="meta-llama/Llama-2-7b-hf",
-    lora_model_path="/home/ubuntu/plotano/models/rlhf_step1_sft",
+    lora_model_path="/home/ubuntu/pykoi/models/rlhf_step1_sft",
 )
 
 #####################################

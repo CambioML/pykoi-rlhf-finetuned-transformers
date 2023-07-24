@@ -6,7 +6,7 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from plotano.application import Application
+from pykoi.application import Application
 
 
 class TestApplication(unittest.TestCase):
@@ -31,9 +31,9 @@ class TestApplication(unittest.TestCase):
         self.assertIn("test_component", self.app.data_sources)
         self.assertIn(component, [c["component"] for c in self.app.components])
 
-    @patch("plotano.application.Flask")
-    @patch("plotano.application.CORS")
-    @patch("plotano.application.send_from_directory")
+    @patch("pykoi.application.Flask")
+    @patch("pykoi.application.CORS")
+    @patch("pykoi.application.send_from_directory")
     def test_run(self, send_from_directory_mock, CORS_mock, Flask_mock):
         """
         Tests running the application.

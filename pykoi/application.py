@@ -7,7 +7,7 @@ from pyngrok import ngrok
 import socket
 from flask_ngrok import run_with_ngrok
 
-from plotano.component.base import Dropdown
+from pykoi.component.base import Dropdown
 
 
 def find_free_port():

@@ -3,7 +3,7 @@ Test the AbsLlm class.
 """
 import unittest
 
-from plotano.llm.abs_llm import AbsLlm
+from pykoi.llm.abs_llm import AbsLlm
 
 
 class DummyLlm(AbsLlm):
