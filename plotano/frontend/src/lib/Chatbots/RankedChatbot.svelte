@@ -12,9 +12,7 @@
   });
 
   async function getDataFromDB() {
-    const response = await fetch(
-      "http://127.0.0.1:5000/chat/ranking_table/retrieve"
-    );
+    const response = await fetch("/chat/ranking_table/retrieve");
     const data = await response.json();
     const dbRows = data["rows"];
     const formattedRows = dbRows.map((row) => ({
@@ -79,16 +77,13 @@
   $: dots = ".".repeat(dotState).padEnd(3);
 
   async function insertRanking(rankingUpdate) {
-    const response = await fetch(
-      "http://127.0.0.1:5000/chat/ranking_table/update",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(rankingUpdate),
-      }
-    );
+    const response = await fetch("/chat/ranking_table/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(rankingUpdate),
+    });
 
     if (response.ok) {
     } else {

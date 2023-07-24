@@ -14,9 +14,7 @@
   });
 
   async function getDataFromDB() {
-    const response = await fetch(
-      "http://127.0.0.1:5000/chat/qa_table/retrieve"
-    );
+    const response = await fetch("/chat/qa_table/retrieve");
     const data = await response.json();
     const dbRows = data["rows"];
     const formattedRows = dbRows.map((row) => ({
@@ -82,7 +80,7 @@
   $: dots = ".".repeat(dotState).padEnd(3);
 
   async function insertVote(feedbackUpdate) {
-    const response = await fetch("http://127.0.0.1:5000/chat/qa_table/update", {
+    const response = await fetch("/chat/qa_table/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -91,6 +89,7 @@
     });
 
     if (response.ok) {
+      console.log("response", response);
     } else {
       const err = await response.text();
       alert(err);
