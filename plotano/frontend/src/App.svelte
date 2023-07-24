@@ -5,6 +5,7 @@
   import Feedback from "./lib/Dashboards/Feedback.svelte";
 
   const components = writable([]);
+  const selectedPage = writable(null);
 
   const componentMap = {
     Chatbot: Chat,
@@ -12,16 +13,43 @@
     Feedback: Feedback,
   };
 
+  const setSelectedPage = (component) => {
+    selectedPage.set(component);
+  };
+
+  // Attempt to fetch components to load from server
   fetch("/components")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
       components.set(data);
+      selectedPage.set(data[0]);
+    })
+    .catch((error) => {
+      console.log("Fetch request failed", error);
     });
 </script>
 
-{#each $components as component}
+<!-- tabs for components -->
+<!-- only draw if more than one -->
+{#if $components.length > 1}
+  {#each $components as component}
+    <button
+      aria-label={`Load ${component.svelte_component} component`}
+      on:click={() => setSelectedPage(component)}
+      >{component.svelte_component}</button
+    >
+  {/each}
+{/if}
+
+<!-- Loaded selected component (tab) -->
+{#if $selectedPage}
   <svelte:component
-    this={componentMap[component.svelte_component]}
-    {...component.props}
+    this={componentMap[$selectedPage.svelte_component]}
+    {...$selectedPage.props}
   />
-{/each}
+{/if}
