@@ -177,3 +177,7 @@ test_data
 
 # mac
 .DS_Store
+
+# model checkpoint
+model/
+models/
