@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional
 import evaluate
 import numpy as np
 import torch
-import pykoi.cambio as cb
+from pykoi.db.qa_database import QuestionAnswerDatabase
 from accelerate import Accelerator
 from datasets import Dataset, load_dataset
 from peft import LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model
@@ -495,7 +495,7 @@ class SFT(Trainer):
 
     def create_datasets(self, tokenizer, args):
         if args.dataset_type == "local_db":
-            qa_database = cb.QuestionAnswerDatabase()
+            qa_database = QuestionAnswerDatabase()
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
             my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS]=="up"]
             my_data_pd = my_data_pd[[QA_CSV_HEADER_ID,

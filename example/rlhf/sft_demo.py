@@ -3,7 +3,7 @@
 from datasets import Dataset
 
 
-import pykoi.cambio as cb
+import pykoi
 
 
 QA_CSV_HEADER_ID = 'ID'
@@ -19,7 +19,7 @@ QA_CSV_HEADER = (
     QA_CSV_HEADER_TIMESTAMPS
 )
 
-qa_database = cb.QuestionAnswerDatabase()
+qa_database = pykoi.QuestionAnswerDatabase()
 
 my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
 print(my_data_pd)
@@ -33,8 +33,8 @@ dataset = Dataset.from_dict(my_data_pd)
 dataset
 
 
-config = cb.RLHFConfig(base_model_path="meta-llama/Llama-2-7b-hf", dataset_type="local_db")
+config = pykoi.RLHFConfig(base_model_path="meta-llama/Llama-2-7b-hf", dataset_type="local_db")
 
-rlhf_step1_sft = cb.SFT(config)
+rlhf_step1_sft = pykoi.SFT(config)
 
 rlhf_step1_sft.train_and_save("./models/rlhf_step1_sft")
