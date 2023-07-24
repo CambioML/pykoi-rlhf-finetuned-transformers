@@ -127,10 +127,7 @@
     border-bottom: var(--line);
     border-right: var(--line);
   }
-  .right-download {
-    border-bottom: var(--line);
-    border-right: var(--line);
-  }
+
   .card-1 {
     border-right: var(--line);
   }
