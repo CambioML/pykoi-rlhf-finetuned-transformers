@@ -181,3 +181,6 @@ test_data
 # model checkpoint
 model/
 models/
+
+# poetry dist
+dist/
