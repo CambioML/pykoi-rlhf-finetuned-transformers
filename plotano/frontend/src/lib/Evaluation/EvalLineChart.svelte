@@ -46,13 +46,13 @@
 >
   <svg width={outerWidth} height={outerHeight}>
     <defs>
-      <linearGradient id="area-gradien2t" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" style="stop-color: var(--green); stop-opacity: 1" />
+      <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style="stop-color: #FF5470; stop-opacity: 1" />
         <stop offset="100%" style="stop-color: white; stop-opacity: .2" />
       </linearGradient>
     </defs>
 
-    <path class="area-path" d={pathArea(data)} fill="url(#area-gradien2t)" />
+    <path class="area-path" d={pathArea(data)} fill="url(#area-gradient)" />
     <path class="outer-path" d={pathLine(data)} />
     <path class="inner-path" d={pathLine(data)} />
 
@@ -152,7 +152,7 @@
   }
 
   .inner-path {
-    stroke: var(--green);
+    stroke: #ff5470;
     stroke-width: 4;
     fill: none;
     stroke-linecap: round;

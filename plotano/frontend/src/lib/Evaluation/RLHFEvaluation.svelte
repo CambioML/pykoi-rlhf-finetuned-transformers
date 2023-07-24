@@ -1,5 +1,6 @@
 <script>
   import Linechart from "./LineChart.svelte";
+  import EvalLineChart from "./EvalLineChart.svelte";
   import { writable } from "svelte/store";
   import Table from "./Table.svelte";
   import Bar from "./Bar.svelte";
@@ -40,8 +41,19 @@
 
   <div class="eval-container">
     <div class="left-charts">
+      <div class="chart-captions">
+        <h4>Model Performance</h4>
+        <p>
+          View the performance of your model over time. GPU stats are available
+          to the right.
+        </p>
+        <div class="buttons">
+          <button class="rating-button">Loss</button>
+          <button class="rating-button">Accuracy</button>
+        </div>
+      </div>
       <div class="eval-main">
-        <Linechart />
+        <EvalLineChart />
       </div>
       <div class="eval-table">
         <Table {data} {options} />
@@ -64,6 +76,42 @@
 <!-- <Linechart /> -->
 
 <style>
+  .buttons {
+    justify-content: center;
+  }
+
+  .rating-button {
+    text-transform: uppercase;
+    margin: 0;
+    /* transition: all 0.1s; */
+  }
+  button {
+    margin: 0;
+  }
+
+  .rating-button:hover {
+    color: var(--white);
+    background: var(--black);
+  }
+
+  /* Remove the space between buttons */
+  .rating-button + .rating-button {
+    margin: 0;
+  }
+  .chart-captions {
+    /* border: 1px solid black; */
+    margin: auto;
+    width: 80%;
+    text-align: center;
+    height: 100%;
+  }
+  .chart-captions h4 {
+    padding: 0;
+    margin: 0;
+  }
+  .chart-captions p {
+    font-size: var(--smallText);
+  }
   .instructions {
     text-align: center;
     padding: 5%;
@@ -104,17 +152,15 @@
     display: grid;
     height: 100vh;
     grid-template-rows: 100%;
-    grid-template-columns: 65% 35%;
+    grid-template-columns: 70% 30%;
     padding: 1rem;
   }
   .left-charts {
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 60% 40%;
+    grid-template-rows: 25% 50% 25%;
   }
 
-  .eval-main {
-  }
   .eval-table {
     margin: auto;
     width: 100%;
@@ -125,8 +171,5 @@
     grid-template-columns: 100%;
     grid-template-rows: 33.3% 33.3% 33.3%;
     height: 100vh;
-  }
-
-  .right-charts > div {
   }
 </style>
