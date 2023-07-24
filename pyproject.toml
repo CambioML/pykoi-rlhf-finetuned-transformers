@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "plotano"
+name = "pykoi"
 version = "0.0.0"
 description = ""
 authors = ["CambioML <wanwanaiai45@gmail.com>"]

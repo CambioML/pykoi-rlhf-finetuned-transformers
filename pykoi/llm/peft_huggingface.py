@@ -4,7 +4,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
-from plotano.llm.abs_llm import AbsLlm
+from pykoi.llm.abs_llm import AbsLlm
 
 
 class PeftHuggingfacemodel(AbsLlm):

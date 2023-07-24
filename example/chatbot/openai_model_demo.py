@@ -1,5 +1,5 @@
 """Demo for the chatbot application using OpenAI endpoint."""
-import plotano.cambio as cb
+import pykoi.cambio as cb
 
 ##########################################################
 # Creating an OpenAI model (requires an OpenAI API key) #

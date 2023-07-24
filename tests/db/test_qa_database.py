@@ -4,7 +4,7 @@ import os
 import sqlite3
 import unittest
 
-from plotano.db.qa_database import QuestionAnswerDatabase
+from pykoi.db.qa_database import QuestionAnswerDatabase
 
 # Define a temporary database file for testing
 TEST_DB_FILE = "test_qd.db"

@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional
 import evaluate
 import numpy as np
 import torch
-import plotano.cambio as cb
+import pykoi.cambio as cb
 from accelerate import Accelerator
 from datasets import Dataset, load_dataset
 from peft import LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model
@@ -37,7 +37,7 @@ from trl import (AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer,
 from trl.core import LengthSampler
 from trl.trainer.utils import ConstantLengthDataset, PeftSavingCallback
 
-# from plotano.db.ranking_database import (
+# from pykoi.db.ranking_database import (
 #     QA_CSV_HEADER,
 #     QA_CSV_HEADER_ID,
 #     QA_CSV_HEADER_QUESTION,

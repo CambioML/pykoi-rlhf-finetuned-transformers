@@ -1,11 +1,11 @@
 
-# Plotano
+# pykoi
 
 ## Setup
 ```
-conda create -n plotano python=3.10
-conda activate plotano
-cd plotano
+conda create -n pykoi python=3.10
+conda activate pykoi
+cd pykoi
 pip3 install poetry
 poetry install --no-root
 ```

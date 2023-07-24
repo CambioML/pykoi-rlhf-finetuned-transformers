@@ -1,7 +1,7 @@
 """Huggingface model for Language Model (LLM)."""
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from plotano.llm.abs_llm import AbsLlm
+from pykoi.llm.abs_llm import AbsLlm
 
 
 class HuggingfaceModel(AbsLlm):

@@ -5,7 +5,7 @@ import os
 import sqlite3
 import unittest
 
-from plotano.db.ranking_database import RankingDatabase
+from pykoi.db.ranking_database import RankingDatabase
 
 # Define a temporary database file for testing
 TEST_DB_FILE = "test_ranking.db"

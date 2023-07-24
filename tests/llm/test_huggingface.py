@@ -4,7 +4,7 @@ Test the HuggingfaceModel class.
 import unittest
 from unittest.mock import MagicMock, patch
 
-from plotano.llm.huggingface import HuggingfaceModel
+from pykoi.llm.huggingface import HuggingfaceModel
 
 
 class TestHuggingfaceModel(unittest.TestCase):
@@ -12,8 +12,8 @@ class TestHuggingfaceModel(unittest.TestCase):
     Test the HuggingfaceModel class.
     """
 
-    @patch("plotano.llm.huggingface.AutoModelForCausalLM", autospec=True)
-    @patch("plotano.llm.huggingface.AutoTokenizer", autospec=True)
+    @patch("pykoi.llm.huggingface.AutoModelForCausalLM", autospec=True)
+    @patch("pykoi.llm.huggingface.AutoTokenizer", autospec=True)
     def test_init(self, mock_tokenizer, mock_model):
         """
         Test the initialization of the HuggingfaceModel class.

@@ -3,7 +3,7 @@
 from datasets import Dataset
 
 
-import plotano.cambio as cb
+import pykoi.cambio as cb
 
 
 QA_CSV_HEADER_ID = 'ID'

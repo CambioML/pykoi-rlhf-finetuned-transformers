@@ -3,7 +3,7 @@ import os
 import unittest
 from dataclasses import asdict
 
-from plotano.rlhf.rlhf import RLHFConfig, read_json_file
+from pykoi.rlhf.rlhf import RLHFConfig, read_json_file
 
 
 class TestRLHFConfig(unittest.TestCase):

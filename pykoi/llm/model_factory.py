@@ -2,8 +2,8 @@
 
 from typing import Union
 
-from plotano.llm.abs_llm import AbsLlm
-from plotano.llm.constants import LlmName
+from pykoi.llm.abs_llm import AbsLlm
+from pykoi.llm.constants import LlmName
 
 
 class ModelFactory:
@@ -40,15 +40,15 @@ class ModelFactory:
         try:
             model_name = LlmName(model_name)
             if model_name == LlmName.OPENAI:
-                from plotano.llm.openai import OpenAIModel
+                from pykoi.llm.openai import OpenAIModel
 
                 return OpenAIModel(**kwargs)
             elif model_name == LlmName.HUGGINGFACE:
-                from plotano.llm.huggingface import HuggingfaceModel
+                from pykoi.llm.huggingface import HuggingfaceModel
 
                 return HuggingfaceModel(**kwargs)
             elif model_name == LlmName.PEFT_HUGGINGFACE:
-                from plotano.llm.peft_huggingface import PeftHuggingfacemodel
+                from pykoi.llm.peft_huggingface import PeftHuggingfacemodel
 
                 return PeftHuggingfacemodel(**kwargs)
             else:

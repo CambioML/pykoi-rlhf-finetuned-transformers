@@ -1,9 +1,9 @@
 """Chatbot Database Factory class."""
 from typing import Union
 
-from plotano.component.constants import FeedbackType
-from plotano.db.qa_database import QuestionAnswerDatabase
-from plotano.db.ranking_database import RankingDatabase
+from pykoi.component.constants import FeedbackType
+from pykoi.db.qa_database import QuestionAnswerDatabase
+from pykoi.db.ranking_database import RankingDatabase
 
 
 class ChatbotDatabaseFactory:

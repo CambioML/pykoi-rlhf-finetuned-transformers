@@ -1,7 +1,7 @@
 """Tests for the base module."""
 import unittest
 
-from plotano.component.base import Component, DataSource
+from pykoi.component.base import Component, DataSource
 
 
 class TestDataSource(unittest.TestCase):
