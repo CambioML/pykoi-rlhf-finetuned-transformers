@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pykoi.rlhf.rlhf &mdash; pykoi 0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pykoi
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pykoi</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pykoi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pykoi.rlhf.rlhf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pykoi.rlhf.rlhf</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2023 The CambioML Team. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">evaluate</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">pykoi.db.qa_database</span> <span class="kn">import</span> <span class="n">QuestionAnswerDatabase</span>
+<span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">Accelerator</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">peft</span> <span class="kn">import</span> <span class="n">LoraConfig</span><span class="p">,</span> <span class="n">PeftConfig</span><span class="p">,</span> <span class="n">PeftModel</span><span class="p">,</span> <span class="n">TaskType</span><span class="p">,</span> <span class="n">get_peft_model</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Adafactor</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span>
+                          <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span> <span class="n">AutoTokenizer</span><span class="p">,</span>
+                          <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainerCallback</span><span class="p">,</span> <span class="n">TrainingArguments</span><span class="p">,</span> <span class="n">logging</span><span class="p">,</span>
+                          <span class="n">pipeline</span><span class="p">,</span> <span class="n">set_seed</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">transformers.utils</span> <span class="kn">import</span> <span class="n">PushToHubMixin</span>
+<span class="kn">from</span> <span class="nn">trl</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AutoModelForCausalLMWithValueHead</span><span class="p">,</span> <span class="n">PPOConfig</span><span class="p">,</span> <span class="n">PPOTrainer</span><span class="p">,</span>
+                 <span class="n">SFTTrainer</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">trl.core</span> <span class="kn">import</span> <span class="n">LengthSampler</span>
+<span class="kn">from</span> <span class="nn">trl.trainer.utils</span> <span class="kn">import</span> <span class="n">ConstantLengthDataset</span><span class="p">,</span> <span class="n">PeftSavingCallback</span>
+
+<span class="c1"># from pykoi.db.ranking_database import (</span>
+<span class="c1">#     QA_CSV_HEADER,</span>
+<span class="c1">#     QA_CSV_HEADER_ID,</span>
+<span class="c1">#     QA_CSV_HEADER_QUESTION,</span>
+<span class="c1">#     QA_CSV_HEADER_ANSWER,</span>
+<span class="c1">#     QA_CSV_HEADER_VOTE_STATUS,</span>
+<span class="c1"># )</span>
+<span class="n">QA_CSV_HEADER_ID</span> <span class="o">=</span> <span class="s1">&#39;ID&#39;</span>
+<span class="n">QA_CSV_HEADER_QUESTION</span> <span class="o">=</span> <span class="s1">&#39;Question&#39;</span>
+<span class="n">QA_CSV_HEADER_ANSWER</span> <span class="o">=</span> <span class="s1">&#39;Answer&#39;</span>
+<span class="n">QA_CSV_HEADER_VOTE_STATUS</span> <span class="o">=</span> <span class="s1">&#39;Vote Status&#39;</span>
+<span class="n">QA_CSV_HEADER_TIMESTAMPS</span> <span class="o">=</span> <span class="s1">&#39;Timestamp&#39;</span>
+<span class="n">QA_CSV_HEADER</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">QA_CSV_HEADER_ID</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_QUESTION</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_ANSWER</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_VOTE_STATUS</span><span class="p">,</span>
+    <span class="n">QA_CSV_HEADER_TIMESTAMPS</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="read_json_file"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.read_json_file">[docs]</a><span class="k">def</span> <span class="nf">read_json_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a JSON file and returns its contents as a dictionary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (str): The path to the JSON file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The contents of the JSON file as a dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="RLHFConfig"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RLHFConfig">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RLHFConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This file contains the configuration parameters for the RLHF (Reinforcement Learning for Humans Feedback) model.</span>
+<span class="sd">    The parameters are divided into three steps:</span>
+<span class="sd">        - Step 1: SFT (Supervised Fine-Tuning) parameters</span>
+<span class="sd">        - Step 2: Reward Modeling parameters</span>
+<span class="sd">        - Step 3: Reinforcement Learning parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">base_model_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;meta-llama/Llama-2-7b-hf&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Huggingface model name or a local path to the base model.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">dataset_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;local_db&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;&#39;local_db&#39;:load from your local database `qd.db` path; </span><span class="se">\</span>
+<span class="s2">                  &#39;local_csv&#39;:load from a local csv path; &#39;huggingface&#39;: load a huggingface dataset.&quot;</span><span class="p">})</span>
+    <span class="n">dataset_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;qd.db&quot;</span><span class="p">,</span> 
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;A local path to a csv dataset or a databse; Or a Huggingface dataset name (e.g. &#39;lvwerra/stack-exchange-paired&#39;).&quot;</span><span class="p">})</span>
+    <span class="n">train_test_split_ratio</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The ratio represents the proportion of the test dataset to </span><span class="se">\</span>
+<span class="s2">                  include in the train and test split.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">streaming</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to use streaming.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">shuffle_buffer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the shuffle buffer.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">max_seq_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Maximum sequence length.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">evaluation_strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The evaluation strategy to adopt during training.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="c1"># batch_size: int = field(</span>
+    <span class="c1">#     default=8,</span>
+    <span class="c1">#     metadata={&quot;help&quot;: &quot;Batch size.&quot;})</span>
+    <span class="n">per_device_train_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch size per device for training.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">per_device_eval_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch size per device for evaluation.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">gradient_accumulation_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of steps for gradient accumulation.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">eos_token_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">49152</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;End-of-sequence token ID.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">learning_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning rate.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">weight_decay</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Weight decay.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">local_rank</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Used for multi-gpu.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">fp16</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enable FP16.&quot;</span><span class="p">})</span>
+    <span class="n">bf16</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enable BF16.&quot;</span><span class="p">})</span>
+    <span class="n">load_in_8bit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether load the model weights in 8-bit or not.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">device_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="n">Accelerator</span><span class="p">()</span><span class="o">.</span><span class="n">process_index</span><span class="p">},</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;specify the mapping of model layers to specific devices, such as different GPUs </span><span class="se">\</span>
+<span class="s2">                  in a multi-GPU setup. This can be helpful for distributing the computational load of a </span><span class="se">\</span>
+<span class="s2">                  large model across multiple GPUs.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">gradient_checkpointing</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Enable gradient checkpointing.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Random seed.&quot;</span><span class="p">})</span>
+    <span class="n">num_workers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of workers.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;./rlhf_checkpoints&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output directory for all model weights.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">log_freq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Logging frequency.&quot;</span><span class="p">})</span>
+    <span class="n">eval_freq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Evaluation frequency.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">save_freq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Model saving frequency.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">push_to_hub</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether push to Huggingface Hub or not.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1">## Step 1 SFT parameters</span>
+    <span class="n">max_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Maximum number of training steps.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">dataset_subset_sft</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;data/finetune&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Subset folder of the dataset to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">dataset_subset_sft_train</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The size of the subset of the training data to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">split</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Dataset split to use.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">question_title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Question&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;the column name of questions from the database.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">answer_title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Answer&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;the column name of answers from the database.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">size_valid_set</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Size of the validation/eval set.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">sft_lora_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;step1_supervised_finetuning_lora_final/&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output directory for step 1 supervised finetuning&#39;s Lora weights.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">sft_merged_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;step1_supervised_finetuning_merged/&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output directory for step 1 supervised finetuning&#39;s merged weights.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">lr_scheduler_type_sft</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Type of learning rate scheduler.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">num_warmup_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of warmup steps for the scheduler.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">lora_config_rl</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LoraConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">LoraConfig</span><span class="p">(</span>
+            <span class="n">r</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+            <span class="n">lora_alpha</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+            <span class="n">lora_dropout</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">CAUSAL_LM</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;LoRA configuration.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1">## Step 2 reward modeling parameters</span>
+    <span class="n">reward_model_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;databricks/dolly-v2-3b&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Huggingface model name or a local path to the reward model.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">reward_lora_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;step1_supervised_finetuning_lora_final/&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output directory for step 1 supervised finetuning&#39;s Lora weights.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">reward_merged_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;step1_supervised_finetuning_merged/&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Output directory for step 1 supervised finetuning&#39;s merged weights.&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">resume_from_checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;If you want to resume training where it left off.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">dataset_reward_folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;data/reward&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Subset folder of the reward dataset to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">dataset_eval_folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;data/evaluation&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Subset folder of the evaluation dataset to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">reward_num_of_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The size of the subset of the training data to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">max_seq_length_reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Maximum sequence length.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="c1"># dataset_subset_reward_eval: Optional[int] = field(</span>
+    <span class="c1">#     default=400,</span>
+    <span class="c1">#     metadata={&quot;help&quot;: &quot;The size of the subset of the validation/eval data to use.&quot;})</span>
+    <span class="n">reward_epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The number of training epochs for reward modeling.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">deepspeed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1">## TODO</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Path to deepspeed config if using deepspeed.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">remove_unused_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Whether to remove unused columns from the dataset.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">label_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;List of column names in the dataset to use as labels.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">logging_strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The strategy used for logging during training.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">logging_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The number of steps between each logging.&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="c1"># callbacks: Optional[List[TrainerCallback]] = field(</span>
+    <span class="c1">#     default=[], ## PeftSavingCallback()</span>
+    <span class="c1">#     metadata={&quot;help&quot;: &quot;The callbacks to use for training.&quot;}),</span>
+    <span class="c1"># optim: Optional[str] = field(</span>
+    <span class="c1">#     default=&quot;adamw_hf&quot;, metadata={&quot;help&quot;: &quot;The optimizer to use.&quot;})</span>
+    <span class="c1"># lr_scheduler_type_rw: str = field(</span>
+    <span class="c1">#     default=&quot;linear&quot;,</span>
+    <span class="c1">#     metadata={&quot;help&quot;: &quot;Type of learning rate scheduler.&quot;})</span>
+    <span class="n">lora_config_reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LoraConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">LoraConfig</span><span class="p">(</span>
+            <span class="n">r</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">lora_alpha</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+            <span class="n">lora_dropout</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+            <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SEQ_CLS</span><span class="p">,</span>
+            <span class="n">inference_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;LoRA configuration.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1">## Step 3 RL parameters</span>
+    <span class="n">dataset_subset_rl</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;data/finetune&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Subset folder of the dataset to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">dataset_subset_rl_train</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;The size of the subset of the training data to use.&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">adafactor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;whether to use the adafactor optimizer&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Value for top_k&quot;</span><span class="p">})</span>
+    <span class="n">top_p</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Value for top_p&quot;</span><span class="p">})</span>
+    <span class="n">do_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Flag for sampling&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">eos_token_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;End of sentence token id&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">output_max_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;maximum length for generation&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">mini_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;the PPO minibatch size&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">ppo_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;the PPO batch size&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">ppo_epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;the number of ppo epochs&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">total_ppo_epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;number of total epochs&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="c1">## TODO: differences between total_ppo_epochs and ppo_epochs</span>
+    <span class="n">early_stopping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;whether to early stop&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">target_kl</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;kl target for early stopping&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">reward_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;a baseline value that is subtracted from the reward&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">init_kl_coef</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Initial KL penalty coefficient (used for adaptive and linear control)&quot;</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">adap_kl_ctrl</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Use adaptive KL control, otherwise linear&quot;</span><span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1">############################################################</span>
+<span class="c1">## Step 1: Supervised Finetuning Trainer</span>
+<span class="c1">############################################################</span>
+
+
+<div class="viewcode-block" id="SFT"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT">[docs]</a><span class="k">class</span> <span class="nc">SFT</span><span class="p">(</span><span class="n">Trainer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class representing the supervised finetuning trainer.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        rlhf_config (RLHFConfig): The RLHF configuration object.</span>
+<span class="sd">        tokenizer (AutoTokenizer): The tokenizer used for tokenizing the input data.</span>
+<span class="sd">        num_proc (int): The number of workers to use for data loading.</span>
+<span class="sd">        dataset (Dict[str, Dataset]): A dictionary containing the train and eval datasets.</span>
+<span class="sd">        torch_dtype (torch.dtype): The torch data type to use for training.</span>
+<span class="sd">        training_args (TrainingArguments): The training arguments for the trainer.</span>
+<span class="sd">        model (AutoModelForCausalLM): The model to train.</span>
+<span class="sd">        trainer (SFTTrainer): The trainer object used for training the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rlhf_config</span><span class="p">:</span> <span class="n">RLHFConfig</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the SFTTrainer object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rlhf_config (RLHFConfig): The RLHF configuration object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span> <span class="o">=</span> <span class="n">rlhf_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">base_model_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">num_workers</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">streaming</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_datasets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">torch_dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">bf16</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">float16</span>
+        <span class="c1"># self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+            <span class="n">dataloader_drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">evaluation_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">evaluation_strategy</span><span class="p">,</span>
+            <span class="n">max_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">max_steps</span><span class="p">,</span>
+            <span class="n">eval_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">eval_freq</span><span class="p">,</span>
+            <span class="n">save_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">save_freq</span><span class="p">,</span>
+            <span class="n">logging_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">log_freq</span><span class="p">,</span>
+            <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="p">,</span>
+            <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">per_device_eval_batch_size</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span>
+            <span class="n">lr_scheduler_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">lr_scheduler_type_sft</span><span class="p">,</span>
+            <span class="n">warmup_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">num_warmup_steps</span><span class="p">,</span>
+            <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">,</span>
+            <span class="n">gradient_checkpointing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">gradient_checkpointing</span><span class="p">,</span>
+            <span class="n">fp16</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">fp16</span><span class="p">,</span>
+            <span class="n">bf16</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">bf16</span><span class="p">,</span>
+            <span class="n">weight_decay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">weight_decay</span><span class="p">,</span>
+            <span class="n">run_name</span><span class="o">=</span><span class="s2">&quot;step1_supervised_finetuning&quot;</span><span class="p">,</span>
+            <span class="n">ddp_find_unused_parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">base_model_path</span><span class="p">,</span>
+            <span class="n">load_in_8bit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">load_in_8bit</span><span class="p">,</span>
+            <span class="n">device_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">device_map</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">SFTTrainer</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_args</span><span class="p">,</span>
+            <span class="n">train_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
+            <span class="n">eval_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;eval&quot;</span><span class="p">],</span>
+            <span class="n">peft_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">lora_config_rl</span><span class="p">,</span>
+            <span class="n">packing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SFT.train"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains the model using the SFTTrainer object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SFT.load_lora"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.load_lora">[docs]</a>    <span class="k">def</span> <span class="nf">load_lora</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_model_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lora_model_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">base_model_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base_model_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">base_model_path</span>
+
+        <span class="c1">## Load lora config</span>
+        <span class="k">if</span> <span class="n">lora_model_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lora_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lora_config</span> <span class="o">=</span> <span class="n">PeftConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">lora_model_path</span><span class="p">)</span>
+
+        <span class="c1">## Load the base tokenizer and model</span>
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lora_config</span><span class="o">.</span><span class="n">task_type</span> <span class="o">==</span> <span class="s2">&quot;SEQ_CLS&quot;</span><span class="p">:</span>
+            <span class="c1"># peft is for reward model so load sequence classification</span>
+            <span class="n">base_model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">base_model_path</span><span class="p">,</span> <span class="n">num_labels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">torch_dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">torch_dtype</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">lora_config</span><span class="o">.</span><span class="n">task_type</span> <span class="o">==</span> <span class="s2">&quot;CAUSAL_LM&quot;</span><span class="p">:</span>
+            <span class="n">base_model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">base_model_path</span><span class="p">,</span>
+                <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">torch_dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">torch_dtype</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid task_type in lora_config&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Merge the base model and the Lora model</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model</span><span class="p">,</span> <span class="n">lora_config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span></div>
+
+<div class="viewcode-block" id="SFT.save"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">sft_lora_path</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SFT.train_and_save"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.train_and_save">[docs]</a>    <span class="k">def</span> <span class="nf">train_and_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SFT.prepare_sample_text"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.prepare_sample_text">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_sample_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the text from a sample of the dataset.&quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Question: </span><span class="si">{</span><span class="n">example</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">question_title</span><span class="p">]</span><span class="si">}</span><span class="se">\n\n\</span>
+<span class="s2">            Answer: </span><span class="si">{</span><span class="n">example</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">answer_title</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+<div class="viewcode-block" id="SFT.create_datasets"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.create_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">create_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;local_db&quot;</span><span class="p">:</span>
+            <span class="n">qa_database</span> <span class="o">=</span> <span class="n">QuestionAnswerDatabase</span><span class="p">()</span>
+            <span class="n">my_data_pd</span> <span class="o">=</span> <span class="n">qa_database</span><span class="o">.</span><span class="n">retrieve_all_question_answers_as_pandas</span><span class="p">()</span>
+            <span class="n">my_data_pd</span> <span class="o">=</span> <span class="n">my_data_pd</span><span class="p">[</span><span class="n">my_data_pd</span><span class="p">[</span><span class="n">QA_CSV_HEADER_VOTE_STATUS</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;up&quot;</span><span class="p">]</span>
+            <span class="n">my_data_pd</span> <span class="o">=</span> <span class="n">my_data_pd</span><span class="p">[[</span><span class="n">QA_CSV_HEADER_ID</span><span class="p">,</span>
+                                     <span class="n">QA_CSV_HEADER_QUESTION</span><span class="p">,</span>
+                                     <span class="n">QA_CSV_HEADER_ANSWER</span><span class="p">]]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;My local database has </span><span class="si">{}</span><span class="s2"> samples&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">my_data_pd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">my_data_pd</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;local_csv&quot;</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="n">data_files</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dataset_name</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">]</span> <span class="c1"># Convert DatasetDict to Dataset</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;huggingface&quot;</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">dataset_name</span><span class="p">,</span>
+                <span class="n">data_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dataset_subset_sft</span><span class="p">,</span>
+                <span class="n">split</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">,</span>
+                <span class="n">use_auth_token</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span><span class="p">,</span>
+                <span class="n">streaming</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">streaming</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">split</span><span class="p">]</span> <span class="c1"># Convert DatasetDict to Dataset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No (supported) data files or dataset script found </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">test_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">train_test_split_ratio</span><span class="p">,</span> 
+                                           <span class="n">seed</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Size of the train set: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">. </span><span class="se">\</span>
+<span class="s2">              Size of the validation set: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">ConstantLengthDataset</span><span class="p">(</span>
+            <span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
+            <span class="n">formatting_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prepare_sample_text</span><span class="p">,</span>
+            <span class="n">infinite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">seq_length</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_seq_length</span><span class="p">,</span>
+            <span class="c1"># chars_per_token=chars_per_token,</span>
+        <span class="p">)</span>
+        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">ConstantLengthDataset</span><span class="p">(</span>
+            <span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
+            <span class="n">formatting_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prepare_sample_text</span><span class="p">,</span>
+            <span class="n">infinite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">seq_length</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_seq_length</span><span class="p">,</span>
+            <span class="c1"># chars_per_token=chars_per_token,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="s2">&quot;eval&quot;</span><span class="p">:</span> <span class="n">eval_dataset</span><span class="p">}</span></div></div>
+
+
+<span class="c1">############################################################</span>
+<span class="c1">## Step 2: Reward Trainer</span>
+<span class="c1">############################################################</span>
+
+<span class="c1">## TODO: LOAD FROM THE DATABASE.PY FILE</span>
+<span class="n">RANKING_CSV_HEADER_ID</span> <span class="o">=</span> <span class="s2">&quot;ID&quot;</span>
+<span class="n">RANKING_CSV_HEADER_QUESTION</span> <span class="o">=</span> <span class="s2">&quot;Question&quot;</span>
+<span class="n">RANKING_CSV_HEADER_UP_RANKING_ANSWER</span> <span class="o">=</span> <span class="s2">&quot;Up Ranking Answer&quot;</span>
+<span class="n">RANKING_CSV_HEADER_LOW_RANKING_ANSWER</span> <span class="o">=</span> <span class="s2">&quot;Low Ranking Answer&quot;</span>
+<span class="n">RANKING_CSV_HEADER</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">RANKING_CSV_HEADER_ID</span><span class="p">,</span>
+    <span class="n">RANKING_CSV_HEADER_QUESTION</span><span class="p">,</span>
+    <span class="n">RANKING_CSV_HEADER_UP_RANKING_ANSWER</span><span class="p">,</span>
+    <span class="n">RANKING_CSV_HEADER_LOW_RANKING_ANSWER</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># We need to define a special data collator that batches the ranking data.</span>
+<div class="viewcode-block" id="RewardDataCollatorWithPadding"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardDataCollatorWithPadding">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">RewardDataCollatorWithPadding</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pad_to_multiple_of</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">def</span> <span class="nf">extract_and_pad</span><span class="p">(</span><span class="n">key_ids</span><span class="p">,</span> <span class="n">key_mask</span><span class="p">):</span>
+            <span class="n">extracted_features</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="n">key_ids</span><span class="p">],</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="n">key_mask</span><span class="p">]}</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span>
+            <span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
+                <span class="n">extracted_features</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span>
+                <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_length</span><span class="p">,</span>
+                <span class="n">pad_to_multiple_of</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_to_multiple_of</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">batch_x</span> <span class="o">=</span> <span class="n">extract_and_pad</span><span class="p">(</span><span class="s2">&quot;input_ids_x&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask_x&quot;</span><span class="p">)</span>
+        <span class="n">batch_y</span> <span class="o">=</span> <span class="n">extract_and_pad</span><span class="p">(</span><span class="s2">&quot;input_ids_y&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask_y&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;input_ids_x&quot;</span><span class="p">:</span> <span class="n">batch_x</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;attention_mask_x&quot;</span><span class="p">:</span> <span class="n">batch_x</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;input_ids_y&quot;</span><span class="p">:</span> <span class="n">batch_y</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;attention_mask_y&quot;</span><span class="p">:</span> <span class="n">batch_y</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;return_loss&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="RewardTrainer"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer">[docs]</a><span class="k">class</span> <span class="nc">RewardTrainer</span><span class="p">(</span><span class="n">Trainer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rlhf_config</span><span class="p">:</span> <span class="n">RLHFConfig</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span> <span class="o">=</span> <span class="n">rlhf_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span>
+            <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="p">,</span>
+            <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">per_device_eval_batch_size</span><span class="p">,</span>
+            <span class="n">num_train_epochs</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">reward_epochs</span><span class="p">,</span>
+            <span class="n">weight_decay</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">weight_decay</span><span class="p">,</span>
+            <span class="n">evaluation_strategy</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">evaluation_strategy</span><span class="p">,</span>
+            <span class="n">save_strategy</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">evaluation_strategy</span><span class="p">,</span>
+            <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">,</span>
+            <span class="n">gradient_checkpointing</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">gradient_checkpointing</span><span class="p">,</span>
+            <span class="c1"># deepspeed=rlhf_config.deepspeed,</span>
+            <span class="n">local_rank</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">local_rank</span><span class="p">,</span>
+            <span class="n">remove_unused_columns</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">remove_unused_columns</span><span class="p">,</span>
+            <span class="n">label_names</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">label_names</span><span class="p">,</span>
+            <span class="n">bf16</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">bf16</span><span class="p">,</span>
+            <span class="n">logging_strategy</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">logging_strategy</span><span class="p">,</span>
+            <span class="n">logging_steps</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">logging_steps</span><span class="p">,</span>
+            <span class="c1"># optim=rlhf_config.optim,</span>
+            <span class="c1"># lr_scheduler_type=rlhf_config.lr_scheduler_type_rw</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">torch_dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span> <span class="k">if</span> <span class="n">rlhf_config</span><span class="o">.</span><span class="n">bf16</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">float16</span>
+        <span class="c1"># self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)</span>
+
+        <span class="c1">## Load the tokenizer and the model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">reward_model_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">rlhf_config</span><span class="o">.</span><span class="n">reward_model_path</span><span class="p">,</span>
+            <span class="n">num_labels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">torch_dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">torch_dtype</span><span class="p">,</span>
+            <span class="n">load_in_8bit</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">load_in_8bit</span><span class="p">,</span>
+            <span class="n">device_map</span><span class="o">=</span><span class="n">rlhf_config</span><span class="o">.</span><span class="n">device_map</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">get_peft_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">,</span> <span class="n">rlhf_config</span><span class="o">.</span><span class="n">lora_config_reward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">print_trainable_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">rlhf_config</span><span class="o">.</span><span class="n">gradient_checkpointing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">num_workers</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">streaming</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_datasets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_datasets</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="n">RewardDataCollatorWithPadding</span><span class="p">(</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">max_seq_length_reward</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+            <span class="n">data_collator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span><span class="p">,</span>
+            <span class="n">train_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
+            <span class="n">eval_dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;eval&quot;</span><span class="p">],</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">compute_metrics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_preprocess_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">examples</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Turn the dataset into pairs of question and answer, where</span>
+<span class="sd">        &quot;text_x = question + preferred answer&quot; and &quot;text_y = question + not preferred answer&quot;.</span>
+<span class="sd">        Then tokenize the dataset.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A dictionary containing the processed data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">tokenize_and_store</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">answer</span><span class="p">,</span> <span class="n">key_ids</span><span class="p">,</span> <span class="n">key_mask</span><span class="p">):</span>
+            <span class="n">tokenized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Question: </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Answer: </span><span class="si">{</span><span class="n">answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">new_examples</span><span class="p">[</span><span class="n">key_ids</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokenized</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span>
+            <span class="n">new_examples</span><span class="p">[</span><span class="n">key_mask</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokenized</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">])</span>
+
+        <span class="n">new_examples</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input_ids_x&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;attention_mask_x&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;input_ids_y&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;attention_mask_y&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">question</span><span class="p">,</span> <span class="n">better_answer</span><span class="p">,</span> <span class="n">worse_answer</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">examples</span><span class="p">[</span><span class="n">RANKING_CSV_HEADER_QUESTION</span><span class="p">],</span>
+            <span class="n">examples</span><span class="p">[</span><span class="n">RANKING_CSV_HEADER_UP_RANKING_ANSWER</span><span class="p">],</span>
+            <span class="n">examples</span><span class="p">[</span><span class="n">RANKING_CSV_HEADER_LOW_RANKING_ANSWER</span><span class="p">],</span>
+        <span class="p">):</span>
+            <span class="n">tokenize_and_store</span><span class="p">(</span>
+                <span class="n">question</span><span class="p">,</span> <span class="n">better_answer</span><span class="p">,</span> <span class="s2">&quot;input_ids_x&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask_x&quot;</span>
+            <span class="p">)</span>
+            <span class="n">tokenize_and_store</span><span class="p">(</span>
+                <span class="n">question</span><span class="p">,</span> <span class="n">worse_answer</span><span class="p">,</span> <span class="s2">&quot;input_ids_y&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask_y&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_examples</span>
+
+<div class="viewcode-block" id="RewardTrainer.create_datasets"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.create_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">create_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the dataset and preprocess it.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A dictionary containing the train and eval datasets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">## based on dataset_type (e.g. &quot;huggingface&quot;, &quot;csv&quot;, etc.), load the data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;huggingface&quot;</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">dataset_name</span><span class="p">,</span>
+                <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">dataset_reward_folder</span><span class="p">,</span>
+                <span class="n">split</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">split</span><span class="p">,</span>
+                <span class="n">use_auth_token</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">num_proc</span><span class="p">,</span>
+                <span class="n">streaming</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">streaming</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="n">data_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">dataset_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No (supported) data files or dataset script found </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">dataset_type</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Preprocess the dataset and filter out QAs that are longer than max_length</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess_function</span><span class="p">,</span>
+            <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;input_ids_x&quot;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">max_seq_length_reward</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;input_ids_y&quot;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">max_seq_length_reward</span>
+        <span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">split</span><span class="p">]</span>  <span class="c1"># Convert DatasetDict to Dataset</span>
+        <span class="c1">## load desired amount of data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">reward_num_of_data</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">reward_num_of_data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)))</span>
+            <span class="p">)</span>
+
+        <span class="c1">## split to train and test datasets</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">train_test_split_ratio</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Size of the train set: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">. </span><span class="se">\</span>
+<span class="s2">                Size of the validation set: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span> <span class="s2">&quot;eval&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]}</span></div>
+
+    <span class="c1"># Define how to compute the reward loss. We use the InstructGPT pairwise logloss:</span>
+    <span class="c1"># https://arxiv.org/abs/2203.02155</span>
+<div class="viewcode-block" id="RewardTrainer.compute_loss"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.compute_loss">[docs]</a>    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">return_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">rewards_x</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="o">=</span><span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids_x&quot;</span><span class="p">],</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;attention_mask_x&quot;</span><span class="p">]</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">rewards_y</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="o">=</span><span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids_y&quot;</span><span class="p">],</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;attention_mask_y&quot;</span><span class="p">]</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="n">rewards_x</span> <span class="o">-</span> <span class="n">rewards_y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">return_outputs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;rewards_x&quot;</span><span class="p">:</span> <span class="n">rewards_x</span><span class="p">,</span> <span class="s2">&quot;rewards_y&quot;</span><span class="p">:</span> <span class="n">rewards_y</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_pred</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the accuracy of the model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eval_pred (:obj:`EvalPrediction`): The evaluation prediction.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A dictionary containing the accuracy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">predictions</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eval_pred</span>
+        <span class="c1"># Here, predictions is rewards_x and rewards_y.</span>
+        <span class="c1"># We want to see how much of the time rewards_x &gt; rewards_y.</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">evaluate</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">accuracy</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span> <span class="n">references</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RewardTrainer.save"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be</span>
+<span class="sd">                saved to the default output path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rlhf_config</span><span class="o">.</span><span class="n">reward_merged_path</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RewardTrainer.train_and_save"><a class="viewcode-back" href="../../../pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.train_and_save">[docs]</a>    <span class="k">def</span> <span class="nf">train_and_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train the model and save it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be</span>
+<span class="sd">                saved to the default output path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CambioML.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pykoi.component.base &mdash; pykoi 0.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pykoi
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">pykoi</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pykoi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pykoi.component.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pykoi.component.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Base classes for components.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">pykoi.component.chatbot_database_factory</span> <span class="kn">import</span> <span class="n">ChatbotDatabaseFactory</span>
+<span class="kn">from</span> <span class="nn">pykoi.component.constants</span> <span class="kn">import</span> <span class="n">FeedbackType</span>
+<span class="kn">from</span> <span class="nn">pykoi.db.qa_database</span> <span class="kn">import</span> <span class="n">QuestionAnswerDatabase</span>
+<span class="kn">from</span> <span class="nn">pykoi.db.ranking_database</span> <span class="kn">import</span> <span class="n">RankingDatabase</span>
+<span class="kn">from</span> <span class="nn">pykoi.llm.abs_llm</span> <span class="kn">import</span> <span class="n">AbsLlm</span>
+
+
+<div class="viewcode-block" id="DataSource"><a class="viewcode-back" href="../../../pykoi.component.html#pykoi.component.base.DataSource">[docs]</a><span class="k">class</span> <span class="nc">DataSource</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataSource class is used to fetch data from a source using a provided function.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (str): The unique identifier for the data source.</span>
+<span class="sd">        fetch_func (Callable): The function to fetch data from the source.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fetch_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of DataSource.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id (str): The unique identifier for the data source.</span>
+<span class="sd">            fetch_func (Callable): The function to fetch data from the source.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fetch_func</span> <span class="o">=</span> <span class="n">fetch_func</span></div>
+
+
+<div class="viewcode-block" id="Component"><a class="viewcode-back" href="../../../pykoi.component.html#pykoi.component.base.Component">[docs]</a><span class="k">class</span> <span class="nc">Component</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Component class is the base class for all components.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (str): The unique identifier for the component.</span>
+<span class="sd">        data_source (DataSource): The data source for the component.</span>
+<span class="sd">        svelte_component (str): The name of the Svelte component.</span>
+<span class="sd">        props (Dict[str, Any]): Additional properties for the component.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">svelte_component</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of Component.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fetch_func (Callable, optional): The function to fetch data for the component.</span>
+<span class="sd">            svelte_component (str): The name of the Svelte component.</span>
+<span class="sd">            kwargs: Additional properties for the component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>  <span class="c1"># Generate a unique ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_source</span> <span class="o">=</span> <span class="n">DataSource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">fetch_func</span><span class="p">)</span> <span class="k">if</span> <span class="n">fetch_func</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svelte_component</span> <span class="o">=</span> <span class="n">svelte_component</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="Dropdown"><a class="viewcode-back" href="../../../pykoi.component.html#pykoi.component.base.Dropdown">[docs]</a><span class="k">class</span> <span class="nc">Dropdown</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dropdown class represents a dropdown component.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        value_column (str): The column to use for the dropdown values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">value_column</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of Dropdown.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fetch_func (Callable): The function to fetch data for the dropdown.</span>
+<span class="sd">            value_column (List[str]): The column to use for the dropdown values.</span>
+<span class="sd">            kwargs: Additional properties for the dropdown.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fetch_func</span><span class="p">,</span> <span class="s2">&quot;Dropdown&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_column</span> <span class="o">=</span> <span class="n">value_column</span></div>
+
+
+<div class="viewcode-block" id="Chatbot"><a class="viewcode-back" href="../../../pykoi.component.html#pykoi.component.base.Chatbot">[docs]</a><span class="k">class</span> <span class="nc">Chatbot</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Chatbot class represents a chatbot component.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        model (str): The model to use for the chatbot.</span>
+<span class="sd">        database (str): The database to use for the chatbot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">AbsLlm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of Chatbot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (AbsLlm): The model to use for the chatbot.</span>
+<span class="sd">            kwargs: Additional properties for the chatbot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Chatbot&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">ChatbotDatabaseFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">feedback</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;feedback&quot;</span><span class="p">,</span> <span class="s2">&quot;vote&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Dashboard"><a class="viewcode-back" href="../../../pykoi.component.html#pykoi.component.base.Dashboard">[docs]</a><span class="k">class</span> <span class="nc">Dashboard</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dashboard class represents a dashboard component.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        database (str): The database to use for the dashboard.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">QuestionAnswerDatabase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new instance of Dashboard.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            database (QuestionAnswerDatabase): The database to use for the dashboard.</span>
+<span class="sd">            kwargs: Additional properties for the dashboard.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Feedback&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CambioML.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
