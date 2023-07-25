@@ -113,7 +113,9 @@ header nav a + a {
     margin-left: 10px;
 }
 
-
+div.main {
+    margin-top: 20px;
+}
 
 p {
     margin-bottom: 1rem;
