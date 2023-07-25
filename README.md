@@ -1,7 +1,5 @@
 
-# pykoi
-
-:whale2: Active learning in one unified interface :ocean:!
+# :whale2: pykoi: Active learning in one unified interface :ocean:!
 
 
 ## :seedling: Installation
@@ -29,7 +27,7 @@ Here are some examples of common applications:
 ### :speech_balloon: Chatbots
 
 - If you are on a GPU instance, check [launch_app_gpu.ipynb](example/notebook/launch_app_gpu.ipynb) and see how to launch a chatbot UI using multiple models, and thumb up/down the model answers side by side.
-- If you are on a CPU instance, check [launch_app_api.ipynb](example/notebook/launch_app.ipynb) and see how to launch a chatbot UI using OpenAI or Amazon Bedrock (:woman_technologist: building now :man_technologist:), and thumb up/down the model answers side by side.
+- If you are on a CPU instance, check [launch_app_api.ipynb](example/notebook/launch_app_api.ipynb) and see how to launch a chatbot UI using OpenAI or Amazon Bedrock (:woman_technologist: building now :man_technologist:), and thumb up/down the model answers side by side.
 
 
 ## :nerd_face: Dev Setup
