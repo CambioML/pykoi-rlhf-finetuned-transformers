@@ -1,7 +1,7 @@
 
 # pykoi
 
-Active learning in one unified interface :ocean:!
+:fish: Active learning in one unified interface :ocean:!
 
 
 ## Installation
