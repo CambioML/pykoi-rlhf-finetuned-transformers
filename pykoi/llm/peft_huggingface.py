@@ -79,7 +79,6 @@ class PeftHuggingfacemodel(AbsLlm):
         input_ids = self._tokenizer.encode(message, return_tensors="pt")
         input_ids = input_ids.to("cuda")
         print("[HuggingfaceModel] generate...")
-        print("input_ids: ", input_ids)
         output_ids = self._model.generate(
             input_ids=input_ids,
             max_length=self._max_length,
