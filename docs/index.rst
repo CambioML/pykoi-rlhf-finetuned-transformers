@@ -8,11 +8,16 @@ Welcome to pykoi's documentation!
 
 .. toctree::
    :maxdepth: 4
-   :caption: Contents:
+   :caption: Getting Started
 
    tutorial
    demo
    installation
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Code
+
    modules
 
 Indices and tables
