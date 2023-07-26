@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from pyngrok import ngrok
 import socket
+
 # from flask_ngrok import run_with_ngrok
 
 from pykoi.component.base import Dropdown
@@ -172,6 +173,38 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
+    def create_chatbot_comparator_route(self, app: Flask, component: Dict[str, Any]):
+        """
+        Create chatbot comparator routes for the application.
+
+        Args:
+            app (Flask): The Flask application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
+        @app.route("/chat/comparator/<message>", methods=["POST"])
+        def compare(message: str):
+            try:
+                output_dict, id_list = {}, []
+                # TODO: refactor to run multiple models in parallel using threading
+                for model_name, model in component["component"].models.items():
+                    output = model.predict(message)[0]
+                    # TODO: refactor this into using another comparator database
+                    # insert question and answer into database
+                    id = component["component"].database.insert_question_answer(
+                        message, output
+                    )
+                    output_dict[model_name] = output
+                    id_list.append(id)
+                return {
+                    "id": id_list,
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": message,
+                    "answer": output_dict,
+                }
+            except Exception as ex:
+                return {"log": f"Inference failed: {ex}", "status": "500"}
+
     def run(self):
         """
         Run the application.
@@ -214,6 +247,8 @@ class Application:
                 self.create_chatbot_route(app, component)
             if component["svelte_component"] == "Feedback":
                 self.create_feedback_route(app, component)
+            if component["svelte_component"] == "ChatbotComparator":
+                self.create_chatbot_comparator_route(app, component)
 
         @app.route("/")
         def base():

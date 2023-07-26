@@ -26,3 +26,14 @@ class AbsLlm(abc.ABC):
             NotImplementedError: This method must be implemented by subclasses.
         """
         raise NotImplementedError("This method must be implemented by subclasses.")
+
+    @property
+    def name(self):
+        """Return the name of the model.
+
+        This method must be implemented by any subclass of `AbsLlm`.
+
+        Raises:
+            NotImplementedError: This method must be implemented by subclasses.
+        """
+        raise NotImplementedError("This method must be implemented by subclasses.")
