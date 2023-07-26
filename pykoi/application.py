@@ -173,6 +173,31 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
+    def create_chatbot_comparator_route(self, app: Flask, component: Dict[str, Any]):
+        @app.route("/chat/comparator/<message>", methods=["POST"])
+        def compare(message: str):
+            try:
+                output_dict, id_list = {}, []
+                # TODO: refactor to run multiple models in parallel using threading
+                for model in component["component"].models:
+                    output = model.predict(message)[0]
+                    # TODO: refactor this into using another comparator database
+                    # insert question and answer into database
+                    id = component["component"].database.insert_question_answer(
+                        message, output
+                    )
+                    output_dict[model.model_source] = output
+                    id_list.append(id)
+                return {
+                    "id": id_list,
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": message,
+                    "answer": output_dict,
+                }
+            except Exception as ex:
+                return {"log": f"Inference failed: {ex}", "status": "500"}
+
     def run(self):
         """
         Run the application.
@@ -215,6 +240,8 @@ class Application:
                 self.create_chatbot_route(app, component)
             if component["svelte_component"] == "Feedback":
                 self.create_feedback_route(app, component)
+            if component["svelte_component"] == "ChatbotComparator":
+                self.create_chatbot_comparator_route(app, component)
 
         @app.route("/")
         def base():

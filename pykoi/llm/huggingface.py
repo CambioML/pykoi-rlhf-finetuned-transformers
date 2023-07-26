@@ -9,6 +9,7 @@ class HuggingfaceModel(AbsLlm):
     This class is a wrapper for the Huggingface model for Language Model (LLM) Chain.
     It inherits from the abstract base class AbsLlm.
     """
+    model_source = "huggingface"
 
     def __init__(
         self,
