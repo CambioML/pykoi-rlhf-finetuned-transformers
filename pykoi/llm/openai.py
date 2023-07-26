@@ -17,6 +17,7 @@ class OpenAIModel(AbsLlm):
         __init__(self, api_key: str, engine: str, max_tokens: int, temperature: float): Initializes the OpenAI model.
         predict(self, message: str): Predicts the next word based on the given message.
     """
+    model_source = "openai"
 
     def __init__(
         self,
