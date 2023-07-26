@@ -41,6 +41,14 @@ class OpenAIModel(AbsLlm):
         self._temperature = temperature
         super().__init__()
 
+    @property
+    def name(self):
+        return "_".join([
+            str(OpenAIModel.model_source),
+            str(self._engine),
+            str(self._max_tokens),
+            str(self._temperature)])
+
     def predict(self, message: str, num_of_response: int = 1):
         """
         Predicts the next word based on the given message.
