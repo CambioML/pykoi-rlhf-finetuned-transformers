@@ -252,8 +252,8 @@ class RLHFConfig:
 
     # Step 3 RL parameters
     dataset_subset_rl: Optional[str] = field(
-        default="data/finetune",
-        metadata={"help": "Subset folder of the dataset to use."},
+        default="data",
+        metadata={"help": "Subset folder of the dataset to use."}, ## TODO
     )
     dataset_subset_rl_train: Optional[int] = field(
         default=10000,

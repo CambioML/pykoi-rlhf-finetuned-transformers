@@ -155,13 +155,14 @@ class RL(Trainer):
         elif args.dataset_type == "huggingface":
             dataset = load_dataset(
                 args.dataset_name,
-                data_dir=args.dataset_subset_sft,
+                data_dir=args.dataset_subset_rl,
                 split=args.split,
                 use_auth_token=True,
                 num_proc=self.num_proc,
                 streaming=args.streaming,
             )
-            dataset = dataset[args.split] # Convert DatasetDict to Dataset
+        ## TODO: if args.split in dataset.columns:
+            # dataset = dataset[args.split] # Convert DatasetDict to Dataset
         else:
             raise FileNotFoundError(f"No (supported) data files or dataset script found {args.dataset_type}")
         
@@ -174,7 +175,8 @@ class RL(Trainer):
 
         def preprocess_function(examples):
             queries = ["Question: " + q + "\n\nAnswer: " for q in examples[QA_CSV_HEADER_QUESTION]]
-            input_ids = [tokenizer(q, truncation=True)["input_ids"] for q in queries]
+            input_ids = [tokenizer(q, truncation=True, ## TODO: max_length
+                                   max_length=self._rlhf_config.output_max_length)["input_ids"] for q in queries]
             return {"query": queries, "input_ids": input_ids}
 
         dataset = dataset.map(
@@ -225,8 +227,9 @@ class RL(Trainer):
 
 
 config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29", # "meta-llama/Llama-2-7b-hf", 
-                          dataset_type="local_db",
-                          dataset_name="/home/ubuntu/git/pykoi/example/notebook/qd.db",
+                          dataset_type="huggingface", ## "local_db",
+                          dataset_name="goldmermaid/stack_exchange_rank_10k_dataset", ##"lvwerra/stack-exchange-paired", ## "/home/ubuntu/git/pykoi/example/notebook/qd.db",
+                          dataset_subset_rl = "data",
                           reward_model_path="goldmermaid/rlhf_reward_model",
                           save_freq=100,
                           ppo_batch_size=32,
