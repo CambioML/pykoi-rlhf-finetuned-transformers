@@ -45,7 +45,16 @@ class HuggingfaceModel(AbsLlm):
             device_map=device_map,
         )
         self._max_length = max_length
+        self._pretrained_model_name_or_path = pretrained_model_name_or_path
         super().__init__()
+
+    @property
+    def name(self):
+        return "_".join([
+            str(HuggingfaceModel.model_source),
+            str(self._pretrained_model_name_or_path),
+            str(self._max_length)
+        ])
 
     def predict(self, message: str, num_of_response: int = 1):
         """

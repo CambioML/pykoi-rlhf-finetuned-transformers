@@ -16,6 +16,7 @@ class PeftHuggingfacemodel(AbsLlm):
         _tokenizer (AutoTokenizer): The tokenizer for the model.
         _max_length (int): The maximum length of the generated text.
     """
+    model_source = "peft_huggingface"
 
     def __init__(
         self,
@@ -60,9 +61,20 @@ class PeftHuggingfacemodel(AbsLlm):
             device_map=device_map,
         )
         self._max_length = max_length
+        self._base_model_path = base_model_path
+        self._lora_model_path = lora_model_path
         self._model.to("cuda")
         self._model.eval()
         super().__init__()
+
+    @property
+    def name(self):
+        return "_".join([
+            str(PeftHuggingfacemodel.model_source),
+            str(self._base_model_path),
+            str(self._lora_model_path),
+            str(self._max_length)
+        ])
 
     def predict(self, message: str, num_of_response: int = 1):
         """
