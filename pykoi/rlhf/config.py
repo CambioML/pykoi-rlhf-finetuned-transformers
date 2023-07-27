@@ -283,12 +283,11 @@ class RLHFConfig:
         default=8, metadata={"help": "the PPO batch size"}
     )
     ppo_epochs: Optional[int] = field(
-        default=4, metadata={"help": "the number of ppo epochs"}
+        default=10, metadata={"help": "the number of optimisation epochs per batch of samples"}
     )
-    total_ppo_epochs: Optional[int] = field(
-        default=2, metadata={"help": "number of total epochs"} ## TODO: ORIGINAL 20000
+    total_epochs: Optional[int] = field(
+        default=100, metadata={"help": "number of total epochs"}
     )
-    # TODO: differences between total_ppo_epochs and ppo_epochs
     early_stopping: Optional[bool] = field(
         default=False, metadata={"help": "whether to early stop"}
     )
