@@ -1,41 +1,11 @@
 <script>
-  import { bisect, extent } from "d3-array";
+  import { extent } from "d3-array";
   import { scaleLinear } from "d3-scale";
   import { line, curveBasis, area } from "d3-shape";
   import { data } from "./data";
-  import { select } from "d3-selection";
 
   let outerHeight;
   let outerWidth;
-
-  let m = { x: 0, y: 0 };
-
-  function handleMousemove(event) {
-    select("#annotation-tooltip").style("opacity", 1);
-    m.x = event.clientX - event.currentTarget.getBoundingClientRect().left;
-    m.y = event.clientY - event.currentTarget.getBoundingClientRect().top;
-    if (m.x < margin.left) {
-      m.x = margin.left;
-      //   select("#annotation-tooltip").style("opacity", 0);
-    }
-    if (m.x > width - margin.right) {
-      m.x = width - margin.right;
-      //   select("#annotation-tooltip").style("opacity", 0);
-    }
-    // if (m.y > height - margin.right) {
-    //   m.y = width - margin.right;
-    //   select("#annotation-tooltip").style("opacity", 0);
-    // }
-    // if (m.y > height - margin.right) {
-    //   m.y = width - margin.right;
-    //   select("#annotation-tooltip").style("opacity", 0);
-    // }
-  }
-
-  function handleMouseout(event) {
-    console.log("out");
-    select("#annotation-tooltip").style("opacity", 0);
-  }
 
   let margin = {
     top: 10,
@@ -74,22 +44,15 @@
   bind:offsetWidth={outerWidth}
   bind:offsetHeight={outerHeight}
 >
-  <svg
-    width={outerWidth}
-    height={outerHeight}
-    on:touchmove={handleMousemove}
-    on:mousemove={handleMousemove}
-    on:mouseleave={handleMouseout}
-    on:touchend={handleMouseout}
-  >
+  <svg width={outerWidth} height={outerHeight}>
     <defs>
-      <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" style="stop-color: #FF5470; stop-opacity: 1" />
+      <linearGradient id="area-gradien2t" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style="stop-color: var(--green); stop-opacity: 1" />
         <stop offset="100%" style="stop-color: white; stop-opacity: .2" />
       </linearGradient>
     </defs>
 
-    <path class="area-path" d={pathArea(data)} fill="url(#area-gradient)" />
+    <path class="area-path" d={pathArea(data)} fill="url(#area-gradien2t)" />
     <path class="outer-path" d={pathLine(data)} />
     <path class="inner-path" d={pathLine(data)} />
 
@@ -164,24 +127,6 @@
       text-anchor="middle"
       transform="rotate(-90)"
     />
-
-    <!-- tooltip -->
-    <line
-      id="annotation-tooltip"
-      x1={m.x}
-      y1={height - margin.bottom}
-      x2={m.x}
-      y2={margin.top}
-      stroke-width="4"
-      stroke="black"
-    />
-    <circle
-      id="annotation-tooltip-circle"
-      r="10"
-      cx={m.x}
-      cy={m.y}
-      fill="red"
-    />
   </svg>
 </div>
 
@@ -207,7 +152,7 @@
   }
 
   .inner-path {
-    stroke: #ff5470;
+    stroke: var(--green);
     stroke-width: 4;
     fill: none;
     stroke-linecap: round;

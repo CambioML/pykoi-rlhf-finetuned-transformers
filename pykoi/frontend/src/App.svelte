@@ -3,6 +3,9 @@
   import Chat from "./lib/Chatbots/Chat.svelte";
   import Dropdown from "./lib/UIComponents/Dropdown.svelte";
   import Feedback from "./lib/Dashboards/Feedback.svelte";
+  import ComparisonChat from "./lib/Chatbots/ComparisonChat.svelte";
+  import ComparisonChart from "./lib/Comparison/ComparisonChart.svelte";
+  import QuestionRating from "./lib/Annotations/QuestionRating.svelte";
 
   const components = writable([]);
   const selectedPage = writable(null);
@@ -47,9 +50,12 @@
 {/if}
 
 <!-- Loaded selected component (tab) -->
-{#if $selectedPage}
+<!-- {#if $selectedPage}
   <svelte:component
     this={componentMap[$selectedPage.svelte_component]}
     {...$selectedPage.props}
   />
-{/if}
+{/if} -->
+<!-- <QuestionRating /> -->
+<ComparisonChat />
+<ComparisonChart />
