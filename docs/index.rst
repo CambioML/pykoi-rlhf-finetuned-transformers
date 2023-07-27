@@ -3,16 +3,38 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pykoi's documentation!
-=================================
+Welcome to pykoi!
+===================================
+
+**pykoi** (/py'koi/) is a Python library for cooks and food lovers that
+creates recipes mixing random ingredients.  It pulls data from the `Open Food
+Facts database <https://world.openfoodfacts.org/>`_ and offers a *simple* and
+*intuitive* API.
+collecting and using feedback
+should be part of the inference process itself.
+
+To learn more, check out the **Getting Started** link below, or navigate to the page of your 
+interest:
 
 .. toctree::
    :maxdepth: 4
    :caption: Getting Started
 
-   tutorial
-   demo
-   installation
+   getting_started
+   tour
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Features
+
+   data_collection_feedback
+   model_comparison
+   rlhf
+   data_labeling_annotation
+   knowledge_retrieval
+   analytics
+   embedding
 
 .. toctree::
    :maxdepth: 4
@@ -20,22 +42,15 @@ Welcome to pykoi's documentation!
 
    modules
 
+.. toctree::
+   :maxdepth: 4
+   :caption: Social
+
+   community
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-
-Welcome to Lumache's documentation!
-===================================
-
-**CambioML** (/lu'make/) is a Python library for cooks and food lovers that
-creates recipes mixing random ingredients.  It pulls data from the `Open Food
-Facts database <https://world.openfoodfacts.org/>`_ and offers a *simple* and
-*intuitive* API.
-
-.. note::
-
-   This project is under active development.
