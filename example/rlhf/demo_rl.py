@@ -51,7 +51,7 @@ class RL(Trainer):
         set_seed(rlhf_config.seed) ## TODO: how to set seed properly in __init__?
 
         self.ppo_config=PPOConfig(
-            steps=self._rlhf_config.total_ppo_epochs,
+            steps=self._rlhf_config.total_epochs,
             model_name=self._rlhf_config.base_model_path,
             learning_rate=self._rlhf_config.learning_rate,
             batch_size=self._rlhf_config.ppo_batch_size,
@@ -78,7 +78,7 @@ class RL(Trainer):
             device_map={"": Accelerator().local_process_index}
         )
         self.reward_kwargs = {
-            "return_all_scores": True,
+            "top_k": None, ## TODO `return_all_scores` is now deprecated,  if want a similar functionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
             "function_to_apply": "none",
             "batch_size": self._rlhf_config.ppo_batch_size,
             "truncation": True,
@@ -97,7 +97,7 @@ class RL(Trainer):
         
         ## Load the base model and tokenizer and define the PPO Trainer for RL
         self.base_tokenizer = self.create_tokenizer(rlhf_config.base_model_path)
-        pdb.set_trace()
+        # pdb.set_trace() ## TODO
         self.base_dataset=self.create_dataset(self.base_tokenizer)
         self.base_model = AutoModelForCausalLMWithValueHead.from_pretrained(
             rlhf_config.base_model_path,
@@ -118,17 +118,14 @@ class RL(Trainer):
             # peft_config=lora_config, ## PPOTrainer doesn't support parameter peft_config
         )
         self.base_kwargs = {
-            # "min_length": -1,
             "top_k": rlhf_config.top_k,
             "top_p": rlhf_config.top_p,
             "do_sample": rlhf_config.do_sample,
             "pad_token_id": self.base_tokenizer.pad_token_id,
             "eos_token_id": rlhf_config.eos_token_id,
-            "max_length": rlhf_config.output_max_length
         }
 
 
-        
     def create_tokenizer(self, model_name):
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         if getattr(tokenizer, "pad_token", None) is None:
@@ -190,18 +187,12 @@ class RL(Trainer):
                 new_examples["query"].append(query)
                 new_examples["input_ids"].append(tokenized_question["input_ids"])
             return new_examples
-        
-        # def preprocess_function(examples):
-        #     queries = ["Question: " + q + "\n\nAnswer: " for q in examples[QA_CSV_HEADER_QUESTION]]
-        #     input_ids = [tokenizer(q, truncation=True, ## TODO: max_length
-        #                            max_length=self._rlhf_config.output_max_length)["input_ids"] for q in queries]
-        #     return {"query": queries, "input_ids": input_ids}
-        
-        pdb.set_trace()
+          
+        # pdb.set_trace() ## TODO
         dataset = dataset.map(
             preprocess_function,
             batched=True,
-            num_proc=24, ## TODO self.num_proc,
+            num_proc=self.num_proc,
             remove_columns=dataset.column_names,
         )
         dataset = dataset.filter(lambda x: len(x["input_ids"]) < self._rlhf_config.max_seq_length, 
@@ -217,7 +208,7 @@ class RL(Trainer):
 
         ## training
         for epoch, batch in tqdm(enumerate(self.ppo_trainer.dataloader)):
-            if epoch >= self._rlhf_config.total_ppo_epochs:
+            if epoch >= self._rlhf_config.total_epochs:
                 break
             ## embed the questions and responses to tensors
             question_tensors = batch["input_ids"]
@@ -237,12 +228,13 @@ class RL(Trainer):
                        for output in pipe_outputs]
             stats = self.ppo_trainer.step(question_tensors, response_tensors, rewards)
             self.ppo_trainer.log_stats(stats, batch, rewards)
+            print("stats: {}\n\n\n rewards: {}\n\n\n".format(stats, rewards))
 
             ## save weights
             if self._rlhf_config.save_freq and epoch and \
                 epoch % self._rlhf_config.save_freq == 0:
                 self.ppo_trainer.save_pretrained(
-                    os.path.join(self._rlhf_config.output_dir, f"rlhf_rl_step_{epoch}"))
+                    os.path.join(self._rlhf_config.output_dir, f"rlhf_step3_rl_epoch_{epoch}")) ## TODO: only save adapter
 
 
 config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29", # "meta-llama/Llama-2-7b-hf", 
@@ -250,10 +242,10 @@ config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29"
                           dataset_name="goldmermaid/stack_exchange_rank_10k_dataset", ##"lvwerra/stack-exchange-paired", ## "/home/ubuntu/git/pykoi/example/notebook/qd.db",
                           dataset_subset_rl = "data",
                           reward_model_path="goldmermaid/rlhf_reward_model",
-                          save_freq=100,
+                          save_freq=1,
                           ppo_batch_size=32,
                           ppo_epochs=1,
-                          output_max_length=128
+                          total_epochs=2,
                           )
 rlhf_step3_rl = RL(config)
 rlhf_step3_rl.train() ## TODO output_path="./models/rlhf_step3_rl"
