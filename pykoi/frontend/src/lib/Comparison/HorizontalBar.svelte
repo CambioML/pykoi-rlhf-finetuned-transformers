@@ -1,0 +1,133 @@
+<script>
+  import { max } from "d3-array";
+  import { scaleLinear, scaleBand, scaleOrdinal } from "d3-scale";
+
+  import { data } from "./data";
+
+  const averageRanks = data.reduce((acc, curr) => {
+    if (!acc[curr.model]) {
+      acc[curr.model] = { sum: curr.rank, count: 1 };
+    } else {
+      acc[curr.model].sum += curr.rank;
+      acc[curr.model].count++;
+    }
+    return acc;
+  }, {});
+
+  const avgRankData = Object.keys(averageRanks).map((key) => ({
+    model: key,
+    avgRank: averageRanks[key].sum / averageRanks[key].count,
+  }));
+
+  let outerHeight = 300;
+  let outerWidth = 500;
+
+  let margin = {
+    top: 30,
+    bottom: 0,
+    left: 45,
+    right: 15,
+  };
+
+  $: width = outerWidth - margin.left - margin.right;
+  $: height = outerHeight - margin.top - margin.bottom;
+
+  $: yScale = scaleBand()
+    .rangeRound([margin.top, height - margin.bottom])
+    .padding(0.05)
+    .domain(avgRankData.map((d) => d.model));
+
+  $: xScale = scaleLinear()
+    .rangeRound([margin.left, width - margin.right])
+    .domain([0, max(avgRankData, (d) => d.avgRank)]);
+
+  $: colorScale = scaleOrdinal()
+    .domain(avgRankData.map((d) => d.model))
+    .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
+
+  let models = Array.from(new Set(data.map((d) => d.model)));
+</script>
+
+<div
+  id="bar-chart-holder"
+  bind:offsetWidth={outerWidth}
+  bind:offsetHeight={outerHeight}
+>
+  <svg width={outerWidth} height={outerHeight}>
+    <!-- y-ticks -->
+    {#each avgRankData.map((d) => d.model) as tick}
+      <g
+        transform={`translate(${margin.left} ${
+          yScale(tick) + yScale.bandwidth() / 2
+        })`}
+      >
+        <text class="axis-text" x="-5" y="0" text-anchor="end">{tick}</text>
+      </g>
+    {/each}
+
+    <!-- x-ticks -->
+    {#each xScale.ticks() as tick}
+      <g transform={`translate(${xScale(tick)}, ${height - margin.bottom})`}>
+        <text class="axis-text" y="15" text-anchor="middle">{tick}</text>
+      </g>
+    {/each}
+
+    <!-- bars -->
+    {#each avgRankData as d, i}
+      <rect
+        y={yScale(d.model)}
+        x={margin.left}
+        width={xScale(d.avgRank) - margin.left}
+        height={yScale.bandwidth()}
+        fill={colorScale(d.model)}
+        class="model-path"
+        data-model={models[i]}
+      />
+      <text
+        class="label-text"
+        y={yScale(d.model) + yScale.bandwidth() / 2}
+        x={xScale(d.avgRank) + 5}
+        text-anchor="start"
+        dominant-baseline="middle"
+      >
+        {d.avgRank.toFixed(2)}
+      </text>
+    {/each}
+    <line
+      class="axis-line"
+      x1={margin.left}
+      x2={width - margin.right}
+      y1={height - margin.bottom}
+      y2={height - margin.bottom}
+    />
+    <text
+      class="chart-title"
+      y={margin.top / 2}
+      x={margin.left}
+      text-anchor="start">Average Rank</text
+    >
+    <text
+      class="chart-subtitle"
+      y={margin.top / 2 + 15}
+      x={margin.left}
+      opacity=".6"
+      text-anchor="start"
+    />
+  </svg>
+</div>
+
+<style>
+  #bar-chart-holder {
+    height: 100%;
+    width: 100%;
+  }
+  .axis-text {
+    font-family: Arial;
+    font-size: 12px;
+  }
+  .axis-line {
+    stroke-width: 3;
+    stroke: black;
+    fill: none;
+  }
+</style>
