@@ -181,7 +181,7 @@ textarea {
     color: var(--grey);
 }
 
-::selection, .highlight {
+::selection {
     background: #ffb7b7; /* Your highlight color */
     background: var(--red); /* Your highlight color */
     color: var(--white); /* Your color for the highlighted text */

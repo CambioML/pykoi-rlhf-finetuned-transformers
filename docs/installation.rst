@@ -1,11 +1,11 @@
 Getting Started
 ===================================
 
-**Lumache** (/lu'make/) is a Python library for cooks and food lovers that
-creates recipes mixing random ingredients.  It pulls data from the `Open Food
-Facts database <https://world.openfoodfacts.org/>`_ and offers a *simple* and
-*intuitive* API.
+**pyKoi** is an open-source data curation platform for LLMs. Using pyKoi,
+everyone can build robust language models through faster data curation using
+both human and machine feedback. We provide support for each step in the MLOps
+cycle, from data labeling, model monitoring, to RLHF.
 
 .. note::
 
-   This project is under active development.
+   This project is under active development! New features are added every week!
