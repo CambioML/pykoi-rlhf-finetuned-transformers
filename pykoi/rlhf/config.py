@@ -270,6 +270,9 @@ class RLHFConfig:
     eos_token_id: Optional[int] = field(
         default=100_000, metadata={"help": "End of sentence token id"}
     )
+    output_min_length: Optional[int] = field(
+        default=32, metadata={"help": "maximum length for generation"}
+    )
     output_max_length: Optional[int] = field(
         default=128, metadata={"help": "maximum length for generation"}
     )
@@ -283,7 +286,7 @@ class RLHFConfig:
         default=4, metadata={"help": "the number of ppo epochs"}
     )
     total_ppo_epochs: Optional[int] = field(
-        default=20000, metadata={"help": "number of total epochs"}
+        default=2, metadata={"help": "number of total epochs"} ## TODO: ORIGINAL 20000
     )
     # TODO: differences between total_ppo_epochs and ppo_epochs
     early_stopping: Optional[bool] = field(

@@ -1,3 +1,6 @@
+## pip install xformers ## TODO
+import pdb; 
+
 import pykoi
 from pykoi import RLHFConfig
 
@@ -64,8 +67,37 @@ class RL(Trainer):
             # accelerator_kwargs=self._rlhf_config.accelerator_kwargs,
             )
         
+        ## Load the reward model and tokenizer and define the reward pipeline
+        self.reward_tokenizer = self.create_tokenizer(rlhf_config.reward_model_path)
+        self.reward_dataset=self.create_dataset(self.reward_tokenizer)
+        self.reward_model = AutoModelForSequenceClassification.from_pretrained(
+            rlhf_config.reward_model_path, 
+            num_labels=1,
+            # torch_dtype=torch.bfloat16,
+            load_in_8bit=True,
+            device_map={"": Accelerator().local_process_index}
+        )
+        self.reward_kwargs = {
+            "return_all_scores": True,
+            "function_to_apply": "none",
+            "batch_size": self._rlhf_config.ppo_batch_size,
+            "truncation": True,
+            "max_length": self._rlhf_config.output_max_length
+        }
+        self.reward_pipe = pipeline(
+            "sentiment-analysis",
+            model=self.reward_model,
+            # device_map={"": Accelerator().local_process_index},
+            # model_kwargs={"load_in_8bit": True},
+            model_kwargs=self.reward_kwargs,
+            tokenizer=self.reward_tokenizer,
+            return_token_type_ids=False,
+        )
+
+        
         ## Load the base model and tokenizer and define the PPO Trainer for RL
         self.base_tokenizer = self.create_tokenizer(rlhf_config.base_model_path)
+        pdb.set_trace()
         self.base_dataset=self.create_dataset(self.base_tokenizer)
         self.base_model = AutoModelForCausalLMWithValueHead.from_pretrained(
             rlhf_config.base_model_path,
@@ -95,32 +127,6 @@ class RL(Trainer):
             "max_length": rlhf_config.output_max_length
         }
 
-        ## Load the reward model and tokenizer and define the reward pipeline
-        self.reward_tokenizer = self.create_tokenizer(rlhf_config.reward_model_path)
-        self.reward_dataset=self.create_dataset(self.reward_tokenizer)
-        self.reward_model = AutoModelForSequenceClassification.from_pretrained(
-            rlhf_config.reward_model_path, 
-            num_labels=1,
-            # torch_dtype=torch.bfloat16,
-            load_in_8bit=True,
-            device_map={"": Accelerator().local_process_index}
-        )
-        self.reward_kwargs = {
-            "return_all_scores": True,
-            "function_to_apply": "none",
-            "batch_size": self._rlhf_config.ppo_batch_size,
-            "truncation": True,
-            "max_length": self._rlhf_config.output_max_length
-        }
-        self.reward_pipe = pipeline(
-            "sentiment-analysis",
-            model=self.reward_model,
-            # device_map={"": Accelerator().local_process_index},
-            # model_kwargs={"load_in_8bit": True},
-            model_kwargs=self.reward_kwargs,
-            tokenizer=self.reward_tokenizer,
-            return_token_type_ids=False,
-        )
 
         
     def create_tokenizer(self, model_name):
@@ -184,12 +190,14 @@ class RL(Trainer):
                 new_examples["query"].append(query)
                 new_examples["input_ids"].append(tokenized_question["input_ids"])
             return new_examples
+        
         # def preprocess_function(examples):
         #     queries = ["Question: " + q + "\n\nAnswer: " for q in examples[QA_CSV_HEADER_QUESTION]]
         #     input_ids = [tokenizer(q, truncation=True, ## TODO: max_length
         #                            max_length=self._rlhf_config.output_max_length)["input_ids"] for q in queries]
         #     return {"query": queries, "input_ids": input_ids}
         
+        pdb.set_trace()
         dataset = dataset.map(
             preprocess_function,
             batched=True,
@@ -248,4 +256,4 @@ config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29"
                           output_max_length=128
                           )
 rlhf_step3_rl = RL(config)
-rlhf_step3_rl.train("./models/rlhf_step3_rl")
+rlhf_step3_rl.train() ## TODO output_path="./models/rlhf_step3_rl"
