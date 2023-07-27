@@ -158,8 +158,8 @@ class RL(Trainer):
                 data_dir=args.dataset_subset_rl,
                 split=args.split,
                 use_auth_token=True,
-                num_proc=self.num_proc,
-                streaming=args.streaming,
+                # num_proc=self.num_proc,
+                # streaming=args.streaming,
             )
         ## TODO: if args.split in dataset.columns:
             # dataset = dataset[args.split] # Convert DatasetDict to Dataset
@@ -174,15 +174,26 @@ class RL(Trainer):
         # dataset = dataset.select(range(self._rlhf_config.dataset_subset_rl_train))
 
         def preprocess_function(examples):
-            queries = ["Question: " + q + "\n\nAnswer: " for q in examples[QA_CSV_HEADER_QUESTION]]
-            input_ids = [tokenizer(q, truncation=True, ## TODO: max_length
-                                   max_length=self._rlhf_config.output_max_length)["input_ids"] for q in queries]
-            return {"query": queries, "input_ids": input_ids}
-
+            new_examples = {
+                "query": [],
+                "input_ids": [],
+            }
+            for question in examples[QA_CSV_HEADER_QUESTION]:
+                query = "Question: " + question + "\n\nAnswer: "
+                tokenized_question = tokenizer(query, truncation=True)
+                new_examples["query"].append(query)
+                new_examples["input_ids"].append(tokenized_question["input_ids"])
+            return new_examples
+        # def preprocess_function(examples):
+        #     queries = ["Question: " + q + "\n\nAnswer: " for q in examples[QA_CSV_HEADER_QUESTION]]
+        #     input_ids = [tokenizer(q, truncation=True, ## TODO: max_length
+        #                            max_length=self._rlhf_config.output_max_length)["input_ids"] for q in queries]
+        #     return {"query": queries, "input_ids": input_ids}
+        
         dataset = dataset.map(
             preprocess_function,
             batched=True,
-            num_proc=self.num_proc,
+            num_proc=24, ## TODO self.num_proc,
             remove_columns=dataset.column_names,
         )
         dataset = dataset.filter(lambda x: len(x["input_ids"]) < self._rlhf_config.max_seq_length, 
