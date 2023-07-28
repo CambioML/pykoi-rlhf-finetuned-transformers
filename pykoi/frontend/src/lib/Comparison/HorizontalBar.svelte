@@ -122,7 +122,6 @@
     width: 100%;
   }
   .axis-text {
-    font-family: Arial;
     font-size: 12px;
   }
   .axis-line {

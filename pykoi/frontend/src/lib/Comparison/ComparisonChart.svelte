@@ -7,6 +7,7 @@
   import Table from "./Table.svelte";
   import Bar from "./Bar.svelte";
   import { data } from "./data";
+  import Heatmap from "./Heatmap.svelte";
 
   const dataStore = writable([]);
   let options = {
@@ -64,7 +65,7 @@
       </div>
       <div class="right-chart-3">
         <!-- <Bar /> -->
-        <CumulativeScore />
+        <Heatmap />
       </div>
     </div>
   </div>
@@ -172,7 +173,7 @@
     /* border: 2px solid black; */
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 10% 35% 35%;
+    grid-template-rows: 10% 35% 37.5%;
   }
 
   .right-chart-1 {
