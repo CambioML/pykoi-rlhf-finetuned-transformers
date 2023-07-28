@@ -1,14 +1,30 @@
 """Application module."""
-from typing import Any, Dict
-
-from flask import Flask, jsonify, request, send_from_directory
-from flask_cors import CORS
-from pyngrok import ngrok
+import os
 import socket
 
-# from flask_ngrok import run_with_ngrok
-
+from typing import Optional, Any, Dict
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from pyngrok import ngrok
+from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
+
+
+class UpdateQATable(BaseModel):
+    id: int
+    vote_status: str
+
+
+class RankingTableUpdate(BaseModel):
+    question: str
+    up_ranking_answer: str
+    low_ranking_answer: str
+
+
+class InferenceRankingTable(BaseModel):
+    n: Optional[int] = 2
 
 
 def find_free_port():
@@ -65,17 +81,17 @@ class Application:
             }
         )
 
-    def create_chatbot_route(self, app: Flask, component: Dict[str, Any]):
+    def create_chatbot_route(self, app: FastAPI, component: Dict[str, Any]):
         """
         Create chatbot routes for the application.
 
         Args:
-            app (Flask): The Flask application.
+            app (FastAPI): The FastAPI application.
             component (Dict[str, Any]): The component for which the routes are being created.
         """
 
-        @app.route("/chat/<message>", methods=["POST"])
-        def inference(message: str):
+        @app.post("/chat/{message}")
+        async def inference(message: str):
             try:
                 output = component["component"].model.predict(message)[0]
                 # insert question and answer into database
@@ -92,30 +108,28 @@ class Application:
             except Exception as ex:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
-        @app.route("/chat/qa_table/update", methods=["POST"])
-        def update_qa_table():
+        @app.post("/chat/qa_table/update")
+        async def update_qa_table(request_body: UpdateQATable):
             try:
-                request_body = request.get_json()
                 component["component"].database.update_vote_status(
-                    request_body["id"], request_body["vote_status"]
+                    request_body.id, request_body.vote_status
                 )
                 return {"log": "Table updated", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
-        @app.route("/chat/qa_table/close", methods=["GET"])
-        def close_qa_table():
+        @app.get("/chat/qa_table/close")
+        async def close_qa_table():
             try:
                 component["component"].database.close_connection()
                 return {"log": "Table closed", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
-        @app.route("/chat/ranking_table/<message>", methods=["POST"])
-        def inference_ranking_table(message: str):
+        @app.post("/chat/multi_responses/{message}")
+        async def inference_ranking_table(message: str, request_body: InferenceRankingTable):
             try:
-                request_body = request.get_json()
-                num_of_response = request_body.get("n", 2)
+                num_of_response = request_body.n
                 output = component["component"].model.predict(message, num_of_response)
                 # Check the type of each item in the output list
                 return {
@@ -127,62 +141,63 @@ class Application:
             except Exception as ex:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
-        @app.route("/chat/ranking_table/update", methods=["POST"])
-        def update_ranking_table():
+        @app.post("/chat/ranking_table/update")
+        async def update_ranking_table(request_body: RankingTableUpdate):
             try:
-                request_body = request.get_json()
                 component["component"].database.insert_ranking(
-                    request_body["question"],
-                    request_body["up_ranking_answer"],
-                    request_body["low_ranking_answer"],
+                    request_body.question,
+                    request_body.up_ranking_answer,
+                    request_body.low_ranking_answer,
                 )
                 return {"log": "Table updated", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
-        @app.route("/chat/ranking_table/retrieve", methods=["GET"])
-        def retrieve_ranking_table():
+        @app.get("/chat/ranking_table/retrieve")
+        async def retrieve_ranking_table():
             try:
+                print("retrieve_ranking_table")
                 rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
-    def create_feedback_route(self, app: Flask, component: Dict[str, Any]):
+    def create_feedback_route(self, app: FastAPI, component: Dict[str, Any]):
         """
         Create feedback routes for the application.
 
         Args:
-            app (Flask): The Flask application.
+            app (FastAPI): The FastAPI application.
             component (Dict[str, Any]): The component for which the routes are being created.
         """
 
-        @app.route("/chat/qa_table/retrieve", methods=["GET"])
-        def retrieve_qa_table():
+        @app.get("/chat/qa_table/retrieve")
+        async def retrieve_qa_table():
             try:
                 rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
-        @app.route("/chat/ranking_table/close", methods=["GET"])
-        def close_ranking_table():
+        @app.get("/chat/ranking_table/close")
+        async def close_ranking_table():
             try:
                 component["component"].database.close_connection()
                 return {"log": "Table closed", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
-    def create_chatbot_comparator_route(self, app: Flask, component: Dict[str, Any]):
+    def create_chatbot_comparator_route(self, app: FastAPI, component: Dict[str, Any]):
         """
         Create chatbot comparator routes for the application.
 
         Args:
-            app (Flask): The Flask application.
+            app (FastAPI): The FastAPI application.
             component (Dict[str, Any]): The component for which the routes are being created.
         """
-        @app.route("/chat/comparator/<message>", methods=["POST"])
-        def compare(message: str):
+
+        @app.post("/chat/comparator/{message}")
+        async def compare(message: str):
             try:
                 output_dict, id_list = {}, []
                 # TODO: refactor to run multiple models in parallel using threading
@@ -209,12 +224,19 @@ class Application:
         """
         Run the application.
         """
-        app = Flask(__name__)
-        CORS(app)  # Allows cross-origin requests
+        app = FastAPI()
 
-        @app.route("/components", methods=["GET"])
-        def get_components():
-            return jsonify(
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=['*'],
+            allow_credentials=True,
+            allow_methods=['*'],
+            allow_headers=['*'],
+        )
+
+        @app.get("/components")
+        async def get_components():
+            return JSONResponse(
                 [
                     {
                         "id": component["id"],
@@ -234,10 +256,10 @@ class Application:
                 data_source (Any): The data source.
             """
 
-            @app.route(f"/data/{id}", methods=["GET"], endpoint=id)
-            def get_data():
+            @app.get(f"/data/{id}")
+            async def get_data():
                 data = data_source.fetch_func()
-                return jsonify(data)
+                return JSONResponse(data)
 
         for id, data_source in self.data_sources.items():
             create_data_route(id, data_source)
@@ -250,25 +272,31 @@ class Application:
             if component["svelte_component"] == "ChatbotComparator":
                 self.create_chatbot_comparator_route(app, component)
 
-        @app.route("/")
-        def base():
-            return send_from_directory("frontend/dist", "index.html")
+        app.mount(
+            "/",
+            StaticFiles(
+                directory=os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    "frontend/dist"),
+                html=True),
+            name="static")
 
-        @app.route("/<path:path>")
-        def home(path: str):
-            return send_from_directory("frontend/dist", path)
+        @app.get("/{path:path}")
+        async def read_item(path: str):
+            return {"path": path}
 
         # debug mode should be set to False in production because
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
+        port = find_free_port()
         if self._share:
-            port = find_free_port()
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
-            app.run(port=port, debug=self._debug)
+            import uvicorn
+            uvicorn.run(app, host="127.0.0.1", port=port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
-            port = find_free_port()
-            app.run(port=port, debug=self._debug)
+            import uvicorn
+            uvicorn.run(app, host="127.0.0.1", port=port)
