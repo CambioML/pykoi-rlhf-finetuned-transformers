@@ -59,13 +59,14 @@
       </div>
     </div>
     <div class="right-charts">
-      <div class="right-chart-1" />
-      <div class="right-chart-2">
+      <div class="right-chart-1">
         <HorizontalBar />
       </div>
-      <div class="right-chart-3">
-        <!-- <Bar /> -->
+      <div class="right-chart-2">
         <Heatmap />
+      </div>
+      <div class="right-chart-3">
+        <CumulativeScore />
       </div>
     </div>
   </div>
@@ -173,7 +174,8 @@
     /* border: 2px solid black; */
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 10% 35% 37.5%;
+    grid-template-rows: 33% 30% 33%;
+    gap: 1%;
   }
 
   .right-chart-1 {

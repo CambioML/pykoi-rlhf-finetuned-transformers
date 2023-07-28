@@ -69,7 +69,7 @@
     top: 50,
     bottom: 0,
     left: 65,
-    right: 15,
+    right: 25,
   };
   $: width = outerWidth - margin.left - margin.right;
   $: height = outerHeight - margin.top - margin.bottom;

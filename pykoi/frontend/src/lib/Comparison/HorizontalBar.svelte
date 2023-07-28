@@ -23,9 +23,9 @@
   let outerWidth = 500;
 
   let margin = {
-    top: 30,
+    top: 50,
     bottom: 0,
-    left: 45,
+    left: 65,
     right: 15,
   };
 
