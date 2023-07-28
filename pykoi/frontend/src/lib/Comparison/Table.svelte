@@ -144,22 +144,8 @@
         {/each}
       </tbody>
     </table>
-    <!-- pagination -->
-    {#if pages > 1}
-      <div class="pretty-pager">
-        <button on:click={() => (page = page > 0 ? page - 1 : 0)}
-          >Previous</button
-        >
-        {#each Array(pages).fill() as _, i}
-          <button on:click={() => (page = i)}>{i + 1}</button>
-        {/each}
-        <button
-          on:click={() => (page = page < pages - 1 ? page + 1 : pages - 1)}
-          >Next</button
-        >
-      </div>
-    {/if}
   </div>
+  <br />
 </div>
 
 <style>
@@ -170,7 +156,7 @@
 
   .table {
     margin: auto;
-    width: 100%;
+    width: 90%;
   }
 
   .pretty-pager {

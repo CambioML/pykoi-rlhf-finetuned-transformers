@@ -143,12 +143,16 @@
           fill={getFillColor(rowModel, colModel)}
           rx="4"
           ry="4"
+          class="model-path"
+          data-model={rowModel}
         />
         <text
           x={margin.left + xScale(colModel) + xScale.bandwidth() / 2}
           y={margin.top + yScale(rowModel) + yScale.bandwidth() / 2}
           text-anchor="middle"
           dominant-baseline="middle"
+          class="model-path"
+          data-model={rowModel}
         >
           {formatter(diffs[rowModel][colModel])}
         </text>

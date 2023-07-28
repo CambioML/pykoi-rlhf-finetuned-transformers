@@ -1,38 +1,15 @@
 <script>
-  import Linechart from "./LineChart.svelte";
   import BumpChart from "./BumpChart.svelte";
-  import CumulativeScore from "./CumulativeScore.svelte";
   import HorizontalBar from "./HorizontalBar.svelte";
   import { writable } from "svelte/store";
   import Table from "./Table.svelte";
-  import Bar from "./Bar.svelte";
   import { data } from "./data";
   import Heatmap from "./Heatmap.svelte";
 
-  const dataStore = writable([]);
   let options = {
     /* Your options here */
   };
-
-  function generateData(size) {
-    return Array.from({ length: size }, (_, i) => ({
-      Question: `What is this question asking you ${i + 1}?`,
-      Answer: `The answer to the asked questio tatere rea raer aer ea rearerearea reareara eran is simply is ${
-        1990 + i * 5
-      }`,
-      Feedback: (i % 5) - 2,
-    }));
-  }
-
-  // slider value
-  let sliderValue = 20;
-  // let data = [];
-  // $: {
-  //     dataStore.set(generateData(sliderValue));
-  //     dataStore.subscribe(value => {
-  //         data = value;
-  //     });
-  // }
+  let models = Array.from(new Set(data.map((d) => d.model)));
 </script>
 
 <div class="main-container">
@@ -46,10 +23,13 @@
     <div class="left-charts">
       <div class="chart-captions">
         <h4>Model Comparisons</h4>
-        <p>
+        <!-- <p>
           View the performance of your model over time. GPU stats are available
           to the right.
-        </p>
+        </p> -->
+        {#each models as model}
+          <button>{model}</button>
+        {/each}
       </div>
       <div class="eval-main">
         <BumpChart />
@@ -59,14 +39,13 @@
       </div>
     </div>
     <div class="right-charts">
-      <div class="right-chart-1">
+      <div class="right-chart-1" />
+      <div class="right-chart-2">
         <HorizontalBar />
       </div>
-      <div class="right-chart-2">
-        <Heatmap />
-      </div>
       <div class="right-chart-3">
-        <CumulativeScore />
+        <!-- <CumulativeStack /> -->
+        <Heatmap />
       </div>
     </div>
   </div>
@@ -174,7 +153,7 @@
     /* border: 2px solid black; */
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 33% 30% 33%;
+    grid-template-rows: 10% 33% 33%;
     gap: 1%;
   }
 

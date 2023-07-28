@@ -153,9 +153,9 @@
       />
       <path
         class="model-path"
+        data-model={models[i]}
         d={pathLine(d)}
         stroke={colorScale(models[i])}
-        data-model={models[i]}
       />
     {/each}
   </svg>

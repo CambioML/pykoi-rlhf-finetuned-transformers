@@ -1,32 +1,36 @@
 <script>
   import { onMount } from "svelte";
-  import { select } from "d3-selection";
-  import { rankChatLog } from "../../store";
+  import { compareChatLog } from "../../store";
   import Sortable from "sortablejs";
+
+  export let numModels = 1;
+  export let models = [0];
 
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
-  let numModels = 4;
   $: gridTemplate = "1fr ".repeat(numModels).trim();
   let answerOrder = [];
 
-  onMount(() => {
-    // getDataFromDB();
-    const answersContainer = document.querySelector(".answers");
-    const sortable = new Sortable(answersContainer, {
-      animation: 150,
-      onUpdate: function (/**Event*/ evt) {
-        answerOrder = sortable.toArray();
-      },
-    });
-    answerOrder = sortable.toArray();
-    updateSelectValues();
+  onMount(async () => {
+    // Give the DOM some time to render
+    await new Promise((r) => setTimeout(r, 200));
+    if (answersContainer) {
+      const sortable = new Sortable(answersContainer, {
+        animation: 150,
+        onUpdate: function (/**Event*/ evt) {
+          answerOrder = sortable.toArray();
+        },
+      });
+      answerOrder = sortable.toArray();
+      updateSelectValues();
+    }
   });
 
   async function getDataFromDB() {
     const response = await fetch("/chat/ranking_table/retrieve");
     const data = await response.json();
+    console.log("data", data);
     const dbRows = data["rows"];
     const formattedRows = dbRows.map((row) => ({
       id: row[0],
@@ -34,7 +38,7 @@
       up_ranking_answer: row[2],
       low_ranking_answer: row[3],
     }));
-    $rankChatLog = [...formattedRows];
+    $compareChatLog = [...formattedRows];
   }
 
   const askModel = async (event) => {
@@ -47,9 +51,9 @@
       up_ranking_answer: "Loading...",
       low_ranking_answer: "Loading...",
     };
-    $rankChatLog = [...$rankChatLog, currentEntry];
+    $compareChatLog = [...$compareChatLog, currentEntry];
 
-    const response = await fetch(`/chat/multi_responses/${mymessage}`, {
+    const response = await fetch(`/chat/comparator/${mymessage}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,9 +65,16 @@
 
     if (response.ok) {
       const data = await response.json();
-      currentEntry["up_ranking_answer"] = data["answer"][0];
-      currentEntry["low_ranking_answer"] = data["answer"][1];
-      rankChatLog.update((state) => {
+      console.log("data", data);
+      models = Object.keys(data["answer"]);
+      numModels = models.length;
+      console.log("models", models);
+
+      for (let model of models) {
+        currentEntry[model] = data["answer"][model];
+      }
+
+      compareChatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
       });
@@ -134,7 +145,7 @@
   }
 
   $: {
-    console.log(answerOrder);
+    console.log($compareChatLog);
   }
 </script>
 
@@ -153,10 +164,10 @@
   <div class="ranked-chat">
     <section class="chatbox">
       <div class="chat-log">
-        {#each $rankChatLog as message, index (index)}
+        {#each $compareChatLog as message, index (index)}
           <div
             class="chat-message"
-            use:scrollToView={index === $rankChatLog.length - 1}
+            use:scrollToView={index === $compareChatLog.length - 1}
           >
             <div class="chat-message-center">
               <div class="avatar">
@@ -173,19 +184,17 @@
                   style="display: grid; grid-template-columns: {gridTemplate}; gap: .25%; width: 100%; margin: auto;"
                 >
                   {#each Array(numModels).fill() as _, i (i)}
-                    <div class="answer" id={`answer-${i}`}>
-                      <h5 class="bold underline">Model {i + 1}:</h5>
+                    <div class="answer" id={`answer-${i}-${index}`}>
+                      <h5 class="bold underline">{models[i]}:</h5>
                       <p>
-                        Sorted index: {answerOrder.indexOf(`answer-${i}`) + 1}
+                        {message[models[i]]}
                       </p>
                       <div>
                         Rank:
                         <select>
-                          <option>1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
+                          {#each Array(numModels).fill() as n, i}
+                            <option>{i + 1}</option>
+                          {/each}
                         </select>
                       </div>
                     </div>

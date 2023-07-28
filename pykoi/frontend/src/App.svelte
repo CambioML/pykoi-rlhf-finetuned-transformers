@@ -14,6 +14,7 @@
     Chatbot: Chat,
     Dropdown: Dropdown,
     Feedback: Feedback,
+    ChatbotComparator: ComparisonChat,
   };
 
   const setSelectedPage = (component) => {
@@ -50,12 +51,9 @@
 {/if}
 
 <!-- Loaded selected component (tab) -->
-<!-- {#if $selectedPage}
+{#if $selectedPage}
   <svelte:component
     this={componentMap[$selectedPage.svelte_component]}
     {...$selectedPage.props}
   />
-{/if} -->
-<!-- <QuestionRating /> -->
-<ComparisonChat />
-<ComparisonChart />
+{/if}
