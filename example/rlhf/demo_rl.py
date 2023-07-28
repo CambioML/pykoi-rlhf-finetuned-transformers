@@ -1,5 +1,7 @@
 ## pip install xformers ## TODO
-import pdb; 
+## running command:
+## accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 /home/ubuntu/git/pykoi/example/rlhf/demo_rl.py
+import pdb; ## TODO
 
 import pykoi
 from pykoi import RLHFConfig
@@ -29,6 +31,7 @@ from trl.core import LengthSampler
 from trl.trainer.utils import ConstantLengthDataset, PeftSavingCallback
 
 
+## TODO: move constantent
 QA_CSV_HEADER_ID = 'ID'
 QA_CSV_HEADER_QUESTION = 'Question'
 QA_CSV_HEADER_ANSWER = 'Answer'
@@ -97,7 +100,6 @@ class RL(Trainer):
         
         ## Load the base model and tokenizer and define the PPO Trainer for RL
         self.base_tokenizer = self.create_tokenizer(rlhf_config.base_model_path)
-        # pdb.set_trace() ## TODO
         self.base_dataset=self.create_dataset(self.base_tokenizer)
         self.base_model = AutoModelForCausalLMWithValueHead.from_pretrained(
             rlhf_config.base_model_path,
@@ -152,10 +154,10 @@ class RL(Trainer):
                                      QA_CSV_HEADER_ANSWER]]
             print("My local database has {} samples".format(my_data_pd.shape[0]))
             dataset = Dataset.from_dict(my_data_pd)
-        elif args.dataset_type == "local_csv":
+        elif args.dataset_type == "local_csv": ## TODO: test
             dataset = load_dataset('csv', data_files=args.dataset_name)
             dataset = dataset[args.split] # Convert DatasetDict to Dataset
-        elif args.dataset_type == "huggingface":
+        elif args.dataset_type == "huggingface": ## TODO: test
             dataset = load_dataset(
                 args.dataset_name,
                 data_dir=args.dataset_subset_rl,
@@ -174,6 +176,7 @@ class RL(Trainer):
         # print(f"Size of the train set: {len(dataset['train'])}. \
         #       Size of the validation set: {len(dataset['test'])}")
         
+        ## TODO: evaluate on eval
         # dataset = dataset.select(range(self._rlhf_config.dataset_subset_rl_train))
 
         def preprocess_function(examples):
@@ -202,7 +205,7 @@ class RL(Trainer):
         return dataset
 
 
-    def train(self):
+    def train(self, save_checkpoints_path=None):
         ## Initialize accelerator
         self.ppo_trainer.dataloader = self.accelerator.prepare(self.ppo_trainer.dataloader)
 
@@ -233,8 +236,25 @@ class RL(Trainer):
             ## save weights
             if self._rlhf_config.save_freq and epoch and \
                 epoch % self._rlhf_config.save_freq == 0:
-                self.ppo_trainer.save_pretrained(
-                    os.path.join(self._rlhf_config.output_dir, f"rlhf_step3_rl_epoch_{epoch}")) ## TODO: only save adapter
+                if save_checkpoints_path is None:
+                    save_checkpoints_path = os.path.join(
+                        save_checkpoints_path, "checkpoints",
+                        f"checkpoints_epoch_{epoch}")
+                self.ppo_trainer.model.save(save_checkpoints_path) ## TODO: only save adapter
+
+
+    def save(self, output_path=None):    
+        if output_path is None:
+            output_path = os.path.join(
+                self._rlhf_config.output_dir, 
+                # "final_lora_models",
+                self._rlhf_config.rl_lora_path)
+        self.ppo_trainer.save_pretrained(output_path)
+
+
+    def train_and_save(self, output_path=None):
+        self.train(save_checkpoints_path=output_path)
+        self.save(output_path)
 
 
 config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29", # "meta-llama/Llama-2-7b-hf", 
@@ -245,8 +265,8 @@ config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29"
                           save_freq=1,
                           ppo_batch_size=32,
                           ppo_epochs=1,
-                          total_epochs=2,
+                          total_epochs=1,
+                          output_dir="./models/rlhf_step3_rl"
                           )
 rlhf_step3_rl = RL(config)
-rlhf_step3_rl.train() ## TODO output_path="./models/rlhf_step3_rl"
-
+rlhf_step3_rl.train_and_save()
