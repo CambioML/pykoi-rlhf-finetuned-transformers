@@ -307,3 +307,9 @@ class RLHFConfig:
     adap_kl_ctrl: Optional[bool] = field(
         default=True, metadata={"help": "Use adaptive KL control, otherwise linear"}
     )
+    rl_lora_path: Optional[str] = field(
+        default="step1_reinforcement_learning_final_lora_weights/",
+        metadata={
+            "help": "Output directory for step 1 supervised finetuning's Lora weights."
+        },
+    )
