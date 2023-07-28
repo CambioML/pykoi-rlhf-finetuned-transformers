@@ -182,5 +182,5 @@ test_data
 model/
 models/
 
-# poetry dist
-dist/
+# poetry dist only
+/dist/
