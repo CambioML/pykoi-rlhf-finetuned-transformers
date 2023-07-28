@@ -49,7 +49,7 @@
     };
     $rankChatLog = [...$rankChatLog, currentEntry];
 
-    const response = await fetch(`/chat/ranking_table/${mymessage}`, {
+    const response = await fetch(`/chat/multi_responses/${mymessage}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
