@@ -44,9 +44,9 @@
   let outerWidth;
 
   let margin = {
-    top: 30,
+    top: 50,
     bottom: 0,
-    left: 45,
+    left: 65,
     right: 15,
   };
 
@@ -153,9 +153,9 @@
       />
       <path
         class="model-path"
+        data-model={models[i]}
         d={pathLine(d)}
         stroke={colorScale(models[i])}
-        data-model={models[i]}
       />
     {/each}
   </svg>

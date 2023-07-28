@@ -81,7 +81,7 @@ export const comparisonData = [
     answer: "Claude's fourth unique answer.",
   },
 
-  { model: "llama", QID: 5, rank: 1, answer: "Llama's fifth unique answer." },
+  { model: "llama", QID: 5, rank: 4, answer: "Llama's fifth unique answer." },
   {
     model: "gpt3.5",
     QID: 5,
@@ -89,7 +89,7 @@ export const comparisonData = [
     answer: "GPT-3.5's fifth unique answer.",
   },
   { model: "gpt4", QID: 5, rank: 3, answer: "GPT-4's fifth unique answer." },
-  { model: "claude", QID: 5, rank: 4, answer: "Claude's fifth unique answer." },
+  { model: "claude", QID: 5, rank: 1, answer: "Claude's fifth unique answer." },
 
   { model: "llama", QID: 6, rank: 2, answer: "Llama's sixth unique answer." },
   {
@@ -182,4 +182,153 @@ export const data = [
   },
   { model: "gpt4", QID: 6, rank: 3, answer: "GPT-4's sixth unique answer." },
   { model: "claude", QID: 6, rank: 4, answer: "'s sixth uniq." },
+  { model: "llama", QID: 7, rank: 4, answer: "Llama's seventh unique answer." },
+  {
+    model: "gpt3.5",
+    QID: 7,
+    rank: 3,
+    answer: "GPT-3.5's seventh unique answer.",
+  },
+  { model: "gpt4", QID: 7, rank: 2, answer: "GPT-4's seventh unique answer." },
+  {
+    model: "claude",
+    QID: 7,
+    rank: 1,
+    answer: "Claude's seventh unique answer.",
+  },
+
+  { model: "llama", QID: 8, rank: 3, answer: "Llama's eighth unique answer." },
+  {
+    model: "gpt3.5",
+    QID: 8,
+    rank: 4,
+    answer: "GPT-3.5's eighth unique answer.",
+  },
+  { model: "gpt4", QID: 8, rank: 1, answer: "GPT-4's eighth unique answer." },
+  {
+    model: "claude",
+    QID: 8,
+    rank: 2,
+    answer: "Claude's eighth unique answer.",
+  },
+
+  { model: "llama", QID: 9, rank: 2, answer: "Llama's ninth unique answer." },
+  {
+    model: "gpt3.5",
+    QID: 9,
+    rank: 1,
+    answer: "GPT-3.5's ninth unique answer.",
+  },
+  { model: "gpt4", QID: 9, rank: 4, answer: "GPT-4's ninth unique answer." },
+  { model: "claude", QID: 9, rank: 3, answer: "Claude's ninth unique answer." },
+
+  { model: "llama", QID: 10, rank: 4, answer: "Llama's tenth unique answer." },
+  {
+    model: "gpt3.5",
+    QID: 10,
+    rank: 3,
+    answer: "GPT-3.5's tenth unique answer.",
+  },
+  { model: "gpt4", QID: 10, rank: 2, answer: "GPT-4's tenth unique answer." },
+  {
+    model: "claude",
+    QID: 10,
+    rank: 1,
+    answer: "Claude's tenth unique answer.",
+  },
+
+  {
+    model: "llama",
+    QID: 11,
+    rank: 3,
+    answer: "Llama's eleventh unique answer.",
+  },
+  {
+    model: "gpt3.5",
+    QID: 11,
+    rank: 4,
+    answer: "GPT-3.5's eleventh unique answer.",
+  },
+  {
+    model: "gpt4",
+    QID: 11,
+    rank: 1,
+    answer: "GPT-4's eleventh unique answer.",
+  },
+  {
+    model: "claude",
+    QID: 11,
+    rank: 2,
+    answer: "Claude's eleventh unique answer.",
+  },
+
+  {
+    model: "llama",
+    QID: 12,
+    rank: 2,
+    answer: "Llama's twelfth unique answer.",
+  },
+  {
+    model: "gpt3.5",
+    QID: 12,
+    rank: 1,
+    answer: "GPT-3.5's twelfth unique answer.",
+  },
+  { model: "gpt4", QID: 12, rank: 4, answer: "GPT-4's twelfth unique answer." },
+  {
+    model: "claude",
+    QID: 12,
+    rank: 3,
+    answer: "Claude's twelfth unique answer.",
+  },
+
+  {
+    model: "llama",
+    QID: 13,
+    rank: 4,
+    answer: "Llama's thirteenth unique answer.",
+  },
+  {
+    model: "gpt3.5",
+    QID: 13,
+    rank: 3,
+    answer: "GPT-3.5's thirteenth unique answer.",
+  },
+  {
+    model: "gpt4",
+    QID: 13,
+    rank: 2,
+    answer: "GPT-4's thirteenth unique answer.",
+  },
+  {
+    model: "claude",
+    QID: 13,
+    rank: 4,
+    answer: "Claude's thirteenth unique answer.",
+  },
+
+  {
+    model: "llama",
+    QID: 14,
+    rank: 3,
+    answer: "Llama's fourteenth unique answer.",
+  },
+  {
+    model: "gpt3.5",
+    QID: 14,
+    rank: 1,
+    answer: "GPT-3.5's fourteenth unique answer.",
+  },
+  {
+    model: "gpt4",
+    QID: 14,
+    rank: 1,
+    answer: "GPT-4's fourteenth unique answer.",
+  },
+  {
+    model: "claude",
+    QID: 14,
+    rank: 1,
+    answer: "Claude's fourteenth unique answer.",
+  },
 ];

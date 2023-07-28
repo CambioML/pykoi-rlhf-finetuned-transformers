@@ -139,7 +139,7 @@
           document
             .querySelectorAll(".model-path, .model-path-outer, .model-circle")
             .forEach((el) => {
-              el.style.opacity = 0.2;
+              el.style.opacity = 0.12;
             });
           document
             .querySelectorAll(
@@ -153,7 +153,7 @@
           document
             .querySelectorAll(".model-path, .model-path-outer, .model-circle")
             .forEach((el) => {
-              el.style.opacity = 0.2;
+              el.style.opacity = 0.12;
             });
           document
             .querySelectorAll(
@@ -193,7 +193,7 @@
             document
               .querySelectorAll(".model-path, .model-path-outer, .model-circle")
               .forEach((el) => {
-                el.style.opacity = 0.2;
+                el.style.opacity = 0.12;
               });
             document
               .querySelectorAll(
@@ -207,7 +207,7 @@
             document
               .querySelectorAll(".model-path, .model-path-outer, .model-circle")
               .forEach((el) => {
-                el.style.opacity = 0.2;
+                el.style.opacity = 0.12;
               });
             document
               .querySelectorAll(
@@ -294,14 +294,14 @@
 
   .model-path {
     fill: none;
-    stroke-width: 15;
+    stroke-width: 5;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
   .model-path-outer {
     fill: none;
-    stroke-width: 18;
+    stroke-width: 8;
     stroke-linecap: round;
     stroke-linejoin: round;
   }

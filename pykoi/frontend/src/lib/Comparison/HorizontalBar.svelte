@@ -23,9 +23,9 @@
   let outerWidth = 500;
 
   let margin = {
-    top: 30,
+    top: 50,
     bottom: 0,
-    left: 45,
+    left: 65,
     right: 15,
   };
 
@@ -67,9 +67,11 @@
 
     <!-- x-ticks -->
     {#each xScale.ticks() as tick}
-      <g transform={`translate(${xScale(tick)}, ${height - margin.bottom})`}>
-        <text class="axis-text" y="15" text-anchor="middle">{tick}</text>
-      </g>
+      {#if tick % 2 == 0}
+        <g transform={`translate(${xScale(tick)}, ${height - margin.bottom})`}>
+          <text class="axis-text" y="15" text-anchor="middle">{tick}</text>
+        </g>
+      {/if}
     {/each}
 
     <!-- bars -->

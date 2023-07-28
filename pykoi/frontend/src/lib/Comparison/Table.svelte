@@ -2,11 +2,52 @@
   import { onMount } from "svelte";
   import { scaleLinear } from "d3-scale";
   import Cell from "./Cell.svelte";
+  import { mean, deviation } from "d3-array";
+  import { format } from "d3-format";
 
   export let data;
   export let options;
 
   let maxCellChars = 25;
+  const formatter = format(".2f");
+
+  function calculateModelStats(data) {
+    // Group the data by model
+    let groupedByModel = data.reduce((acc, curr) => {
+      if (!acc[curr.model]) {
+        acc[curr.model] = [];
+      }
+      acc[curr.model].push(curr.rank);
+      return acc;
+    }, {});
+
+    // Calculate overall rank, average rank, and standard deviation for each model
+    let modelStats = Object.entries(groupedByModel).map(([model, ranks]) => {
+      // Count rank occurrences
+      let rankCounts = ranks.reduce((acc, rank) => {
+        acc[rank] = (acc[rank] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Determine overall rank by finding the most frequent rank
+      let overallRank = Object.entries(rankCounts).reduce((a, b) =>
+        b[1] > a[1] ? b : a
+      )[0];
+
+      return {
+        model,
+        overall_rank: Number(overallRank),
+        average_rank: formatter(mean(ranks)),
+        standard_deviation_rank: formatter(deviation(ranks)),
+      };
+    });
+
+    return modelStats;
+  }
+
+  let modelStats = calculateModelStats(data);
+
+  console.log("mssssd", modelStats);
 
   const defaultOptions = { columns: {}, style: "normal", paged: 25 };
   options = { ...defaultOptions, ...options };
@@ -15,6 +56,8 @@
     .domain([-1, 0, 1])
     .range(["#FF5470", "#f8f8f8", "#00ebc7"]);
 
+  // model, overall rank, avg rank, std rank
+
   let { sortable, index, paged } = options;
   let sortKey = undefined;
   let sortDirection = true;
@@ -22,11 +65,11 @@
   if (sortable && index) {
     throw new Error("A table can either be ranked or sortable, but not both");
   }
-  let columns = Object.keys(data[0]).map((key) => {
+  let columns = Object.keys(modelStats[0]).map((key) => {
     const opts = options.columns[key] || {};
     return {
       key: key,
-      type: opts.type || typeof data[0][key],
+      type: opts.type || typeof modelStats[0][key],
       options: opts,
     };
   });
@@ -37,7 +80,7 @@
   sortable = 1;
   $: {
     if (sortKey) {
-      data = data.slice().sort((a, b) => {
+      modelStats = modelStats.slice().sort((a, b) => {
         let as = a[sortKey];
         let bs = b[sortKey];
         if (as == bs) return JSON.stringify(a).localeCompare(JSON.stringify(b));
@@ -47,7 +90,7 @@
       });
     }
     let offset = page * paged;
-    rows = data.slice(offset, offset + (paged || data.length));
+    rows = modelStats.slice(offset, offset + (paged || modelStats.length));
     pages = paged ? Math.ceil(data.length / paged) : 1;
   }
 
@@ -101,22 +144,8 @@
         {/each}
       </tbody>
     </table>
-    <!-- pagination -->
-    {#if pages > 1}
-      <div class="pretty-pager">
-        <button on:click={() => (page = page > 0 ? page - 1 : 0)}
-          >Previous</button
-        >
-        {#each Array(pages).fill() as _, i}
-          <button on:click={() => (page = i)}>{i + 1}</button>
-        {/each}
-        <button
-          on:click={() => (page = page < pages - 1 ? page + 1 : pages - 1)}
-          >Next</button
-        >
-      </div>
-    {/if}
   </div>
+  <br />
 </div>
 
 <style>
@@ -127,7 +156,7 @@
 
   .table {
     margin: auto;
-    width: 100%;
+    width: 90%;
   }
 
   .pretty-pager {
