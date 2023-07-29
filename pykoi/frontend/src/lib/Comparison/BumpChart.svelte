@@ -5,7 +5,7 @@
   import { data } from "./data";
 
   const firstData = data
-    .filter((d) => d.QID === 1)
+    .filter((d) => d.qid === 1)
     .map((d) => ({ model: d.model, rank: d.rank }));
 
   console.log("firstData", firstData);
@@ -28,7 +28,7 @@
 
   // scales
   $: xScale = scalePoint()
-    .domain(data.map((d) => d.QID))
+    .domain(data.map((d) => d.qid))
     .padding(0.3)
     .range([margin.left, width - margin.right]);
 
@@ -43,7 +43,7 @@
 
   // the path generator
   $: pathLine = line()
-    .x((d) => xScale(d.QID))
+    .x((d) => xScale(d.qid))
     .y((d) => yScale(d.rank));
   // .curve(curveBasis)
 
@@ -181,8 +181,8 @@
       />
     {/each}
 
-    {#each data as d (d.model + d.QID)}
-      <g transform={`translate(${xScale(d.QID)}, ${yScale(d.rank)})`}>
+    {#each data as d (d.model + d.qid)}
+      <g transform={`translate(${xScale(d.qid)}, ${yScale(d.rank)})`}>
         <circle
           r={(d.answer.length / 2) * 0 + 12}
           fill={colorScale(d.model)}

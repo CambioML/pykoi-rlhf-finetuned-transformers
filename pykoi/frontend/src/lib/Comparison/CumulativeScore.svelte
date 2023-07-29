@@ -18,11 +18,11 @@
         modelRanks[item.model] += invertedRank;
       }
 
-      // If the QID hasn't been seen before, add a new object to the cumulativeRanks array
-      if (!cumulativeRanks[item.QID - 1]) {
-        cumulativeRanks[item.QID - 1] = { ...modelRanks, QID: item.QID };
+      // If the qid hasn't been seen before, add a new object to the cumulativeRanks array
+      if (!cumulativeRanks[item.qid - 1]) {
+        cumulativeRanks[item.qid - 1] = { ...modelRanks, qid: item.qid };
       } else {
-        cumulativeRanks[item.QID - 1][item.model] = modelRanks[item.model];
+        cumulativeRanks[item.qid - 1][item.model] = modelRanks[item.model];
       }
     });
 
@@ -35,7 +35,7 @@
   let maxVal = max(Object.values(sumData[sumData.length - 1]));
 
   const firstData = data
-    .filter((d) => d.QID === 1)
+    .filter((d) => d.qid === 1)
     .map((d) => ({ model: d.model, rank: d.rank }));
 
   let models = Array.from(new Set(data.map((d) => d.model)));
@@ -55,7 +55,7 @@
 
   // scales
   $: xScale = scalePoint()
-    .domain(data.map((d) => d.QID))
+    .domain(data.map((d) => d.qid))
     .padding(0.3)
     .range([margin.left, width - margin.right]);
 
@@ -69,12 +69,12 @@
 
   // the path generator
   $: pathLine = line()
-    .x((d) => xScale(d.QID))
+    .x((d) => xScale(d.qid))
     .y((d) => yScale(d.rank))
     .curve(curveStepBefore);
 
   $: modelData = models.map((model) =>
-    sumData.map((d) => ({ model: model, QID: d.QID, rank: maxVal - d[model] }))
+    sumData.map((d) => ({ model: model, qid: d.qid, rank: maxVal - d[model] }))
   );
   $: console.log(modelData);
 </script>

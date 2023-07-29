@@ -25,11 +25,11 @@
         modelRanks[item.model] += invertedRank;
       }
 
-      // If the QID hasn't been seen before, add a new object to the cumulativeRanks array
-      if (!cumulativeRanks[item.QID - 1]) {
-        cumulativeRanks[item.QID - 1] = { ...modelRanks, QID: item.QID };
+      // If the qid hasn't been seen before, add a new object to the cumulativeRanks array
+      if (!cumulativeRanks[item.qid - 1]) {
+        cumulativeRanks[item.qid - 1] = { ...modelRanks, qid: item.qid };
       } else {
-        cumulativeRanks[item.QID - 1][item.model] = modelRanks[item.model];
+        cumulativeRanks[item.qid - 1][item.model] = modelRanks[item.model];
       }
     });
 
@@ -52,7 +52,7 @@
   const sumData = calculateCumulativeRanks(data);
   console.log("sumData", sumData);
 
-  const models = Object.keys(sumData[0]).filter((d) => d != "QID");
+  const models = Object.keys(sumData[0]).filter((d) => d != "qid");
 
   const stackd = stack().keys(models).order(stackOrderReverse);
 
@@ -61,7 +61,7 @@
   let maxValue = max(stackedSeries, (d) => max(d, (d) => d[1]));
 
   $: xScale = scaleBand()
-    .domain(sumData.map((d) => d.QID))
+    .domain(sumData.map((d) => d.qid))
     .range([margin.left, width - margin.right]);
 
   $: yScale = scaleLinear()
@@ -73,13 +73,13 @@
     .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
 
   $: areaGenerator = area()
-    .x((d, i) => xScale(d.data.QID) + xScale.bandwidth() / 2)
+    .x((d, i) => xScale(d.data.qid) + xScale.bandwidth() / 2)
     .y0((d) => yScale(d[0]))
     .y1((d) => yScale(d[1]))
     .curve(curveStepBefore);
 
   $: pathLine = line()
-    .x((d, i) => xScale(d.data.QID) + xScale.bandwidth() / 2)
+    .x((d, i) => xScale(d.data.qid) + xScale.bandwidth() / 2)
     .y((d) => yScale(d[1]))
     .curve(curveStepBefore);
 </script>

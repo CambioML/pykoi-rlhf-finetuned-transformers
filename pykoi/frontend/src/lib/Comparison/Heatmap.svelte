@@ -8,12 +8,12 @@
   const formatter = format(".1f");
 
   function calculateDiffs(data) {
-    // Group the data by QID
-    let groupedByQid = data.reduce((acc, curr) => {
-      if (!acc[curr.QID]) {
-        acc[curr.QID] = [];
+    // Group the data by qid
+    let groupedByqid = data.reduce((acc, curr) => {
+      if (!acc[curr.qid]) {
+        acc[curr.qid] = [];
       }
-      acc[curr.QID].push(curr);
+      acc[curr.qid].push(curr);
       return acc;
     }, {});
 
@@ -30,8 +30,8 @@
     }, {});
 
     // Populate the diffs object
-    for (let qid in groupedByQid) {
-      let group = groupedByQid[qid];
+    for (let qid in groupedByqid) {
+      let group = groupedByqid[qid];
       for (let model1 of models) {
         for (let model2 of models) {
           let data1 = group.find((d) => d.model === model1);

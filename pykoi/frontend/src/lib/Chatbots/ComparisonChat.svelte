@@ -23,14 +23,14 @@
         },
       });
       answerOrder = sortable.toArray();
-      updateSelectValues();
+      // updateSelectValues();
     }
   });
 
   async function getDataFromDB() {
     const response = await fetch("/chat/ranking_table/retrieve");
     const data = await response.json();
-    console.log("data", data);
+    // console.log("data", data);
     const dbRows = data["rows"];
     const formattedRows = dbRows.map((row) => ({
       id: row[0],
@@ -65,10 +65,10 @@
 
     if (response.ok) {
       const data = await response.json();
-      console.log("data", data);
+      // console.log("data", data);
       models = Object.keys(data["answer"]);
       numModels = models.length;
-      console.log("models", models);
+      // console.log("models", models);
 
       for (let model of models) {
         currentEntry[model] = data["answer"][model];
@@ -78,7 +78,6 @@
         state[state.length - 1] = currentEntry;
         return state;
       });
-      //   insertToDatabase(currentEntry);
     } else {
       const err = await response.text();
       alert(err);
@@ -110,38 +109,41 @@
         animation: 150,
         dataIdAttr: "id",
         onUpdate: function (evt) {
+          console.log("update"); // yes
           answerOrder = sortable.toArray();
-          updateSelectValues();
+          updateSelectValues({});
         },
       });
       answerOrder = sortable.toArray();
-      updateSelectValues();
+      console.log("rrrrr"); // no
+      // updateSelectValues();
     }
   }
 
-  async function insertRanking(rankingUpdate) {
-    console.log("run selection");
-    // const response = await fetch("/chat/ranking_table/update", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(rankingUpdate),
-    // });
+  async function updateComparison(rankingUpdate) {
+    console.log("run update", rankingUpdate);
+    const response = await fetch("/chat/comparator/db/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(rankingUpdate),
+    });
 
-    // if (response.ok) {
-    // } else {
-    //   const err = await response.text();
-    //     alert(err);
-    // }
+    if (response.ok) {
+      console.log("ok", response);
+    } else {
+      const err = await response.text();
+      alert(err);
+    }
   }
 
   function handleSelectChange(event, questionIndex, modelIndex) {
-    const QID = questionIndex;
+    const qid = questionIndex;
     const newRank = event.target.value + 1;
     const selModel = models[modelIndex];
     const updatedValues = {
-      QID: QID,
+      qid: qid,
       rank: parseInt(newRank),
       model: selModel,
     };
@@ -149,22 +151,23 @@
   }
 
   function updateSelectValues(rankValues = {}) {
+    console.log("called");
     let payload = [];
 
     // SELECT CASE
     if (Object.keys(rankValues).length !== 0) {
       const entry = {
         model: rankValues.model,
-        QID: rankValues.QID,
+        qid: parseInt(rankValues.qid),
         rank: rankValues.rank,
-        answer: $compareChatLog[rankValues.QID][rankValues.model],
+        answer: $compareChatLog[rankValues.qid][rankValues.model],
       };
       payload.push(entry);
     }
 
     // DRAG CASE
     else {
-      let QID = answerOrder[0].split("-")[2];
+      let qid = answerOrder[0].split("-")[2];
       let answerOrders = [];
       for (let [index, answer] of answerOrder.entries()) {
         const modelIndex = parseInt(answer.split("-")[1]);
@@ -175,9 +178,9 @@
       for (let modelEntry of answerOrders) {
         const entry = {
           model: modelEntry.model,
-          QID: QID,
+          qid: parseInt(qid),
           rank: modelEntry.rank,
-          answer: $compareChatLog[QID][modelEntry.model],
+          answer: $compareChatLog[qid][modelEntry.model],
         };
         payload.push(entry);
       }
@@ -189,12 +192,13 @@
         }
       });
     }
-
-    console.log("payload", payload);
+    const rankingUpdate = { data: payload };
+    console.log(rankingUpdate);
+    updateComparison(rankingUpdate);
   }
 
   $: {
-    console.log("compareChatLog", $compareChatLog);
+    // console.log("compareChatLog", $compareChatLog);
   }
 </script>
 
