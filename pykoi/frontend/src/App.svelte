@@ -52,14 +52,14 @@
 {/if}
 
 <!-- Loaded selected component (tab) -->
-<!-- {#if $selectedPage}
+{#if $selectedPage}
   <svelte:component
     this={componentMap[$selectedPage.svelte_component]}
     {...$selectedPage.props}
   />
-{/if} -->
+{/if}
 
-<RankedChatbot />
+<!-- <RankedChatbot /> -->
 
 <!-- <ComparisonChat />
 <ComparisonChart /> -->
