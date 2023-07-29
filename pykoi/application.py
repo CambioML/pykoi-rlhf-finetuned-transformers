@@ -6,8 +6,11 @@ from typing import (
     List,
     Optional,
     Any,
-    Dict)
-from fastapi import FastAPI
+    Dict,
+    Union)
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from passlib.context import CryptContext
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -47,7 +50,6 @@ def find_free_port():
         s.bind(("", 0))  # binds to an arbitrary free port
         return s.getsockname()[1]
 
-
 # def find_free_port():
 #     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #     s.bind(("", 0))  # binds to an arbitrary free port
@@ -57,23 +59,85 @@ def find_free_port():
 #     return port
 
 
+oauth_scheme = HTTPBasic()
+
+
+class UserInDB:
+    def __init__(self, username: str, hashed_password: str):
+        self.username = username
+        self.hashed_password = hashed_password
+
+
 class Application:
     """
     The Application class.
     """
 
-    def __init__(self, share: bool = False, debug: bool = False):
+    def __init__(self,
+                 share: bool = False,
+                 debug: bool = False,
+                 username: Union[None, str, List] = None,
+                 password: Union[None, str, List] = None):
         """
         Initialize the Application.
 
         Args:
             share (bool, optional): If True, the application will be shared via ngrok. Defaults to False.
             debug (bool, optional): If True, the application will run in debug mode. Defaults to False.
+            username (str, optional): The username for authentication. Defaults to None.
+            password (str, optional): The password for authentication. Defaults to None.
         """
         self._debug = debug
         self._share = share
         self.data_sources = {}
         self.components = []
+        if username and password:
+            self._auth = True
+        else:
+            self._auth = False
+        if isinstance(username, str):
+            username = [username]
+        if isinstance(password, str):
+            password = [password]
+        if username is not None and password is not None and len(username) != len(password):
+            raise ValueError("The length of username and password must be the same.")
+        self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+        self._fake_users_db = {}
+        if username is not None and password is not None:
+            for user_name, pass_word in zip(username, password):
+                self._fake_users_db[user_name] = \
+                    UserInDB(username=user_name, hashed_password=self._pwd_context.hash(pass_word))
+
+    def authenticate_user(self, fake_db, username: str, password: str):
+        if self._auth:
+            user = fake_db.get(username)
+            if not user:
+                return False
+            if not self._pwd_context.verify(password, user.hashed_password):
+                return False
+            return user
+        else:
+            return "no_auth"
+
+    def auth_required(self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
+        user = self.authenticate_user(self._fake_users_db, credentials.username, credentials.password)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Basic"},
+            )
+        return user
+
+    def dummy_auth(self):
+        return None
+
+    def get_auth_dependency(self):
+        if self._auth:
+            return self.auth_required
+        else:
+            return self.dummy_auth
 
     def add_component(self, component: Any):
         """
@@ -106,7 +170,8 @@ class Application:
         """
 
         @app.post("/chat/{message}")
-        async def inference(message: str):
+        async def inference(message: str,
+                            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 output = component["component"].model.predict(message)[0]
                 # insert question and answer into database
@@ -124,7 +189,8 @@ class Application:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.post("/chat/qa_table/update")
-        async def update_qa_table(request_body: UpdateQATable):
+        async def update_qa_table(request_body: UpdateQATable,
+                                  user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 component["component"].database.update_vote_status(
                     request_body.id, request_body.vote_status
@@ -134,7 +200,7 @@ class Application:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.get("/chat/qa_table/close")
-        async def close_qa_table():
+        async def close_qa_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 component["component"].database.close_connection()
                 return {"log": "Table closed", "status": "200"}
@@ -142,7 +208,9 @@ class Application:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
         @app.post("/chat/multi_responses/{message}")
-        async def inference_ranking_table(message: str, request_body: InferenceRankingTable):
+        async def inference_ranking_table(message: str,
+                                          request_body: InferenceRankingTable,
+                                          user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 num_of_response = request_body.n
                 output = component["component"].model.predict(message, num_of_response)
@@ -157,7 +225,8 @@ class Application:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.post("/chat/ranking_table/update")
-        async def update_ranking_table(request_body: RankingTableUpdate):
+        async def update_ranking_table(request_body: RankingTableUpdate,
+                                       user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 component["component"].database.insert_ranking(
                     request_body.question,
@@ -169,7 +238,7 @@ class Application:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.get("/chat/ranking_table/retrieve")
-        async def retrieve_ranking_table():
+        async def retrieve_ranking_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 print("retrieve_ranking_table")
                 rows = component["component"].database.retrieve_all_question_answers()
@@ -187,7 +256,7 @@ class Application:
         """
 
         @app.get("/chat/qa_table/retrieve")
-        async def retrieve_qa_table():
+        async def retrieve_qa_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
@@ -195,7 +264,7 @@ class Application:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
         @app.get("/chat/ranking_table/close")
-        async def close_ranking_table():
+        async def close_ranking_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 component["component"].database.close_connection()
                 return {"log": "Table closed", "status": "200"}
@@ -212,7 +281,8 @@ class Application:
         """
 
         @app.post("/chat/comparator/{message}")
-        async def compare(message: str):
+        async def compare(message: str,
+                          user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 output_dict = {}
                 # insert question and answer into database
@@ -241,7 +311,8 @@ class Application:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.post("/chat/comparator/db/update")
-        async def update_comparator(request: ComparatorInsertRequest):
+        async def update_comparator(request: ComparatorInsertRequest,
+                                    user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 for model_answer in request.data:
                     component["component"].comparator_db.update(
@@ -254,7 +325,7 @@ class Application:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.get("/chat/comparator/db/retrieve")
-        async def retrieve_comparator():
+        async def retrieve_comparator(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 rows = component["component"].question_db.retrieve_all()
                 question_dict = {}
@@ -285,7 +356,7 @@ class Application:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
         @app.get("/chat/comparator/db/close")
-        async def close_comparator():
+        async def close_comparator(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
                 component["component"].question_db.close_connection()
                 component["component"].comparator_db.close_connection()
@@ -307,8 +378,19 @@ class Application:
             allow_headers=['*'],
         )
 
+        @app.post("/token")
+        def login(credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
+            user = self.authenticate_user(self._fake_users_db, credentials.username, credentials.password)
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Incorrect username or password",
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+            return {"message": "Logged in successfully"}
+
         @app.get("/components")
-        async def get_components():
+        async def get_components(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             return JSONResponse(
                 [
                     {
@@ -330,7 +412,7 @@ class Application:
             """
 
             @app.get(f"/data/{id}")
-            async def get_data():
+            async def get_data(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
                 data = data_source.fetch_func()
                 return JSONResponse(data)
 
@@ -355,14 +437,15 @@ class Application:
             name="static")
 
         @app.get("/{path:path}")
-        async def read_item(path: str):
+        async def read_item(path: str,
+                            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             return {"path": path}
 
         # debug mode should be set to False in production because
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
+        port = 5000  # find_free_port()
         if self._share:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
