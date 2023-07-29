@@ -42,7 +42,7 @@
   }
 
   const askModel = async (event) => {
-    event.preventDefault(); // Prevents page refresh
+    event.preventDefault();
     mymessage = messageplaceholder;
     messageplaceholder = "";
     chatLoading = true;
@@ -100,22 +100,6 @@
 
   $: dots = ".".repeat(dotState).padEnd(3);
 
-  async function insertRanking(rankingUpdate) {
-    const response = await fetch("/chat/ranking_table/update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(rankingUpdate),
-    });
-
-    if (response.ok) {
-    } else {
-      const err = await response.text();
-      //   alert(err);
-    }
-  }
-
   let answersContainer;
   let sortable;
 
@@ -135,17 +119,82 @@
     }
   }
 
-  function updateSelectValues() {
-    answerOrder.forEach((id, index) => {
-      const selectElement = document.querySelector(`#${id} select`);
-      if (selectElement) {
-        selectElement.value = index + 1;
+  async function insertRanking(rankingUpdate) {
+    console.log("run selection");
+    // const response = await fetch("/chat/ranking_table/update", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(rankingUpdate),
+    // });
+
+    // if (response.ok) {
+    // } else {
+    //   const err = await response.text();
+    //     alert(err);
+    // }
+  }
+
+  function handleSelectChange(event, questionIndex, modelIndex) {
+    const QID = questionIndex;
+    const newRank = event.target.value + 1;
+    const selModel = models[modelIndex];
+    const updatedValues = {
+      QID: QID,
+      rank: newRank,
+      model: selModel,
+    };
+    updateSelectValues(updatedValues);
+  }
+
+  function updateSelectValues(rankValues = {}) {
+    let payload = [];
+
+    // SELECT CASE
+    if (Object.keys(rankValues).length !== 0) {
+      const entry = {
+        model: rankValues.model,
+        QID: rankValues.QID,
+        rank: rankValues.rank,
+        answer: $compareChatLog[rankValues.QID][rankValues.model],
+      };
+      payload.push(entry);
+    }
+
+    // DRAG CASE
+    else {
+      let QID = answerOrder[0].split("-")[2];
+      let answerOrders = [];
+      for (let [index, answer] of answerOrder.entries()) {
+        const modelIndex = parseInt(answer.split("-")[1]);
+        const modelName = models[modelIndex];
+        const rank2model = { rank: index, model: modelName };
+        answerOrders.push(rank2model);
       }
-    });
+      for (let modelEntry of answerOrders) {
+        const entry = {
+          model: modelEntry.model,
+          QID: QID,
+          rank: modelEntry.rank,
+          answer: $compareChatLog[QID][modelEntry.model],
+        };
+        payload.push(entry);
+      }
+
+      answerOrder.forEach((id, index) => {
+        const selectElement = document.querySelector(`#${id} select`);
+        if (selectElement) {
+          selectElement.value = index + 1;
+        }
+      });
+    }
+
+    console.log("payload", payload);
   }
 
   $: {
-    console.log($compareChatLog);
+    console.log("compareChatLog", $compareChatLog);
   }
 </script>
 
@@ -191,7 +240,10 @@
                       </p>
                       <div>
                         Rank:
-                        <select>
+                        <select
+                          on:change={(event) =>
+                            handleSelectChange(event, index, i)}
+                        >
                           {#each Array(numModels).fill() as n, i}
                             <option>{i + 1}</option>
                           {/each}
@@ -285,14 +337,6 @@
     opacity: 1;
   }
 
-  .green {
-    border-bottom: 2px solid var(--green);
-  }
-
-  .red {
-    border-bottom: 2px solid var(--red);
-  }
-
   .instructions {
     text-align: center;
     padding: 5%;
@@ -382,6 +426,11 @@
     text-align: left;
     padding: 10px;
     border: 1px solid var(--black);
+  }
+
+  option {
+    font-weight: bold;
+    font-size: 120%;
   }
 
   /* .message-content .answers {
