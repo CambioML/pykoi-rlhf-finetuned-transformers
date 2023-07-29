@@ -25,20 +25,21 @@
       answerOrder = sortable.toArray();
       // updateSelectValues();
     }
+    // retrieveDBData();
   });
 
-  async function getDataFromDB() {
-    const response = await fetch("/chat/ranking_table/retrieve");
+  async function retrieveDBData() {
+    const response = await fetch("/chat/comparator/db/retrieve");
     const data = await response.json();
-    // console.log("data", data);
+    console.log("uploooo", data);
     const dbRows = data["rows"];
-    const formattedRows = dbRows.map((row) => ({
-      id: row[0],
-      question: row[1],
-      up_ranking_answer: row[2],
-      low_ranking_answer: row[3],
-    }));
-    $compareChatLog = [...formattedRows];
+    // const formattedRows = dbRows.map((row) => ({
+    //   id: row[0],
+    //   question: row[1],
+    //   up_ranking_answer: row[2],
+    //   low_ranking_answer: row[3],
+    // }));
+    // $compareChatLog = [...formattedRows];
   }
 
   const askModel = async (event) => {
@@ -65,11 +66,8 @@
 
     if (response.ok) {
       const data = await response.json();
-      // console.log("data", data);
       models = Object.keys(data["answer"]);
       numModels = models.length;
-      // console.log("models", models);
-
       for (let model of models) {
         currentEntry[model] = data["answer"][model];
       }

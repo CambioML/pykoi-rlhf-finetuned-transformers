@@ -3,8 +3,9 @@
   import { scaleLinear, scaleBand, scaleOrdinal } from "d3-scale";
 
   import { data } from "./data";
+  import { comparisonData } from "./store";
 
-  const averageRanks = data.reduce((acc, curr) => {
+  const averageRanks = $comparisonData.reduce((acc, curr) => {
     if (!acc[curr.model]) {
       acc[curr.model] = { sum: curr.rank, count: 1 };
     } else {
@@ -45,7 +46,7 @@
     .domain(avgRankData.map((d) => d.model))
     .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
 
-  let models = Array.from(new Set(data.map((d) => d.model)));
+  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
 </script>
 
 <div

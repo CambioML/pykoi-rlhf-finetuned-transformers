@@ -3,14 +3,15 @@
   import { scaleLinear, scalePoint, scaleOrdinal } from "d3-scale";
   import { line, curveBasis } from "d3-shape";
   import { data } from "./data";
+  import { comparisonData } from "./store";
 
-  const firstData = data
+  const firstData = $comparisonData
     .filter((d) => d.qid === 1)
     .map((d) => ({ model: d.model, rank: d.rank }));
 
   console.log("firstData", firstData);
 
-  let models = Array.from(new Set(data.map((d) => d.model)));
+  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
   console.log("models", models);
 
   let outerHeight;
@@ -28,17 +29,17 @@
 
   // scales
   $: xScale = scalePoint()
-    .domain(data.map((d) => d.qid))
+    .domain($comparisonData.map((d) => d.qid))
     .padding(0.3)
     .range([margin.left, width - margin.right]);
 
   $: yScale = scalePoint()
-    .domain(data.map((d) => d.rank))
+    .domain($comparisonData.map((d) => d.rank))
     .padding(1)
     .range([margin.top, height - margin.bottom]);
 
   $: colorScale = scaleOrdinal()
-    .domain(data.map((d) => d.model))
+    .domain($comparisonData.map((d) => d.model))
     .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
 
   // the path generator
@@ -47,7 +48,9 @@
     .y((d) => yScale(d.rank));
   // .curve(curveBasis)
 
-  $: modelData = models.map((model) => data.filter((d) => d.model === model));
+  $: modelData = models.map((model) =>
+    $comparisonData.filter((d) => d.model === model)
+  );
 </script>
 
 <div
@@ -181,7 +184,7 @@
       />
     {/each}
 
-    {#each data as d (d.model + d.qid)}
+    {#each $comparisonData as d (d.model + d.qid)}
       <g transform={`translate(${xScale(d.qid)}, ${yScale(d.rank)})`}>
         <circle
           r={(d.answer.length / 2) * 0 + 12}

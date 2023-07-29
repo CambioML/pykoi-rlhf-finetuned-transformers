@@ -3,7 +3,7 @@
   import { interpolateRgb } from "d3-interpolate";
   import { min, max } from "d3-array";
   import { format } from "d3-format";
-  import { data } from "./data";
+  import { comparisonData } from "./store";
 
   const formatter = format(".1f");
 
@@ -60,9 +60,9 @@
     return diffs;
   }
 
-  let diffs = calculateDiffs(data);
+  let diffs = calculateDiffs($comparisonData);
 
-  let models = Array.from(new Set(data.map((d) => d.model)));
+  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
   let outerHeight = 500;
   let outerWidth = 500;
   let margin = {

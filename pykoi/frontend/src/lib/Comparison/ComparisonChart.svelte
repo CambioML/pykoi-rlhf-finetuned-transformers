@@ -1,15 +1,36 @@
 <script>
   import BumpChart from "./BumpChart.svelte";
+  import { onMount } from "svelte";
   import HorizontalBar from "./HorizontalBar.svelte";
   import { writable } from "svelte/store";
   import Table from "./Table.svelte";
   import { data } from "./data";
+  import { comparisonData } from "./store";
+
   import Heatmap from "./Heatmap.svelte";
 
   let options = {
     /* Your options here */
   };
-  let models = Array.from(new Set(data.map((d) => d.model)));
+  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
+
+  async function retrieveDBData() {
+    const response = await fetch("/chat/comparator/db/retrieve");
+    const data = await response.json();
+    console.log("uploooo", data);
+    const dbRows = data["data"];
+    // const formattedRows = dbRows.map((row) => ({
+    //   id: row[0],
+    //   question: row[1],
+    //   up_ranking_answer: row[2],
+    //   low_ranking_answer: row[3],
+    // }));
+    $comparisonData = [...dbRows];
+  }
+
+  onMount(() => {
+    retrieveDBData();
+  });
 </script>
 
 <div class="main-container">
@@ -44,7 +65,6 @@
         <HorizontalBar />
       </div>
       <div class="right-chart-3">
-        <!-- <CumulativeStack /> -->
         <Heatmap />
       </div>
     </div>

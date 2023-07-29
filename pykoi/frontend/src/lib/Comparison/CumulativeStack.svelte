@@ -10,12 +10,13 @@
     stack,
   } from "d3-shape";
   import { data } from "./data";
+  import { comparisonData } from "./store";
 
   function calculateCumulativeRanks(data, maxRank = 4) {
     const cumulativeRanks = [];
     const modelRanks = {};
 
-    data.forEach((item) => {
+    $comparisonData.forEach((item) => {
       const invertedRank = maxRank + 1 - item.rank; // Invert the rank
 
       // If the model hasn't been seen before, initialize it in the modelRanks object
@@ -49,7 +50,7 @@
   $: width = outerWidth - margin.left - margin.right;
   $: height = outerHeight - margin.top - margin.bottom;
 
-  const sumData = calculateCumulativeRanks(data);
+  const sumData = calculateCumulativeRanks($comparisonData);
   console.log("sumData", sumData);
 
   const models = Object.keys(sumData[0]).filter((d) => d != "qid");
@@ -69,7 +70,7 @@
     .range([height - margin.bottom, margin.top]);
 
   $: colorScale = scaleOrdinal()
-    .domain(data.map((d) => d.model))
+    .domain($comparisonData.map((d) => d.model))
     .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
 
   $: areaGenerator = area()

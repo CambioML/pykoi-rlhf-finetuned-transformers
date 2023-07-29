@@ -3,6 +3,7 @@
   import { scaleLinear, scalePoint, scaleOrdinal } from "d3-scale";
   import { line, curveStepBefore } from "d3-shape";
   import { data } from "./data";
+  import { comparisonData } from "./store";
 
   function calculateCumulativeRanks(data, maxRank = 4) {
     const cumulativeRanks = [];
@@ -29,16 +30,16 @@
     return cumulativeRanks;
   }
 
-  const sumData = calculateCumulativeRanks(data);
+  const sumData = calculateCumulativeRanks($comparisonData);
   console.log(sumData);
 
   let maxVal = max(Object.values(sumData[sumData.length - 1]));
 
-  const firstData = data
+  const firstData = $comparisonData
     .filter((d) => d.qid === 1)
     .map((d) => ({ model: d.model, rank: d.rank }));
 
-  let models = Array.from(new Set(data.map((d) => d.model)));
+  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
 
   let outerHeight;
   let outerWidth;
@@ -55,7 +56,7 @@
 
   // scales
   $: xScale = scalePoint()
-    .domain(data.map((d) => d.qid))
+    .domain($comparisonData.map((d) => d.qid))
     .padding(0.3)
     .range([margin.left, width - margin.right]);
 
@@ -64,7 +65,7 @@
     .range([margin.top, height - margin.bottom]);
 
   $: colorScale = scaleOrdinal()
-    .domain(data.map((d) => d.model))
+    .domain($comparisonData.map((d) => d.model))
     .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
 
   // the path generator
