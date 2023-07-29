@@ -23,12 +23,12 @@
     <div class="left-charts">
       <div class="chart-captions">
         <h4>Model Comparisons</h4>
-        <!-- <p>
+        <p>
           View the performance of your model over time. GPU stats are available
           to the right.
-        </p> -->
+        </p>
         {#each models as model}
-          <button>{model}</button>
+          <!-- <button>{model}</button> -->
         {/each}
       </div>
       <div class="eval-main">
