@@ -2,7 +2,11 @@
 import os
 import socket
 
-from typing import Optional, Any, Dict
+from typing import (
+    List,
+    Optional,
+    Any,
+    Dict)
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -25,6 +29,17 @@ class RankingTableUpdate(BaseModel):
 
 class InferenceRankingTable(BaseModel):
     n: Optional[int] = 2
+
+
+class ModelAnswer(BaseModel):
+    model: str
+    qid: int
+    rank: int
+    answer: str
+
+
+class ComparatorInsertRequest(BaseModel):
+    data: List[ModelAnswer]
 
 
 def find_free_port():
@@ -199,19 +214,18 @@ class Application:
         @app.post("/chat/comparator/{message}")
         async def compare(message: str):
             try:
-                output_dict, id_list = {}, []
+                output_dict = {}
+                # insert question and answer into database
+                qid = component["component"].question_db.insert(
+                    question=message,
+                )
                 # TODO: refactor to run multiple models in parallel using threading
                 for model_name, model in component["component"].models.items():
                     output = model.predict(message)[0]
                     # TODO: refactor this into using another comparator database
-                    # insert question and answer into database
-                    id = component["component"].database.insert_question_answer(
-                        message, output
-                    )
                     output_dict[model_name] = output
-                    id_list.append(id)
                 return {
-                    "id": id_list,
+                    "qid": qid,
                     "log": "Inference complete",
                     "status": "200",
                     "question": message,
@@ -219,6 +233,73 @@ class Application:
                 }
             except Exception as ex:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
+
+        @app.post("/chat/comparator/db/insert")
+        async def insert_comparator(request: ComparatorInsertRequest):
+            try:
+                for model_answer in request.data:
+                    component["component"].comparator_db.insert(
+                        model=model_answer.model,
+                        qid=model_answer.qid,
+                        rank=model_answer.rank,
+                        answer=model_answer.answer
+                    )
+                return {"log": "Table updated", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.post("/chat/comparator/db/update")
+        async def update_comparator(request: ComparatorInsertRequest):
+            try:
+                for model_answer in request.data:
+                    component["component"].comparator_db.update(
+                        model=model_answer.model,
+                        qid=model_answer.qid,
+                        rank=model_answer.rank,
+                    )
+                return {"log": "Table updated", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.get("/chat/comparator/db/retrieve")
+        async def retrieve_comparator():
+            try:
+                rows = component["component"].question_db.retrieve_all()
+                question_dict = {}
+                for row in rows:
+                    qid, question, _ = row
+                    question_dict[qid] = question
+
+                rows = component["component"].comparator_db.retrieve_all()
+                qid_dict = {}
+
+                for row in rows:
+                    _, model_name, qid, rank, answer, _ = row
+
+                    if qid not in qid_dict:
+                        qid_dict[qid] = {
+                            "qid": qid,
+                            "question": question_dict[qid],
+                            "answer": {},
+                            "rank": {}}
+
+                    qid_dict[qid]["answer"][model_name] = answer
+                    qid_dict[qid]["rank"][model_name] = rank
+
+                data = list(qid_dict.values())
+
+                return {"data": data, "log": "Table retrieved", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table retrieval failed: {ex}", "status": "500"}
+
+        @app.get("/chat/comparator/db/close")
+        async def close_comparator():
+            try:
+                component["component"].question_db.close_connection()
+                component["component"].comparator_db.close_connection()
+                return {"log": "Table closed", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table close failed: {ex}", "status": "500"}
 
     def run(self):
         """
@@ -289,7 +370,8 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
+        # port = find_free_port()
+        port = 5000
         if self._share:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)

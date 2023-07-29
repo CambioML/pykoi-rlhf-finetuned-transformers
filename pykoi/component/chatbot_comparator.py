@@ -2,7 +2,10 @@
 from typing import List
 
 from pykoi.component.base import Component
-from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
+from pykoi.db.comparator_database import (
+    ComparatorDatabase,
+    ComparatorQuestionDatabase
+)
 from pykoi.llm.abs_llm import AbsLlm
 
 
@@ -24,9 +27,8 @@ class ChatbotComparator(Component):
         self.models = {}
         for model in models:
             self.add(model)
-        self.database = ChatbotDatabaseFactory.create(
-            feedback=kwargs.get("feedback", "vote")
-        )
+        self.question_db = ComparatorQuestionDatabase()
+        self.comparator_db = ComparatorDatabase()
 
     def add(self, model: AbsLlm):
         """
