@@ -224,6 +224,12 @@ class Application:
                     output = model.predict(message)[0]
                     # TODO: refactor this into using another comparator database
                     output_dict[model_name] = output
+                    component["component"].comparator_db.insert(
+                        model=model_name,
+                        qid=qid,
+                        rank=1,  # default rank is 1
+                        answer=output
+                    )
                 return {
                     "qid": qid,
                     "log": "Inference complete",
@@ -233,20 +239,6 @@ class Application:
                 }
             except Exception as ex:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
-
-        @app.post("/chat/comparator/db/insert")
-        async def insert_comparator(request: ComparatorInsertRequest):
-            try:
-                for model_answer in request.data:
-                    component["component"].comparator_db.insert(
-                        model=model_answer.model,
-                        qid=model_answer.qid,
-                        rank=model_answer.rank,
-                        answer=model_answer.answer
-                    )
-                return {"log": "Table updated", "status": "200"}
-            except Exception as ex:
-                return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.post("/chat/comparator/db/update")
         async def update_comparator(request: ComparatorInsertRequest):
@@ -370,8 +362,7 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        # port = find_free_port()
-        port = 5000
+        port = find_free_port()
         if self._share:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
