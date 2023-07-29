@@ -142,7 +142,7 @@
     const selModel = models[modelIndex];
     const updatedValues = {
       QID: QID,
-      rank: newRank,
+      rank: parseInt(newRank),
       model: selModel,
     };
     updateSelectValues(updatedValues);
