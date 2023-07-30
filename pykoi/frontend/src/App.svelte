@@ -15,7 +15,7 @@
     Chatbot: Chat,
     Dropdown: Dropdown,
     Feedback: Feedback,
-    ChatbotComparator: ComparisonChat,
+    Compare: ComparisonChat,
   };
 
   const setSelectedPage = (component) => {

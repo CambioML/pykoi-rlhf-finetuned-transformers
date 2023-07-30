@@ -33,7 +33,7 @@
   }
 
   onMount(() => {
-    retrieveDBData();
+    // retrieveDBData();
   });
 
   function highLight(i) {

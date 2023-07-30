@@ -2,12 +2,7 @@
 import os
 import socket
 
-from typing import (
-    List,
-    Optional,
-    Any,
-    Dict,
-    Union)
+from typing import List, Optional, Any, Dict, Union
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from passlib.context import CryptContext
@@ -50,6 +45,7 @@ def find_free_port():
         s.bind(("", 0))  # binds to an arbitrary free port
         return s.getsockname()[1]
 
+
 # def find_free_port():
 #     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #     s.bind(("", 0))  # binds to an arbitrary free port
@@ -73,11 +69,13 @@ class Application:
     The Application class.
     """
 
-    def __init__(self,
-                 share: bool = False,
-                 debug: bool = False,
-                 username: Union[None, str, List] = None,
-                 password: Union[None, str, List] = None):
+    def __init__(
+        self,
+        share: bool = False,
+        debug: bool = False,
+        username: Union[None, str, List] = None,
+        password: Union[None, str, List] = None,
+    ):
         """
         Initialize the Application.
 
@@ -99,15 +97,21 @@ class Application:
             username = [username]
         if isinstance(password, str):
             password = [password]
-        if username is not None and password is not None and len(username) != len(password):
+        if (
+            username is not None
+            and password is not None
+            and len(username) != len(password)
+        ):
             raise ValueError("The length of username and password must be the same.")
         self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
         self._fake_users_db = {}
         if username is not None and password is not None:
             for user_name, pass_word in zip(username, password):
-                self._fake_users_db[user_name] = \
-                    UserInDB(username=user_name, hashed_password=self._pwd_context.hash(pass_word))
+                self._fake_users_db[user_name] = UserInDB(
+                    username=user_name,
+                    hashed_password=self._pwd_context.hash(pass_word),
+                )
 
     def authenticate_user(self, fake_db, username: str, password: str):
         if self._auth:
@@ -121,7 +125,9 @@ class Application:
             return "no_auth"
 
     def auth_required(self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
-        user = self.authenticate_user(self._fake_users_db, credentials.username, credentials.password)
+        user = self.authenticate_user(
+            self._fake_users_db, credentials.username, credentials.password
+        )
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -170,8 +176,10 @@ class Application:
         """
 
         @app.post("/chat/{message}")
-        async def inference(message: str,
-                            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def inference(
+            message: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
             try:
                 output = component["component"].model.predict(message)[0]
                 # insert question and answer into database
@@ -189,8 +197,10 @@ class Application:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.post("/chat/qa_table/update")
-        async def update_qa_table(request_body: UpdateQATable,
-                                  user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def update_qa_table(
+            request_body: UpdateQATable,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
             try:
                 component["component"].database.update_vote_status(
                     request_body.id, request_body.vote_status
@@ -200,7 +210,9 @@ class Application:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.get("/chat/qa_table/close")
-        async def close_qa_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def close_qa_table(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 component["component"].database.close_connection()
                 return {"log": "Table closed", "status": "200"}
@@ -208,9 +220,11 @@ class Application:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
         @app.post("/chat/multi_responses/{message}")
-        async def inference_ranking_table(message: str,
-                                          request_body: InferenceRankingTable,
-                                          user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def inference_ranking_table(
+            message: str,
+            request_body: InferenceRankingTable,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
             try:
                 num_of_response = request_body.n
                 output = component["component"].model.predict(message, num_of_response)
@@ -225,8 +239,10 @@ class Application:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.post("/chat/ranking_table/update")
-        async def update_ranking_table(request_body: RankingTableUpdate,
-                                       user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def update_ranking_table(
+            request_body: RankingTableUpdate,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
             try:
                 component["component"].database.insert_ranking(
                     request_body.question,
@@ -238,7 +254,9 @@ class Application:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.get("/chat/ranking_table/retrieve")
-        async def retrieve_ranking_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def retrieve_ranking_table(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 print("retrieve_ranking_table")
                 rows = component["component"].database.retrieve_all_question_answers()
@@ -256,7 +274,9 @@ class Application:
         """
 
         @app.get("/chat/qa_table/retrieve")
-        async def retrieve_qa_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def retrieve_qa_table(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
@@ -264,7 +284,9 @@ class Application:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
         @app.get("/chat/ranking_table/close")
-        async def close_ranking_table(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def close_ranking_table(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 component["component"].database.close_connection()
                 return {"log": "Table closed", "status": "200"}
@@ -281,8 +303,10 @@ class Application:
         """
 
         @app.post("/chat/comparator/{message}")
-        async def compare(message: str,
-                          user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def compare(
+            message: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
             try:
                 output_dict = {}
                 # insert question and answer into database
@@ -298,7 +322,7 @@ class Application:
                         model=model_name,
                         qid=qid,
                         rank=1,  # default rank is 1
-                        answer=output
+                        answer=output,
                     )
                 return {
                     "qid": qid,
@@ -311,8 +335,11 @@ class Application:
                 return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.post("/chat/comparator/db/update")
-        async def update_comparator(request: ComparatorInsertRequest,
-                                    user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def update_comparator(
+            request: ComparatorInsertRequest,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            print("REQ", request.data)
             try:
                 for model_answer in request.data:
                     component["component"].comparator_db.update(
@@ -325,25 +352,31 @@ class Application:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
         @app.get("/chat/comparator/db/retrieve")
-        async def retrieve_comparator(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def retrieve_comparator(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 rows = component["component"].comparator_db.retrieve_all()
                 data = []
                 for row in rows:
                     _, model_name, qid, rank, answer, _ = row
 
-                    data.append({
-                        "model": model_name,
-                        "qid": qid,
-                        "rank": rank,
-                        "answer": answer,
-                    })
+                    data.append(
+                        {
+                            "model": model_name,
+                            "qid": qid,
+                            "rank": rank,
+                            "answer": answer,
+                        }
+                    )
                 return {"data": data, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
         @app.get("/chat/comparator/db/close")
-        async def close_comparator(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def close_comparator(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 component["component"].question_db.close_connection()
                 component["component"].comparator_db.close_connection()
@@ -359,15 +392,17 @@ class Application:
 
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=['*'],
+            allow_origins=["*"],
             allow_credentials=True,
-            allow_methods=['*'],
-            allow_headers=['*'],
+            allow_methods=["*"],
+            allow_headers=["*"],
         )
 
         @app.post("/token")
         def login(credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
-            user = self.authenticate_user(self._fake_users_db, credentials.username, credentials.password)
+            user = self.authenticate_user(
+                self._fake_users_db, credentials.username, credentials.password
+            )
             if not user:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -377,7 +412,9 @@ class Application:
             return {"message": "Logged in successfully"}
 
         @app.get("/components")
-        async def get_components(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def get_components(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             return JSONResponse(
                 [
                     {
@@ -399,7 +436,9 @@ class Application:
             """
 
             @app.get(f"/data/{id}")
-            async def get_data(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+            async def get_data(
+                user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+            ):
                 data = data_source.fetch_func()
                 return JSONResponse(data)
 
@@ -411,21 +450,24 @@ class Application:
                 self.create_chatbot_route(app, component)
             if component["svelte_component"] == "Feedback":
                 self.create_feedback_route(app, component)
-            if component["svelte_component"] == "ChatbotComparator":
+            if component["svelte_component"] == "Compare":
                 self.create_chatbot_comparator_route(app, component)
 
         app.mount(
             "/",
             StaticFiles(
                 directory=os.path.join(
-                    os.path.dirname(os.path.realpath(__file__)),
-                    "frontend/dist"),
-                html=True),
-            name="static")
+                    os.path.dirname(os.path.realpath(__file__)), "frontend/dist"
+                ),
+                html=True,
+            ),
+            name="static",
+        )
 
         @app.get("/{path:path}")
-        async def read_item(path: str,
-                            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def read_item(
+            path: str, user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             return {"path": path}
 
         # debug mode should be set to False in production because
@@ -437,9 +479,11 @@ class Application:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
             import uvicorn
+
             uvicorn.run(app, host="127.0.0.1", port=port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
             import uvicorn
+
             uvicorn.run(app, host="127.0.0.1", port=port)

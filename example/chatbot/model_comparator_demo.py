@@ -10,17 +10,14 @@ api_key = ""
 
 # Creating an OpenAI model
 openai_model_1 = pykoi.ModelFactory.create_model(
-    model_source="openai",
-    api_key=api_key,
-    engine="babbage")
+    model_source="openai", api_key=api_key, engine="babbage"
+)
 openai_model_2 = pykoi.ModelFactory.create_model(
-    model_source="openai",
-    api_key=api_key,
-    engine="curie")
+    model_source="openai", api_key=api_key, engine="curie"
+)
 openai_model_3 = pykoi.ModelFactory.create_model(
-    model_source="openai",
-    api_key=api_key,
-    engine="davinci")
+    model_source="openai", api_key=api_key, engine="davinci"
+)
 
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
@@ -39,13 +36,12 @@ openai_model_3 = pykoi.ModelFactory.create_model(
 #     base_model_path="meta-llama/Llama-2-7b-hf",
 #     lora_model_path="/home/ubuntu/pykoi/models/rlhf_step1_sft",
 # )
-
+# questions = [...]
 #################################
 # Creating a chatbot comparator #
 #################################
 # pass in a list of models to compare
-chatbot_comparator = pykoi.ChatbotComparator(
-    models=[openai_model_1, openai_model_2])
+chatbot_comparator = pykoi.Compare(models=[openai_model_1, openai_model_2])
 chatbot_comparator.add(openai_model_3)
 # or add models later
 # chatbot_comparator.add(huggingface_model)

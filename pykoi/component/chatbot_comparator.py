@@ -2,18 +2,16 @@
 from typing import List
 
 from pykoi.component.base import Component
-from pykoi.db.comparator_database import (
-    ComparatorDatabase,
-    ComparatorQuestionDatabase
-)
+from pykoi.db.comparator_database import ComparatorDatabase, ComparatorQuestionDatabase
 from pykoi.llm.abs_llm import AbsLlm
 
 
-class ChatbotComparator(Component):
+class Compare(Component):
     """Chatbot comparator component."""
+
     def __init__(self, models: List[AbsLlm], **kwargs):
         """
-        Initializes a new instance of the ChatbotComparator class.
+        Initializes a new instance of the Compare class.
 
         Args:
             models (List[AbsLlm]): A list of models to compare.
@@ -23,7 +21,7 @@ class ChatbotComparator(Component):
             Exception: If a model with the same name already exists.
 
         """
-        super().__init__(None, "ChatbotComparator", **kwargs)
+        super().__init__(None, "Compare", **kwargs)
         self.models = {}
         for model in models:
             self.add(model)
