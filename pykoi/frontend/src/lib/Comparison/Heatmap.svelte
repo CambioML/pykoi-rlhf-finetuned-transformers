@@ -60,9 +60,10 @@
     return diffs;
   }
 
-  let diffs = calculateDiffs($comparisonData);
+  $: diffs = calculateDiffs($comparisonData);
 
-  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
+  $: models = Array.from(new Set($comparisonData.map((d) => d.model)));
+
   let outerHeight = 500;
   let outerWidth = 500;
   let margin = {
@@ -77,9 +78,9 @@
   $: xScale = scaleBand().range([0, width]).domain(models).padding(0.05);
   $: yScale = scaleBand().range([0, height]).domain(models).padding(0.05);
 
-  let diffValues = Object.values(diffs).flatMap((obj) => Object.values(obj));
-  let diffMin = min(diffValues);
-  let diffMax = max(diffValues);
+  $: diffValues = Object.values(diffs).flatMap((obj) => Object.values(obj));
+  $: diffMin = min(diffValues);
+  $: diffMax = max(diffValues);
 
   $: colorScale = scaleOrdinal()
     .domain(models)

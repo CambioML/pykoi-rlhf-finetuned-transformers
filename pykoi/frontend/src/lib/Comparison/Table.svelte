@@ -4,9 +4,13 @@
   import Cell from "./Cell.svelte";
   import { mean, deviation } from "d3-array";
   import { format } from "d3-format";
+  import { comparisonData } from "./store";
 
-  export let data;
-  export let options;
+  $: data = $comparisonData;
+
+  let options = {
+    /* Your options here */
+  };
 
   let maxCellChars = 25;
   const formatter = format(".2f");
@@ -45,9 +49,7 @@
     return modelStats;
   }
 
-  let modelStats = calculateModelStats(data);
-
-  console.log("mssssd", modelStats);
+  $: modelStats = calculateModelStats($comparisonData);
 
   const defaultOptions = { columns: {}, style: "normal", paged: 25 };
   options = { ...defaultOptions, ...options };
@@ -56,8 +58,6 @@
     .domain([-1, 0, 1])
     .range(["#FF5470", "#f8f8f8", "#00ebc7"]);
 
-  // model, overall rank, avg rank, std rank
-
   let { sortable, index, paged } = options;
   let sortKey = undefined;
   let sortDirection = true;
@@ -65,7 +65,7 @@
   if (sortable && index) {
     throw new Error("A table can either be ranked or sortable, but not both");
   }
-  let columns = Object.keys(modelStats[0]).map((key) => {
+  $: columns = Object.keys(modelStats[0]).map((key) => {
     const opts = options.columns[key] || {};
     return {
       key: key,
@@ -74,7 +74,7 @@
     };
   });
 
-  let rows = [];
+  $: rows = [];
   let pages = 1;
   index = 1;
   sortable = 1;
@@ -91,7 +91,7 @@
     }
     let offset = page * paged;
     rows = modelStats.slice(offset, offset + (paged || modelStats.length));
-    pages = paged ? Math.ceil(data.length / paged) : 1;
+    pages = paged ? Math.ceil($comparisonData.length / paged) : 1;
   }
 
   const identity = (value) => value; // Define your identity function here if needed

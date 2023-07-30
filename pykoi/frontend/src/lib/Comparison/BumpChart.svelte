@@ -1,18 +1,16 @@
 <script>
-  import { extent, max } from "d3-array";
-  import { scaleLinear, scalePoint, scaleOrdinal } from "d3-scale";
-  import { line, curveBasis } from "d3-shape";
-  import { data } from "./data";
+  import { scalePoint, scaleOrdinal } from "d3-scale";
+  import { line } from "d3-shape";
   import { comparisonData } from "./store";
 
-  const firstData = $comparisonData
-    .filter((d) => d.qid === 1)
+  $: firstData = $comparisonData
+    .filter((d) => d.qid === 3)
     .map((d) => ({ model: d.model, rank: d.rank }));
 
-  console.log("firstData", firstData);
+  $: console.log("firstData", $comparisonData);
 
-  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
-  console.log("models", models);
+  $: models = Array.from(new Set($comparisonData.map((d) => d.model)));
+  $: console.log("models", models);
 
   let outerHeight;
   let outerWidth;
@@ -20,7 +18,7 @@
   let margin = {
     top: 35,
     bottom: 15,
-    left: 60,
+    left: 160,
     right: 0,
   };
 
@@ -40,7 +38,7 @@
 
   $: colorScale = scaleOrdinal()
     .domain($comparisonData.map((d) => d.model))
-    .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
+    .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F", "red"]);
 
   // the path generator
   $: pathLine = line()
@@ -51,6 +49,17 @@
   $: modelData = models.map((model) =>
     $comparisonData.filter((d) => d.model === model)
   );
+
+  $: console.log("md", modelData);
+  $: console.log(
+    "ranks",
+    $comparisonData.map((d) => d.rank)
+  );
+
+  $: xTickArray =
+    xScale.domain().length > 10
+      ? xScale.domain().filter((_, index) => index % 2 === 0)
+      : xScale.domain();
 </script>
 
 <div
@@ -68,7 +77,7 @@
     />
 
     <!-- x-ticks -->
-    {#each xScale.domain() as tick}
+    {#each xTickArray as tick}
       {#if Number.isInteger(tick)}
         <g
           transform={`translate(${xScale(tick) + 0} ${height - margin.bottom})`}

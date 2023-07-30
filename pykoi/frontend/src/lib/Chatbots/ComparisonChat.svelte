@@ -157,7 +157,7 @@
       const entry = {
         model: rankValues.model,
         qid: parseInt(rankValues.qid),
-        rank: rankValues.rank,
+        rank: parseInt(rankValues.rank),
         answer: $compareChatLog[rankValues.qid][rankValues.model],
       };
       payload.push(entry);
@@ -177,7 +177,7 @@
         const entry = {
           model: modelEntry.model,
           qid: parseInt(qid),
-          rank: modelEntry.rank,
+          rank: parseInt(modelEntry.rank),
           answer: $compareChatLog[qid][modelEntry.model],
         };
         payload.push(entry);

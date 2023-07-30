@@ -1,11 +1,9 @@
 <script>
   import { max } from "d3-array";
   import { scaleLinear, scaleBand, scaleOrdinal } from "d3-scale";
-
-  import { data } from "./data";
   import { comparisonData } from "./store";
 
-  const averageRanks = $comparisonData.reduce((acc, curr) => {
+  $: averageRanks = $comparisonData.reduce((acc, curr) => {
     if (!acc[curr.model]) {
       acc[curr.model] = { sum: curr.rank, count: 1 };
     } else {
@@ -15,7 +13,7 @@
     return acc;
   }, {});
 
-  const avgRankData = Object.keys(averageRanks).map((key) => ({
+  $: avgRankData = Object.keys(averageRanks).map((key) => ({
     model: key,
     avgRank: averageRanks[key].sum / averageRanks[key].count,
   }));
@@ -26,8 +24,8 @@
   let margin = {
     top: 50,
     bottom: 0,
-    left: 65,
-    right: 15,
+    left: 100,
+    right: 0,
   };
 
   $: width = outerWidth - margin.left - margin.right;
@@ -46,7 +44,7 @@
     .domain(avgRankData.map((d) => d.model))
     .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F"]);
 
-  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
+  $: models = Array.from(new Set($comparisonData.map((d) => d.model)));
 </script>
 
 <div
@@ -125,11 +123,14 @@
     width: 100%;
   }
   .axis-text {
-    font-size: 12px;
+    font-size: 9px;
   }
   .axis-line {
     stroke-width: 3;
     stroke: black;
     fill: none;
+  }
+  .label-text {
+    font-size: 9px;
   }
 </style>

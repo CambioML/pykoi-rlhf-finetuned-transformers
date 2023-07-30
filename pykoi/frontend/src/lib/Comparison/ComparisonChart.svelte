@@ -12,25 +12,29 @@
   let options = {
     /* Your options here */
   };
-  let models = Array.from(new Set($comparisonData.map((d) => d.model)));
+  // let models = Array.from(new Set($comparisonData.map((d) => d.model)));
 
   async function retrieveDBData() {
     const response = await fetch("/chat/comparator/db/retrieve");
     const data = await response.json();
     console.log("uploooo", data);
     const dbRows = data["data"];
-    // const formattedRows = dbRows.map((row) => ({
-    //   id: row[0],
-    //   question: row[1],
-    //   up_ranking_answer: row[2],
-    //   low_ranking_answer: row[3],
-    // }));
-    $comparisonData = [...dbRows];
+    const formattedRows = dbRows.map((d) => ({
+      model: d.model,
+      answer: d.answer,
+      qid: parseInt(d.qid),
+      rank: parseInt(d.rank),
+    }));
+    $comparisonData = [...formattedRows];
   }
 
   onMount(() => {
     retrieveDBData();
   });
+
+  $: {
+    console.log("DDDDDD", $comparisonData, $comparisonData.length);
+  }
 </script>
 
 <div class="main-container">
@@ -40,40 +44,55 @@
     <button>Download Data</button>
   </div>
 
-  <div class="eval-container">
-    <div class="left-charts">
-      <div class="chart-captions">
-        <h4>Model Comparisons</h4>
-        <p>
-          View the performance of your model over time. GPU stats are available
-          to the right.
-        </p>
-        {#each models as model}
+  {#if $comparisonData.length > 0}
+    <div class="eval-container">
+      <div class="left-charts">
+        <div class="chart-captions">
+          <h4>Model Comparisons</h4>
+          <p>
+            View the performance of your model over time. GPU stats are
+            available to the right.
+          </p>
+          <!-- {#each models as model} -->
           <!-- <button>{model}</button> -->
-        {/each}
+          <!-- {/each} -->
+        </div>
+        <div class="eval-main">
+          <BumpChart />
+        </div>
+        <div class="eval-table">
+          <Table />
+        </div>
       </div>
-      <div class="eval-main">
-        <BumpChart />
-      </div>
-      <div class="eval-table">
-        <Table {data} {options} />
+      <div class="right-charts">
+        <div class="right-chart-1" />
+        <div class="right-chart-2">
+          <HorizontalBar />
+        </div>
+        <div class="right-chart-3">
+          <Heatmap />
+        </div>
       </div>
     </div>
-    <div class="right-charts">
-      <div class="right-chart-1" />
-      <div class="right-chart-2">
-        <HorizontalBar />
-      </div>
-      <div class="right-chart-3">
-        <Heatmap />
-      </div>
+  {:else}
+    <div class="holder">
+      <h5>
+        To view the comparison dashboard, you must first rank some comparisons!
+      </h5>
     </div>
-  </div>
+  {/if}
 </div>
 
 <!-- <Linechart /> -->
 
 <style>
+  .holder {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .buttons {
     justify-content: center;
   }
@@ -151,7 +170,7 @@
     display: grid;
     height: 100vh;
     grid-template-rows: 100%;
-    grid-template-columns: 70% 30%;
+    grid-template-columns: 65% 35%;
     padding: 1rem;
   }
   .left-charts {

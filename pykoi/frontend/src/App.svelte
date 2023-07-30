@@ -61,5 +61,5 @@
 
 <!-- <RankedChatbot /> -->
 
-<!-- <ComparisonChat /> -->
+<ComparisonChat />
 <ComparisonChart />
