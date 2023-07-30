@@ -18,7 +18,7 @@
   let margin = {
     top: 35,
     bottom: 15,
-    left: 160,
+    left: 10,
     right: 0,
   };
 
@@ -31,8 +31,10 @@
     .padding(0.3)
     .range([margin.left, width - margin.right]);
 
+  $: sortedRanks = $comparisonData.map((d) => d.rank).sort((a, b) => a - b);
+
   $: yScale = scalePoint()
-    .domain($comparisonData.map((d) => d.rank))
+    .domain(sortedRanks)
     .padding(1)
     .range([margin.top, height - margin.bottom]);
 
@@ -60,6 +62,29 @@
     xScale.domain().length > 10
       ? xScale.domain().filter((_, index) => index % 2 === 0)
       : xScale.domain();
+
+  function highLight(i) {
+    document
+      .querySelectorAll(".model-path, .model-path-outer, .model-circle")
+      .forEach((el) => {
+        el.style.opacity = 0.12;
+      });
+    document
+      .querySelectorAll(
+        `.model-path[data-model="${models[i]}"], .model-circle[data-model="${models[i]}"]`
+      )
+      .forEach((el) => {
+        el.style.opacity = 1;
+      });
+  }
+
+  function unHighlight() {
+    document
+      .querySelectorAll(".model-path, .model-path-outer, .model-circle")
+      .forEach((el) => {
+        el.style.opacity = 1;
+      });
+  }
 </script>
 
 <div
@@ -100,7 +125,7 @@
     <!-- y-ticks -->
     {#each yScale.domain() as tick}
       <g transform={`translate(${margin.left} ${yScale(tick) + 0})`}>
-        <text
+        <!-- <text
           class="axis-text"
           x="-5"
           y="0"
@@ -109,7 +134,7 @@
           >{firstData
             .filter((d) => d.rank == tick)
             .map((d) => d.model)[0]}</text
-        >
+        > -->
       </g>
     {/each}
 
@@ -147,48 +172,10 @@
         d={pathLine(d)}
         role="img"
         stroke={colorScale(models[i])}
-        on:mouseover={() => {
-          document
-            .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-            .forEach((el) => {
-              el.style.opacity = 0.12;
-            });
-          document
-            .querySelectorAll(
-              `.model-path[data-model="${models[i]}"], .model-circle[data-model="${models[i]}"]`
-            )
-            .forEach((el) => {
-              el.style.opacity = 1;
-            });
-        }}
-        on:focus={() => {
-          document
-            .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-            .forEach((el) => {
-              el.style.opacity = 0.12;
-            });
-          document
-            .querySelectorAll(
-              `.model-path[data-model="${models[i]}"], .model-circle[data-model="${models[i]}"]`
-            )
-            .forEach((el) => {
-              el.style.opacity = 1;
-            });
-        }}
-        on:mouseout={() => {
-          document
-            .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-            .forEach((el) => {
-              el.style.opacity = 1;
-            });
-        }}
-        on:blur={() => {
-          document
-            .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-            .forEach((el) => {
-              el.style.opacity = 1;
-            });
-        }}
+        on:mouseover={() => highLight(i)}
+        on:focus={() => highLight(i)}
+        on:mouseout={unHighlight}
+        on:blur={unHighlight}
         data-model={models[i]}
       />
     {/each}
@@ -201,48 +188,10 @@
           stroke="white"
           class="model-circle"
           role="img"
-          on:mouseover={() => {
-            document
-              .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-              .forEach((el) => {
-                el.style.opacity = 0.12;
-              });
-            document
-              .querySelectorAll(
-                `.model-path[data-model="${d.model}"], .model-circle[data-model="${d.model}"]`
-              )
-              .forEach((el) => {
-                el.style.opacity = 1;
-              });
-          }}
-          on:focus={() => {
-            document
-              .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-              .forEach((el) => {
-                el.style.opacity = 0.12;
-              });
-            document
-              .querySelectorAll(
-                `.model-path[data-model="${d.model}"], .model-circle[data-model="${d.model}"]`
-              )
-              .forEach((el) => {
-                el.style.opacity = 1;
-              });
-          }}
-          on:mouseout={() => {
-            document
-              .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-              .forEach((el) => {
-                el.style.opacity = 1;
-              });
-          }}
-          on:blur={() => {
-            document
-              .querySelectorAll(".model-path, .model-path-outer, .model-circle")
-              .forEach((el) => {
-                el.style.opacity = 1;
-              });
-          }}
+          on:mouseover={() => highLight(i)}
+          on:focus={() => highLight(i)}
+          on:mouseout={unHighlight}
+          on:blur={unHighlight}
           data-model={d.model}
         />
         <text

@@ -25,21 +25,22 @@
       answerOrder = sortable.toArray();
       // updateSelectValues();
     }
-    // retrieveDBData();
+    retrieveDBData();
   });
 
   async function retrieveDBData() {
     const response = await fetch("/chat/comparator/db/retrieve");
     const data = await response.json();
     console.log("uploooo", data);
-    const dbRows = data["rows"];
+    // const dbRows = data["data"];
     // const formattedRows = dbRows.map((row) => ({
     //   id: row[0],
     //   question: row[1],
     //   up_ranking_answer: row[2],
     //   low_ranking_answer: row[3],
     // }));
-    // $compareChatLog = [...formattedRows];
+    // $compareChatLog = [...dbRows];
+    // console.log("ee");
   }
 
   const askModel = async (event) => {
@@ -49,9 +50,11 @@
     chatLoading = true;
     let currentEntry = {
       question: mymessage,
-      up_ranking_answer: "Loading...",
-      low_ranking_answer: "Loading...",
     };
+    for (let model of models) {
+      currentEntry[model] = "Loading...";
+    }
+    // $compareChatLog = [...$compareChatLog, currentEntry];
     $compareChatLog = [...$compareChatLog, currentEntry];
 
     const response = await fetch(`/chat/comparator/${mymessage}`, {
@@ -66,11 +69,13 @@
 
     if (response.ok) {
       const data = await response.json();
+      console.log("HERE IS RESPONSE", data);
       models = Object.keys(data["answer"]);
       numModels = models.length;
       for (let model of models) {
         currentEntry[model] = data["answer"][model];
       }
+      currentEntry["qid"] = data["qid"];
 
       compareChatLog.update((state) => {
         state[state.length - 1] = currentEntry;
@@ -138,13 +143,15 @@
 
   function handleSelectChange(event, questionIndex, modelIndex) {
     const qid = questionIndex;
-    const newRank = event.target.value + 1;
+    console.log("using qid", qid);
+    const newRank = parseInt(event.target.value);
     const selModel = models[modelIndex];
     const updatedValues = {
       qid: qid,
       rank: parseInt(newRank),
       model: selModel,
     };
+    console.log("updated fine", updatedValues);
     updateSelectValues(updatedValues);
   }
 
@@ -154,19 +161,29 @@
 
     // SELECT CASE
     if (Object.keys(rankValues).length !== 0) {
+      console.log("option change");
+      let curr = $compareChatLog.filter((d) => d.qid === rankValues.qid);
+      console.log("curr", curr);
+      console.log("curr", rankValues.model);
+      let currAnswer = curr[0][rankValues.model];
+      console.log("currAnswer", currAnswer);
       const entry = {
         model: rankValues.model,
         qid: parseInt(rankValues.qid),
         rank: parseInt(rankValues.rank),
-        answer: $compareChatLog[rankValues.qid][rankValues.model],
+        answer: currAnswer,
       };
+      console.log("entry", entry);
       payload.push(entry);
     }
 
     // DRAG CASE
     else {
+      console.log("drag change");
+
       let qid = answerOrder[0].split("-")[2];
       let answerOrders = [];
+      // find model names in new sorted order
       for (let [index, answer] of answerOrder.entries()) {
         const modelIndex = parseInt(answer.split("-")[1]);
         const modelName = models[modelIndex];
@@ -177,12 +194,12 @@
         const entry = {
           model: modelEntry.model,
           qid: parseInt(qid),
-          rank: parseInt(modelEntry.rank),
+          rank: parseInt(modelEntry.rank) + 1,
           answer: $compareChatLog[qid][modelEntry.model],
         };
         payload.push(entry);
       }
-
+      // update sorted positions
       answerOrder.forEach((id, index) => {
         const selectElement = document.querySelector(`#${id} select`);
         if (selectElement) {
@@ -196,7 +213,7 @@
   }
 
   $: {
-    // console.log("compareChatLog", $compareChatLog);
+    console.log("compareChatLog", $compareChatLog);
   }
 </script>
 
@@ -226,7 +243,7 @@
               </div>
               <div class="message-content">
                 <div class="question">
-                  <h5 class="bold">Question:</h5>
+                  <h5 class="bold">Question: {message.qid}</h5>
                   <p>{message.question}</p>
                 </div>
                 <div
@@ -244,7 +261,7 @@
                         Rank:
                         <select
                           on:change={(event) =>
-                            handleSelectChange(event, index, i)}
+                            handleSelectChange(event, message.qid, i)}
                         >
                           {#each Array(numModels).fill() as n, i}
                             <option>{i + 1}</option>

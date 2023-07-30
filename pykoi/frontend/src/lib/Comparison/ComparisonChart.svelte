@@ -1,5 +1,6 @@
 <script>
   import BumpChart from "./BumpChart.svelte";
+  import { scaleOrdinal } from "d3-scale";
   import { onMount } from "svelte";
   import HorizontalBar from "./HorizontalBar.svelte";
   import { writable } from "svelte/store";
@@ -12,7 +13,10 @@
   let options = {
     /* Your options here */
   };
-  // let models = Array.from(new Set($comparisonData.map((d) => d.model)));
+  $: models = Array.from(new Set($comparisonData.map((d) => d.model)));
+  $: colorScale = scaleOrdinal()
+    .domain($comparisonData.map((d) => d.model))
+    .range(["#FF5470", "#1B2D45", "#00EBC7", "#FDE24F", "red"]);
 
   async function retrieveDBData() {
     const response = await fetch("/chat/comparator/db/retrieve");
@@ -32,8 +36,27 @@
     retrieveDBData();
   });
 
-  $: {
-    console.log("DDDDDD", $comparisonData, $comparisonData.length);
+  function highLight(i) {
+    document
+      .querySelectorAll(".model-path, .model-path-outer, .model-circle")
+      .forEach((el) => {
+        el.style.opacity = 0.12;
+      });
+    document
+      .querySelectorAll(
+        `.model-path[data-model="${models[i]}"], .model-circle[data-model="${models[i]}"]`
+      )
+      .forEach((el) => {
+        el.style.opacity = 1;
+      });
+  }
+
+  function unHighlight() {
+    document
+      .querySelectorAll(".model-path, .model-path-outer, .model-circle")
+      .forEach((el) => {
+        el.style.opacity = 1;
+      });
   }
 </script>
 
@@ -49,13 +72,21 @@
       <div class="left-charts">
         <div class="chart-captions">
           <h4>Model Comparisons</h4>
-          <p>
+          <!-- <p>
             View the performance of your model over time. GPU stats are
             available to the right.
-          </p>
-          <!-- {#each models as model} -->
-          <!-- <button>{model}</button> -->
-          <!-- {/each} -->
+          </p> -->
+          {#each models as model, i}
+            <button
+              data-model={model}
+              class="model-path"
+              style="color: white; background: {colorScale(model)}"
+              on:mouseover={() => highLight(i)}
+              on:focus={() => highLight(i)}
+              on:mouseout={unHighlight}
+              on:blur={unHighlight}>{model}</button
+            >
+          {/each}
         </div>
         <div class="eval-main">
           <BumpChart />
