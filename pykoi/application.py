@@ -327,30 +327,17 @@ class Application:
         @app.get("/chat/comparator/db/retrieve")
         async def retrieve_comparator(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
             try:
-                rows = component["component"].question_db.retrieve_all()
-                question_dict = {}
-                for row in rows:
-                    qid, question, _ = row
-                    question_dict[qid] = question
-
                 rows = component["component"].comparator_db.retrieve_all()
-                qid_dict = {}
-
+                data = []
                 for row in rows:
                     _, model_name, qid, rank, answer, _ = row
 
-                    if qid not in qid_dict:
-                        qid_dict[qid] = {
-                            "qid": qid,
-                            "question": question_dict[qid],
-                            "answer": {},
-                            "rank": {}}
-
-                    qid_dict[qid]["answer"][model_name] = answer
-                    qid_dict[qid]["rank"][model_name] = rank
-
-                data = list(qid_dict.values())
-
+                    data.append({
+                        "model": model_name,
+                        "qid": qid,
+                        "rank": rank,
+                        "answer": answer,
+                    })
                 return {"data": data, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -445,7 +432,7 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
+        port = 5000  # find_free_port()
         if self._share:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
