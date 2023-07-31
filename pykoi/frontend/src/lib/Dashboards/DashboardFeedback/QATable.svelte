@@ -7,14 +7,12 @@
     feedbackSelection,
     questionDistribution,
   } from "../../../store";
-  import { tallyQuestions, getQAWordFrequency } from "../../../utils";
+  import { tallyQuestions } from "../../../utils";
 
   $: qadata =
     $feedbackSelection === "all"
       ? $chatLog
       : $chatLog.filter((d) => d.vote_status === $feedbackSelection);
-
-  $: console.log("qadata", qadata);
 
   const customSlide = (
     node,

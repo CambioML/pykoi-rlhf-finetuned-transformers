@@ -11,7 +11,7 @@ export const feedbackSelection = writable("all"); // up, down, or NA
 
 export const stackedData = writable({ "n/a": 1, up: 1, down: 1 });
 
-const questions = ["Who", "What", "How", "Why", "Where", "Does", "Can", "N/A"];
+const questions = ["who", "what", "how", "why", "where", "does", "can", "n/a"];
 
 export const questionDistribution = tweened(
   questions.map((question) => ({ question, count: 0 }))

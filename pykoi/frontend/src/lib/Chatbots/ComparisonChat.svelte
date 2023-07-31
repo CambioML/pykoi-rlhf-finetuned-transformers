@@ -31,7 +31,7 @@
   async function retrieveDBData() {
     const response = await fetch("/chat/comparator/db/retrieve");
     const data = await response.json();
-    console.log("uploooo", data);
+    // console.log("uploooo", data);
     // const dbRows = data["data"];
     // const formattedRows = dbRows.map((row) => ({
     //   id: row[0],
@@ -69,7 +69,7 @@
 
     if (response.ok) {
       const data = await response.json();
-      console.log("HERE IS RESPONSE", data);
+      // console.log("HERE IS RESPONSE", data);
       models = Object.keys(data["answer"]);
       numModels = models.length;
       for (let model of models) {
@@ -112,19 +112,19 @@
         animation: 150,
         dataIdAttr: "id",
         onUpdate: function (evt) {
-          console.log("update"); // yes
+          // console.log("update"); // yes
           answerOrder = sortable.toArray();
           updateSelectValues({});
         },
       });
       answerOrder = sortable.toArray();
-      console.log("rrrrr"); // no
+      // console.log("rrrrr"); // no
       // updateSelectValues();
     }
   }
 
   async function updateComparison(rankingUpdate) {
-    console.log("run update", rankingUpdate);
+    // console.log("run update", rankingUpdate);
     const response = await fetch("/chat/comparator/db/update", {
       method: "POST",
       headers: {
@@ -134,7 +134,7 @@
     });
 
     if (response.ok) {
-      console.log("ok", response);
+      // console.log("ok", response);
     } else {
       const err = await response.text();
       alert(err);
@@ -143,7 +143,6 @@
 
   function handleSelectChange(event, questionIndex, modelIndex) {
     const qid = questionIndex;
-    console.log("using qid", qid);
     const newRank = parseInt(event.target.value);
     const selModel = models[modelIndex];
     const updatedValues = {
@@ -151,37 +150,33 @@
       rank: parseInt(newRank),
       model: selModel,
     };
-    console.log("updated fine", updatedValues);
+    // console.log("updated fine", updatedValues);
     updateSelectValues(updatedValues);
   }
 
   function updateSelectValues(rankValues = {}) {
-    console.log("called");
     let payload = [];
 
     // SELECT CASE
     if (Object.keys(rankValues).length !== 0) {
-      console.log("option change");
       let curr = $compareChatLog.filter((d) => d.qid === rankValues.qid);
-      console.log("curr", curr);
-      console.log("curr", rankValues.model);
       let currAnswer = curr[0][rankValues.model];
-      console.log("currAnswer", currAnswer);
       const entry = {
         model: rankValues.model,
         qid: parseInt(rankValues.qid),
         rank: parseInt(rankValues.rank),
         answer: currAnswer,
       };
-      console.log("entry", entry);
       payload.push(entry);
     }
 
     // DRAG CASE
     else {
-      console.log("drag change");
+      // console.log("drag change");
 
       let qid = answerOrder[0].split("-")[2];
+      console.log("qid", qid);
+      console.log("ao", answerOrder);
       let answerOrders = [];
       // find model names in new sorted order
       for (let [index, answer] of answerOrder.entries()) {
@@ -190,15 +185,21 @@
         const rank2model = { rank: index, model: modelName };
         answerOrders.push(rank2model);
       }
+      console.log("ao2", answerOrders);
+      console.log("compareChatLog", $compareChatLog);
+      let curr = $compareChatLog.filter((d) => d.qid === qid);
+      console.log("curr", curr);
+      // let currAnswer = curr[0][rankValues.model];
       for (let modelEntry of answerOrders) {
         const entry = {
           model: modelEntry.model,
           qid: parseInt(qid),
           rank: parseInt(modelEntry.rank) + 1,
-          answer: $compareChatLog[qid][modelEntry.model],
+          answer: "curr[0][modelEntry.model]",
         };
         payload.push(entry);
       }
+      console.log("3");
       // update sorted positions
       answerOrder.forEach((id, index) => {
         const selectElement = document.querySelector(`#${id} select`);
@@ -208,13 +209,13 @@
       });
     }
     const rankingUpdate = { data: payload };
-    console.log(rankingUpdate);
+    console.log("Updated data:", rankingUpdate);
     updateComparison(rankingUpdate);
   }
 
-  $: {
-    console.log("compareChatLog", $compareChatLog);
-  }
+  // $: {
+  //   console.log("compareChatLog", $compareChatLog);
+  // }
 </script>
 
 <div class="ranked-feedback-container">
@@ -238,9 +239,6 @@
             use:scrollToView={index === $compareChatLog.length - 1}
           >
             <div class="chat-message-center">
-              <div class="avatar">
-                <!-- <img src={logo} alt="SvelteKit" /> -->
-              </div>
               <div class="message-content">
                 <div class="question">
                   <h5 class="bold">Question: {message.qid}</h5>
@@ -252,7 +250,7 @@
                   style="display: grid; grid-template-columns: {gridTemplate}; gap: .25%; width: 100%; margin: auto;"
                 >
                   {#each Array(numModels).fill() as _, i (i)}
-                    <div class="answer" id={`answer-${i}-${index}`}>
+                    <div class="answer" id={`answer-${i}-${message.qid}`}>
                       <h5 class="bold underline">{models[i]}:</h5>
                       <p>
                         {message[models[i]]}
@@ -299,13 +297,6 @@
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: 80% 20%;
-  }
-
-  .message {
-    font-size: var(--smallText);
-    padding-left: 40px;
-    padding-right: 40px;
-    margin: 0 auto;
   }
 
   .chat-input-holder {
@@ -451,14 +442,6 @@
     font-weight: bold;
     font-size: 120%;
   }
-
-  /* .message-content .answers {
-    display: grid;
-    grid-template-columns: 49% 49%;
-    gap: 2%;
-    width: 100%;
-    margin: auto;
-  } */
 
   p {
     margin: 0;
