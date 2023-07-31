@@ -46,6 +46,6 @@ poetry install --no-root
 Frontend:
 ```
 cd frontend
-npm instal vite
+npm install vite
 npm run build
 ```
