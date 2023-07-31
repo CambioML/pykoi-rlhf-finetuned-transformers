@@ -13,7 +13,6 @@ from transformers import (
     AutoModelForCausalLM,
     AutoModelForSequenceClassification,
     AutoTokenizer,
-    Trainer,
     TrainingArguments)
 
 from trl import SFTTrainer
@@ -27,7 +26,7 @@ from pykoi.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
 
 
-class SFT(Trainer):
+class SupervisedFinetuning():
     """
     A class representing the supervised finetuning trainer.
 
@@ -152,11 +151,11 @@ class SFT(Trainer):
         if args.dataset_type == "local_db":
             qa_database = QuestionAnswerDatabase()
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
-            my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS]=="up"]
+            my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"]
             my_data_pd = my_data_pd[[QA_CSV_HEADER_ID,
                                      QA_CSV_HEADER_QUESTION,
                                      QA_CSV_HEADER_ANSWER]]
-            print("My local database has {} samples".format(my_data_pd.shape[0]))
+            print("My local database has {} up vote samples for SFT".format(my_data_pd.shape[0]))
             dataset = Dataset.from_dict(my_data_pd)
         elif args.dataset_type == "local_csv":
             dataset = load_dataset('csv', data_files=args.dataset_name)

@@ -4,6 +4,8 @@ import os
 import sqlite3
 import threading
 
+import pandas as pd
+
 from pykoi.db.constants import RANKING_CSV_HEADER
 
 
@@ -155,3 +157,15 @@ class RankingDatabase:
             writer = csv.writer(file)
             writer.writerow(RANKING_CSV_HEADER)
             writer.writerows(ranking_data)
+
+    def retrieve_all_question_answers_as_pandas(self):
+        """
+        Retrieves pairs from the database as a pandas dataframe.
+
+        Returns:
+            DataFrame: A pandas dataframe.
+        """
+        rows = self.retrieve_all_question_answers()
+        rows_to_pd = pd.DataFrame(rows)
+        rows_to_pd.columns = RANKING_CSV_HEADER
+        return rows_to_pd
