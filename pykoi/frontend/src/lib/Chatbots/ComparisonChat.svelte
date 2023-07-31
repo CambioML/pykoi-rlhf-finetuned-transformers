@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { compareChatLog } from "../../store";
   import Sortable from "sortablejs";
+  import { select } from "d3-selection";
 
   export let numModels = 1;
   export let models = [0];
@@ -141,6 +142,42 @@
     }
   }
 
+  function handleDragEnd(event, questionIndex) {
+    const qid = questionIndex;
+    const parent = select(event.currentTarget.parentNode);
+    // update ranks to reflect re-order
+    const answerOrder = parent
+      .selectAll("div.answer")
+      .nodes()
+      .map((node) => node.id);
+    answerOrder.forEach((id, index) => {
+      select(`#${id}`)
+        .select(".answer-rank")
+        .property("value", index + 1);
+    });
+    let answerOrders = [];
+    for (let [index, answer] of answerOrder.entries()) {
+      const modelIndex = parseInt(answer.split("-")[1]);
+      const modelName = models[modelIndex];
+      const rank2model = { rank: index, model: modelName };
+      answerOrders.push(rank2model);
+    }
+
+    let curr = $compareChatLog.filter((d) => d.qid === qid);
+    let payload = [];
+    for (let modelEntry of answerOrders) {
+      const entry = {
+        model: modelEntry.model,
+        qid: parseInt(qid),
+        rank: parseInt(modelEntry.rank) + 1,
+        answer: curr[0][modelEntry.model],
+      };
+      payload.push(entry);
+    }
+
+    console.log("updated", payload);
+  }
+
   function handleSelectChange(event, questionIndex, modelIndex) {
     const qid = questionIndex;
     const newRank = parseInt(event.target.value);
@@ -175,8 +212,8 @@
       // console.log("drag change");
 
       let qid = answerOrder[0].split("-")[2];
-      console.log("qid", qid);
-      console.log("ao", answerOrder);
+      // console.log("qid", qid);
+      // console.log("ao", answerOrder);
       let answerOrders = [];
       // find model names in new sorted order
       for (let [index, answer] of answerOrder.entries()) {
@@ -185,10 +222,10 @@
         const rank2model = { rank: index, model: modelName };
         answerOrders.push(rank2model);
       }
-      console.log("ao2", answerOrders);
-      console.log("compareChatLog", $compareChatLog);
+      // console.log("ao2", answerOrders);
+      // console.log("compareChatLog", $compareChatLog);
       let curr = $compareChatLog.filter((d) => d.qid === qid);
-      console.log("curr", curr);
+      // console.log("curr", curr);
       // let currAnswer = curr[0][rankValues.model];
       for (let modelEntry of answerOrders) {
         const entry = {
@@ -199,7 +236,7 @@
         };
         payload.push(entry);
       }
-      console.log("3");
+      // console.log("3");
       // update sorted positions
       answerOrder.forEach((id, index) => {
         const selectElement = document.querySelector(`#${id} select`);
@@ -209,7 +246,7 @@
       });
     }
     const rankingUpdate = { data: payload };
-    console.log("Updated data:", rankingUpdate);
+    // console.log("Updated data:", rankingUpdate);
     updateComparison(rankingUpdate);
   }
 
@@ -250,7 +287,11 @@
                   style="display: grid; grid-template-columns: {gridTemplate}; gap: .25%; width: 100%; margin: auto;"
                 >
                   {#each Array(numModels).fill() as _, i (i)}
-                    <div class="answer" id={`answer-${i}-${message.qid}`}>
+                    <div
+                      class="answer"
+                      id={`answer-${i}-${message.qid}`}
+                      on:dragend={(event) => handleDragEnd(event, message.qid)}
+                    >
                       <h5 class="bold underline">{models[i]}:</h5>
                       <p>
                         {message[models[i]]}
@@ -258,6 +299,7 @@
                       <div>
                         Rank:
                         <select
+                          class="answer-rank"
                           on:change={(event) =>
                             handleSelectChange(event, message.qid, i)}
                         >
