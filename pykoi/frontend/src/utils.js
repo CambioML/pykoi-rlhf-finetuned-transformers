@@ -17,28 +17,28 @@ export function formatBytes(bytes, decimals = 2) {
 export function tallyQuestions(data) {
   // Create an empty object to store the count of each question category
   let questionCounts = {
-    Who: 0,
-    What: 0,
-    How: 0,
-    Why: 0,
-    Where: 0,
-    Does: 0,
-    Can: 0,
-    "N/A": 0,
+    who: 0,
+    what: 0,
+    how: 0,
+    why: 0,
+    where: 0,
+    does: 0,
+    can: 0,
+    "n/a": 0,
   };
 
   // Iterate through each item in the data
   for (let i = 0; i < data.length; i++) {
     // Get the first word of the question (i.e., the question category)
-    let questionCategory = data[i].question.split(" ")[0];
+    let questionCategory = data[i].question.split(" ")[0].toLowerCase();
 
     // If this question category exists in our counts object, increment its count
     if (questionCategory in questionCounts) {
       questionCounts[questionCategory]++;
     }
-    // Otherwise, count it as "N/A"
+    // Otherwise, count it as "n/a"
     else {
-      questionCounts["N/A"]++;
+      questionCounts["n/a"]++;
     }
   }
 
@@ -52,7 +52,6 @@ export function tallyQuestions(data) {
 }
 
 export function getQAWordFrequency(arr) {
-  // console.log("input", arr);
   return arr.map((item) => {
     const questionTokens = item.question.split(" ").length;
     const answerTokens = item.answer.split(" ").length;

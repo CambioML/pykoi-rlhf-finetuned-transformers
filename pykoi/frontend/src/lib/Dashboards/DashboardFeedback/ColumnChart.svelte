@@ -1,9 +1,8 @@
 <script>
-  import { max, min } from "d3-array";
+  import { max } from "d3-array";
   import { format } from "d3-format";
   import { scaleLinear, scaleBand } from "d3-scale";
   import { questionDistribution, feedbackSelection } from "../../../store.js";
-  import { interpolate } from "d3-interpolate";
 
   const emojiObj = {
     up: "Good 👍",
@@ -34,8 +33,6 @@
   $: width = outerWidth - margin.left - margin.right;
   $: height = outerHeight - margin.top - margin.bottom;
 
-  // const color = scaleOrdinal().range(["#2074d5", "#fde24f"]);
-
   $: xScale = scaleBand()
     .rangeRound([margin.left, width - margin.right])
     .padding(0.05)
@@ -45,11 +42,7 @@
     .rangeRound([height - margin.bottom, margin.top])
     .domain([0, max($questionDistribution, (d) => d.count)]);
 
-  $: maxValue = max($questionDistribution, (d) => d.count);
-  $: color = scaleLinear()
-    .domain([0, maxValue])
-    .range(["white", colorObj[$feedbackSelection]])
-    .interpolate(interpolate);
+  $: console.log($questionDistribution);
 </script>
 
 <div
@@ -98,7 +91,7 @@
           x={xScale(d.question)}
           y={yScale(d.count)}
           height={height - yScale(d.count) - margin.bottom}
-          fill={color(d.count)}
+          fill={colorObj[$feedbackSelection]}
           fill-opacity="0.95"
           width={xScale.bandwidth()}
         />
