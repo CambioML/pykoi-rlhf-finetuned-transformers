@@ -20,7 +20,7 @@ openai_model_3 = pykoi.ModelFactory.create_model(
 )
 
 ###################################################################################
-# Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
+# Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.2xlarge with 100GB space) #
 ###################################################################################
 # huggingface_model = pykoi.ModelFactory.create_model(
 #     model_source="huggingface",
@@ -28,7 +28,7 @@ openai_model_3 = pykoi.ModelFactory.create_model(
 # )
 
 ###################################################################################
-# Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
+# Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.2xlarge with 100GB space) #
 ###################################################################################
 # only run this after run rlfh/sft_demo.py to fine tune the model
 # peft_huggingface_model = pykoi.ModelFactory.create_model(
