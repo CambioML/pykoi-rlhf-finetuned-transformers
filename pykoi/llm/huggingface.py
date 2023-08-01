@@ -67,22 +67,31 @@ class HuggingfaceModel(AbsLlm):
         Returns:
             List[str]: List of response.
         """
-        print("[HuggingfaceModel] encode...")
-        input_ids = self._tokenizer.encode(message, return_tensors="pt")
-        input_ids = input_ids.to("cuda")
-        print("[HuggingfaceModel] generate...")
-        output_ids = self._model.generate(
-            input_ids,
-            max_length=self._max_length,
-            num_return_sequences=num_of_response,
-            do_sample=True,
-            temperature=0.3,
-        )
-        print("[HuggingfaceModel] decode...")
-        response = [
-            self._tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids
-        ]
+        ## TODO: need to refractor and include all the derivatives of dolly family
+        if "dolly" in self._pretrained_model_name_or_path:
+            from pykoi.llm.instruct_pipeline import InstructionTextGenerationPipeline
+            generate_text = InstructionTextGenerationPipeline(model=self._model, 
+                                                              tokenizer=self._tokenizer)
+            res = generate_text(message)
+            response = [res[0]["generated_text"]]
+        ## all other models except dolly family
+        else:
+            print("[HuggingfaceModel] encode...")
+            input_ids = self._tokenizer.encode(message, return_tensors="pt")
+            input_ids = input_ids.to("cuda")
+            print("[HuggingfaceModel] generate...")
+            output_ids = self._model.generate(
+                input_ids,
+                max_length=self._max_length,
+                num_return_sequences=num_of_response,
+                do_sample=True,
+                temperature=0.3,
+            )
+            print("[HuggingfaceModel] decode...")
+            response = [
+                self._tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids
+            ]
 
-        response = [resp.split("\n")[1] for resp in response if "\n" in resp]
+            response = [resp.split("\n")[1] for resp in response if "\n" in resp]
 
         return response
