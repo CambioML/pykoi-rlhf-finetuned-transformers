@@ -47,6 +47,6 @@ chatbot_comparator.add(openai_model_3)
 # chatbot_comparator.add(huggingface_model)
 # chatbot_comparator.add(peft_huggingface_model)
 
-app = pykoi.Application(debug=False, share=False)
+app = pykoi.Application(debug=False, share=True, username="rachel", password="rachel")
 app.add_component(chatbot_comparator)
 app.run()
