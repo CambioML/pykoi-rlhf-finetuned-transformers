@@ -58,3 +58,5 @@
     {...$selectedPage.props}
   />
 {/if}
+
+<ComparisonChart />
