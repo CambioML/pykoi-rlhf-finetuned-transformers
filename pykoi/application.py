@@ -3,7 +3,7 @@ import os
 import socket
 
 from typing import List, Optional, Any, Dict, Union
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from passlib.context import CryptContext
 from fastapi.responses import JSONResponse
@@ -384,6 +384,112 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
+    def create_qa_retrieval_route(self, app: FastAPI, component: Dict[str, Any]):
+        """
+        Create QA retrieval routes for the application.
+
+        Args:
+            app (FastAPI): The FastAPI application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
+        @app.get("/retrieval/file/get")
+        async def get_files(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            print("[/retrieval/file/get]: getting files...")
+            # create folder if it doesn't exist
+            dir_path = os.environ["DOC_PATH"]
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            files = os.listdir(dir_path)
+
+            # Create a list of dictionaries, each containing the file's name, size and type
+            file_data = []
+            for file in files:
+                size = os.path.getsize(
+                    os.path.join(dir_path, file)
+                )  # get size of file in bytes
+                _, ext = os.path.splitext(file)  # split the file name into name and extension
+                file_data.append(
+                    {
+                        "name": file,
+                        "size": size,
+                        "type": ext[1:],  # remove the period from the extension
+                    }
+                )
+            return {"files": file_data}
+
+        @app.post("/retrieval/file/upload")
+        async def upload_files(files: List[UploadFile],
+                               user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+            try:
+                # create folder if it doesn't exist
+                if not os.path.exists(os.getenv("DOC_PATH")):
+                    os.makedirs(os.getenv("DOC_PATH"))
+
+                print("[/retrieval/file/upload]: upload files...")
+                # Check if any file is sent
+                if not files:
+                    raise HTTPException(status_code=400, detail="No file part")
+
+                filenames = []
+                # Iterate over each file
+                for file in files:
+                    # Check if file is selected
+                    if not file.filename:
+                        raise HTTPException(status_code=400, detail="No selected file")
+
+                    print(f"[/retrieval/file/upload]: saving file {file.filename}")
+                    # Save or process the file
+                    with open(os.path.join(os.getenv("DOC_PATH"), file.filename), "wb") as buffer:
+                        buffer.write(await file.read())
+                    filenames.append(file.filename)
+
+                # List all files in the DOC_PATH directory
+                file_list = os.listdir(os.getenv("DOC_PATH"))
+
+                return JSONResponse({"status": "ok", "filenames": filenames, "files": file_list})
+
+            except Exception as e:
+                return JSONResponse({"status": "error", "message": str(e)})
+
+        @app.post("/retrieval/vector_db/index")
+        async def index_vector_db(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+            try:
+                print("[/retrieval/vector_db/index]: indexing files...")
+                component["component"].vector_db.index()
+                return {'log': 'Indexing complete',
+                        'status': '200'}
+            except Exception as ex:
+                return {'log': f'Indexing failed: {ex}',
+                        'status': '500'}
+
+        @app.get("/retrieval/{message}")
+        async def inference(
+            message: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            try:
+                print("[/retrieval]: model inference...")
+                output = component["component"].retrieval_model.run(message)
+                return {'log': 'Inference complete',
+                        'status': '200',
+                        'question': message,
+                        'answer': output}
+            except Exception as ex:
+                return {'log': f'Inference failed: {ex}',
+                        'status': '500'}
+
+        @app.get("/retrieval/vector_db/get")
+        async def get_vector_db(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+            try:
+                print("[/retrieval/vector_db/get]: get embedding...")
+                response_dict = component["component"].vector_db.get_embedding()
+                return response_dict
+            except Exception as ex:
+                return {"log": "Failed to get embedding: {}".format(ex),
+                        "status": "500"}
+
     def run(self):
         """
         Run the application.
@@ -452,6 +558,8 @@ class Application:
                 self.create_feedback_route(app, component)
             if component["svelte_component"] == "Compare":
                 self.create_chatbot_comparator_route(app, component)
+            if component["svelte_component"] == "RetrievalQA":
+                self.create_qa_retrieval_route(app, component)
 
         app.mount(
             "/",
