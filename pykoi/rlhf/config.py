@@ -144,12 +144,6 @@ class RLHFConfig:
             "help": "Output directory for step 1 supervised finetuning's Lora weights."
         },
     )
-    sft_merged_path: Optional[str] = field(
-        default="step1_supervised_finetuning_merged/",
-        metadata={
-            "help": "Output directory for step 1 supervised finetuning's merged weights."
-        },
-    )
     lr_scheduler_type_sft: Optional[str] = field(
         default="cosine", metadata={"help": "Type of learning rate scheduler."}
     )
@@ -175,15 +169,9 @@ class RLHFConfig:
         },
     )
     reward_lora_path: Optional[str] = field(
-        default="step1_supervised_finetuning_lora_final/",
+        default="step2_reward_finetuning_lora_final/",
         metadata={
             "help": "Output directory for step 1 supervised finetuning's Lora weights."
-        },
-    )
-    reward_merged_path: Optional[str] = field(
-        default="step1_supervised_finetuning_merged/",
-        metadata={
-            "help": "Output directory for step 1 supervised finetuning's merged weights."
         },
     )
     resume_from_checkpoint: Optional[bool] = field(
@@ -308,8 +296,8 @@ class RLHFConfig:
         default=True, metadata={"help": "Use adaptive KL control, otherwise linear"}
     )
     rl_lora_path: Optional[str] = field(
-        default="step1_reinforcement_learning_final_lora_weights/",
+        default="step3_reinforcement_learning_final_lora_weights/",
         metadata={
-            "help": "Output directory for step 1 supervised finetuning's Lora weights."
+            "help": "Output directory for step 3 reinforcement learning's Lora weights."
         },
     )
