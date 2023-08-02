@@ -239,6 +239,14 @@ class RLHFConfig:
     )
 
     # Step 3 RL parameters
+    step1_sft_model_path: str = field(
+        default="./models/rlhf_step1_sft",
+        metadata={"help": "Huggingface model name or a local path to the LoRA model trained via step 1."},
+    )
+    step2_reward_model_path: str = field(
+        default="./models/rlhf_step2_rw",
+        metadata={"help": "Huggingface model name or a local path to the LoRA model trained via step 1."},
+    )
     dataset_subset_rl: Optional[str] = field(
         default="data",
         metadata={"help": "Subset folder of the dataset to use."}, ## TODO
