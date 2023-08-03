@@ -4,7 +4,8 @@ from pykoi.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,
-    QA_CSV_HEADER_VOTE_STATUS)
+    QA_CSV_HEADER_VOTE_STATUS,
+)
 
 import os
 
@@ -27,12 +28,18 @@ from trl.core import LengthSampler
 
 class RLFinetuning(Trainer):
     def __init__(self, rlhf_config: RLHFConfig):
+        """
+        RLFinetuning class for finetuning a language model using reinforcement learning.
+
+        Args:
+            rlhf_config (RLHFConfig): Configuration object for RLHF.
+        """
         self._rlhf_config = rlhf_config
         self.accelerator = Accelerator()
         self.num_proc = (
             self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         )
-        set_seed(rlhf_config.seed)  ## TODO: how to set seed properly in __init__?
+        set_seed(rlhf_config.seed)
 
         self.ppo_config = PPOConfig(
             steps=self._rlhf_config.total_epochs,
@@ -57,12 +64,11 @@ class RLFinetuning(Trainer):
         self.reward_model = AutoModelForSequenceClassification.from_pretrained(
             rlhf_config.reward_model_path,
             num_labels=1,
-            # torch_dtype=torch.bfloat16,
             load_in_8bit=True,
             device_map={"": Accelerator().local_process_index},
         )
         self.reward_kwargs = {
-            "top_k": None,  ## TODO `return_all_scores` is now deprecated,  if want a similar functionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
+            "top_k": None,
             "function_to_apply": "none",
             "batch_size": self._rlhf_config.ppo_batch_size,
             "truncation": True,
@@ -84,8 +90,6 @@ class RLFinetuning(Trainer):
         self.base_model = AutoModelForCausalLMWithValueHead.from_pretrained(
             rlhf_config.base_model_path,
             load_in_8bit=rlhf_config.load_in_8bit,
-            # is_loaded_in_8bit = True, # TODO TypeError: LlamaForCausalLM.__init__() got an unexpected keyword argument 'is_loaded_in_8bit'
-            # torch_dtype=torch.float16,
             device_map={"": Accelerator().local_process_index},
             peft_config=rlhf_config.lora_config_rl,
         )
@@ -96,8 +100,6 @@ class RLFinetuning(Trainer):
             tokenizer=self.base_tokenizer,
             dataset=self.base_dataset,
             data_collator=self.data_collator,
-            # optimizer=optimizer,
-            # peft_config=lora_config, ## PPOTrainer doesn't support parameter peft_config
         )
         self.base_kwargs = {
             "top_k": rlhf_config.top_k,
@@ -108,18 +110,42 @@ class RLFinetuning(Trainer):
         }
 
     def create_tokenizer(self, model_name):
+        """
+        Create a tokenizer for the given model name or model path.
+
+        Args:
+            model_name (str): The name of the model to create the tokenizer for.
+
+        Returns:
+            tokenizer (transformers.tokenization_utils_base.PreTrainedTokenizerBase): The tokenizer for the given model.
+        """
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         if getattr(tokenizer, "pad_token", None) is None:
             tokenizer.pad_token = tokenizer.eos_token
         return tokenizer
 
     def data_collator(self, data):
+        """
+        Collate a batch of data samples into a dictionary.
+
+        Args:
+            data (List[Dict[str, Any]]): A list of data samples, where each sample is a dictionary.
+
+        Returns:
+            collated_data (Dict[str, List[Any]]): A dictionary where each key corresponds to a feature and the value is a list of values for that feature across all samples.
+        """
         return dict((key, [d[key] for d in data]) for key in data[0])
 
     def create_dataset(self, tokenizer):
         """
-        Build dataset for training. This builds the dataset from `load_dataset`, one should
+        Build dataset for finetuning. This builds the dataset from `load_dataset`, one should
         customize this function to train the model on its own dataset.
+
+        Args:
+            tokenizer (transformers.tokenization_utils_base.PreTrainedTokenizerBase): The tokenizer to load a given dataset.
+
+        Returns:
+            dataset (datasets.Dataset): The dataset for finetuning.
         """
         args = self._rlhf_config
         if args.dataset_type == "local_db":
@@ -134,7 +160,7 @@ class RLFinetuning(Trainer):
         elif args.dataset_type == "local_csv":  ## TODO: test
             dataset = load_dataset("csv", data_files=args.dataset_name)
             dataset = dataset[args.split]  # Convert DatasetDict to Dataset
-        elif args.dataset_type == "huggingface":  ## TODO: test
+        elif args.dataset_type == "huggingface":
             dataset = load_dataset(
                 args.dataset_name,
                 data_dir=args.dataset_subset_rl,
@@ -143,20 +169,10 @@ class RLFinetuning(Trainer):
                 # num_proc=self.num_proc,
                 # streaming=args.streaming,
             )
-        ## TODO: if args.split in dataset.columns:
-        # dataset = dataset[args.split] # Convert DatasetDict to Dataset
         else:
             raise FileNotFoundError(
                 f"No (supported) data files or dataset script found {args.dataset_type}"
             )
-
-        # dataset = dataset.train_test_split(test_size=args.train_test_split_ratio,
-        #                                    seed=args.seed)
-        # print(f"Size of the train set: {len(dataset['train'])}. \
-        #       Size of the validation set: {len(dataset['test'])}")
-
-        ## TODO: evaluate on eval
-        # dataset = dataset.select(range(self._rlhf_config.dataset_subset_rl_train))
 
         def preprocess_function(examples):
             new_examples = {
@@ -170,7 +186,6 @@ class RLFinetuning(Trainer):
                 new_examples["input_ids"].append(tokenized_question["input_ids"])
             return new_examples
 
-        # pdb.set_trace() ## TODO
         dataset = dataset.map(
             preprocess_function,
             batched=True,
@@ -181,16 +196,21 @@ class RLFinetuning(Trainer):
             lambda x: len(x["input_ids"]) < self._rlhf_config.max_seq_length,
             batched=False,
         )
-        dataset.set_format(type="torch")  ## TODO
+        dataset.set_format(type="torch")
 
         return dataset
 
     def train(self, save_checkpoints_path=None):
+        """
+        Finetune the RL model using PPO algorithm.
+
+        Args:
+            save_checkpoints_path (str, optional): Path to save the model checkpoints. Defaults to None.
+        """
         ## Initialize accelerator
         self.ppo_trainer.dataloader = self.accelerator.prepare(
             self.ppo_trainer.dataloader
         )
-
         ## training
         for epoch, batch in tqdm(enumerate(self.ppo_trainer.dataloader)):
             if epoch >= self._rlhf_config.total_epochs:
@@ -232,19 +252,30 @@ class RLFinetuning(Trainer):
                         "checkpoints",
                         f"checkpoints_epoch_{epoch}",
                     )
-                self.ppo_trainer.model.save(
-                    save_checkpoints_path
-                )  ## TODO: only save adapter
+                self.ppo_trainer.model.save(save_checkpoints_path)
 
     def save(self, output_path=None):
+        """
+        Saves the RL findtuned model to the specified output path. If no output path is provided, the model is saved to the
+        output directory specified in the RLHFConfig object.
+
+        Args:
+            output_path (str, optional): The path to save the model to. Defaults to None.
+        """
         if output_path is None:
             output_path = os.path.join(
                 self._rlhf_config.output_dir,
-                # "final_lora_models",
                 self._rlhf_config.rl_lora_path,
             )
         self.ppo_trainer.save_pretrained(output_path)
 
     def train_and_save(self, output_path=None):
+        """
+        Finetune the model with RL and save it to the specified output path. If no output path is provided, the model
+        is saved to the output directory specified in the RLHFConfig object.
+
+        Args:
+            output_path (str, optional): The path to save the model to. Defaults to None.
+        """
         self.train(save_checkpoints_path=output_path)
         self.save(output_path)
