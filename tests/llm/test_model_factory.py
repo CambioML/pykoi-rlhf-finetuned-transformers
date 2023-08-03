@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import patch
 from pykoi.llm.constants import ModelSource
-from pykoi.llm.factory import ModelFactory
+from pykoi.llm.model_factory import ModelFactory
 
 
 class TestModelFactory(unittest.TestCase):
-    @patch("pykoi.llm.factory.OpenAIModel")
+    @patch("pykoi.llm.model_factory.OpenAIModel")
     def test_create_model_openai(self, mock_model):
         """
         Test that the factory creates an OpenAIModel instance when the model
@@ -13,7 +13,7 @@ class TestModelFactory(unittest.TestCase):
         ModelFactory.create_model(ModelSource.OPENAI, model_name="gpt3")
         mock_model.assert_called_once_with(model_name="gpt3")
 
-    @patch("pykoi.llm.factory.HuggingfaceModel")
+    @patch("pykoi.llm.model_factory.HuggingfaceModel")
     def test_create_model_huggingface(self, mock_model):
         """
         Test that the factory creates a HuggingfaceModel instance when the model
@@ -21,7 +21,7 @@ class TestModelFactory(unittest.TestCase):
         ModelFactory.create_model(ModelSource.HUGGINGFACE, model_name="gpt2")
         mock_model.assert_called_once_with(model_name="gpt2")
 
-    @patch("pykoi.llm.factory.PeftHuggingfacemodel")
+    @patch("pykoi.llm.model_factory.PeftHuggingfacemodel")
     def test_create_model_peft_huggingface(self, mock_model):
         """
         Test that the factory creates a PeftHuggingfaceModel instance when the model
