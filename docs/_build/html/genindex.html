@@ -1,0 +1,971 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 6.2.1 and Furo 2023.07.26 --><title>Index - pykoi 0.0.0 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=369552022d0b975c8e74270ce6eabe0fb7978f24" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-admonition-title--note: #00ebc7;
+  --color-admonition-title-background--note: #a2fff1;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">pykoi 0.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo.svg" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tour.html">Quick Tour</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data_collection_feedback.html">Chat UI &amp; Feedback</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_comparison.html">Comparing Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reinforment_learning_with_human_feedback_rlhf.html">RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_labeling_annotation.html">Data Labeling &amp; Annotation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_retrieval.html">Finetuning &amp; Knowledge Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analytics.html">Observability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding.html">Vista</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">pykoi</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of pykoi</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pykoi.html">pykoi package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of pykoi package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="pykoi.component.html">pykoi.component package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykoi.db.html">pykoi.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykoi.llm.html">pykoi.llm package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pykoi.rlhf.html">pykoi.rlhf package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Social</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="community.html">Community</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a></div>
+</section>
+<section id="_" class="genindex-section">
+  <h2>_</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel._engine">_engine (pykoi.llm.openai.OpenAIModel attribute)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel._max_length">_max_length (pykoi.llm.peft_huggingface.PeftHuggingfacemodel attribute)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel._max_tokens">_max_tokens (pykoi.llm.openai.OpenAIModel attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel._model">_model (pykoi.llm.peft_huggingface.PeftHuggingfacemodel attribute)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel._temperature">_temperature (pykoi.llm.openai.OpenAIModel attribute)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel._tokenizer">_tokenizer (pykoi.llm.peft_huggingface.PeftHuggingfacemodel attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#pykoi.llm.abs_llm.AbsLlm">AbsLlm (class in pykoi.llm.abs_llm)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.Application.add_component">add_component() (pykoi.application.Application method)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.ModelAnswer.answer">answer (pykoi.application.ModelAnswer attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.Application">Application (class in pykoi.application)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.Application.auth_required">auth_required() (pykoi.application.Application method)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.Application.authenticate_user">authenticate_user() (pykoi.application.Application method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.component.html#pykoi.component.base.Chatbot">Chatbot (class in pykoi.component.base)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.chatbot_database_factory.ChatbotDatabaseFactory">ChatbotDatabaseFactory (class in pykoi.component.chatbot_database_factory)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.close_connection">close_connection() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.close_connection">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.html#pykoi.application.ComparatorInsertRequest">ComparatorInsertRequest (class in pykoi.application)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.base.Component">Component (class in pykoi.component.base)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.compute_loss">compute_loss() (pykoi.rlhf.rlhf.RewardTrainer method)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.state.Store.count">count (pykoi.state.Store attribute)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.chatbot_database_factory.ChatbotDatabaseFactory.create">create() (pykoi.component.chatbot_database_factory.ChatbotDatabaseFactory static method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.Application.create_chatbot_comparator_route">create_chatbot_comparator_route() (pykoi.application.Application method)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.Application.create_chatbot_route">create_chatbot_route() (pykoi.application.Application method)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RL.create_dataset">create_dataset() (pykoi.rlhf.rlhf.RL method)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.create_datasets">create_datasets() (pykoi.rlhf.rlhf.RewardTrainer method)</a>
+
+        <ul>
+          <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.create_datasets">(pykoi.rlhf.rlhf.SFT method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.html#pykoi.application.Application.create_feedback_route">create_feedback_route() (pykoi.application.Application method)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.model_factory.ModelFactory.create_model">create_model() (pykoi.llm.model_factory.ModelFactory static method)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.create_table">create_table() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.create_table">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RL.create_tokenizer">create_tokenizer() (pykoi.rlhf.rlhf.RL method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.component.html#pykoi.component.base.Dashboard">Dashboard (class in pykoi.component.base)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.ComparatorInsertRequest.data">data (pykoi.application.ComparatorInsertRequest attribute)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RL.data_collator">data_collator() (pykoi.rlhf.rlhf.RL method)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.base.Component.data_source">data_source (pykoi.component.base.Component attribute)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.base.Chatbot.database">database (pykoi.component.base.Chatbot attribute)</a>
+
+        <ul>
+          <li><a href="pykoi.component.html#pykoi.component.base.Dashboard.database">(pykoi.component.base.Dashboard attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.dataset">dataset (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.base.DataSource">DataSource (class in pykoi.component.base)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.state.Store.decrement">decrement() (pykoi.state.Store method)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.base.Dropdown">Dropdown (class in pykoi.component.base)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.Application.dummy_auth">dummy_auth() (pykoi.application.Application method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.component.html#pykoi.component.constants.FeedbackType">FeedbackType (class in pykoi.component.constants)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.component.html#pykoi.component.base.DataSource.fetch_func">fetch_func (pykoi.component.base.DataSource attribute)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.find_free_port">find_free_port() (in module pykoi.application)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.Application.get_auth_dependency">get_auth_dependency() (pykoi.application.Application method)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.get_connection">get_connection() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.get_connection">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.get_cursor">get_cursor() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.get_cursor">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.state.Store.hello">hello() (pykoi.state.Store method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#id0">HUGGINGFACE (pykoi.llm.constants.ModelSource attribute)</a>, <a href="pykoi.llm.html#pykoi.llm.constants.ModelSource.HUGGINGFACE">[1]</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.huggingface.HuggingfaceModel">HuggingfaceModel (class in pykoi.llm.huggingface)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.UpdateQATable.id">id (pykoi.application.UpdateQATable attribute)</a>
+
+        <ul>
+          <li><a href="pykoi.component.html#pykoi.component.base.Component.id">(pykoi.component.base.Component attribute)</a>
+</li>
+          <li><a href="pykoi.component.html#pykoi.component.base.DataSource.id">(pykoi.component.base.DataSource attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.state.Store.increment">increment() (pykoi.state.Store method)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.InferenceRankingTable">InferenceRankingTable (class in pykoi.application)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.insert_question_answer">insert_question_answer() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.insert_ranking">insert_ranking() (pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.load_lora">load_lora() (pykoi.rlhf.rlhf.SFT method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.RankingTableUpdate.low_ranking_answer">low_ranking_answer (pykoi.application.RankingTableUpdate attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.ModelAnswer.model">model (pykoi.application.ModelAnswer attribute)</a>
+
+        <ul>
+          <li><a href="pykoi.component.html#pykoi.component.base.Chatbot.model">(pykoi.component.base.Chatbot attribute)</a>
+</li>
+          <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.model">(pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.html#pykoi.application.ComparatorInsertRequest.model_config">model_config (pykoi.application.ComparatorInsertRequest attribute)</a>
+
+        <ul>
+          <li><a href="pykoi.html#pykoi.application.InferenceRankingTable.model_config">(pykoi.application.InferenceRankingTable attribute)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.application.ModelAnswer.model_config">(pykoi.application.ModelAnswer attribute)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.application.RankingTableUpdate.model_config">(pykoi.application.RankingTableUpdate attribute)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.application.UpdateQATable.model_config">(pykoi.application.UpdateQATable attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.html#pykoi.application.ComparatorInsertRequest.model_fields">model_fields (pykoi.application.ComparatorInsertRequest attribute)</a>
+
+        <ul>
+          <li><a href="pykoi.html#pykoi.application.InferenceRankingTable.model_fields">(pykoi.application.InferenceRankingTable attribute)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.application.ModelAnswer.model_fields">(pykoi.application.ModelAnswer attribute)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.application.RankingTableUpdate.model_fields">(pykoi.application.RankingTableUpdate attribute)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.application.UpdateQATable.model_fields">(pykoi.application.UpdateQATable attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.llm.html#pykoi.llm.huggingface.HuggingfaceModel.model_source">model_source (pykoi.llm.huggingface.HuggingfaceModel attribute)</a>
+
+        <ul>
+          <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel.model_source">(pykoi.llm.openai.OpenAIModel attribute)</a>
+</li>
+          <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel.model_source">(pykoi.llm.peft_huggingface.PeftHuggingfacemodel attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.html#pykoi.application.ModelAnswer">ModelAnswer (class in pykoi.application)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.model_factory.ModelFactory">ModelFactory (class in pykoi.llm.model_factory)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.constants.ModelSource">ModelSource (class in pykoi.llm.constants)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    module
+
+        <ul>
+          <li><a href="pykoi.html#module-pykoi">pykoi</a>
+</li>
+          <li><a href="pykoi.html#module-pykoi.application">pykoi.application</a>
+</li>
+          <li><a href="pykoi.component.html#module-pykoi.component">pykoi.component</a>
+</li>
+          <li><a href="pykoi.component.html#module-pykoi.component.base">pykoi.component.base</a>
+</li>
+          <li><a href="pykoi.component.html#module-pykoi.component.chatbot_database_factory">pykoi.component.chatbot_database_factory</a>
+</li>
+          <li><a href="pykoi.component.html#module-pykoi.component.constants">pykoi.component.constants</a>
+</li>
+          <li><a href="pykoi.db.html#module-pykoi.db">pykoi.db</a>
+</li>
+          <li><a href="pykoi.db.html#module-pykoi.db.qa_database">pykoi.db.qa_database</a>
+</li>
+          <li><a href="pykoi.db.html#module-pykoi.db.ranking_database">pykoi.db.ranking_database</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm">pykoi.llm</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.abs_llm">pykoi.llm.abs_llm</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.constants">pykoi.llm.constants</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.huggingface">pykoi.llm.huggingface</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.model_factory">pykoi.llm.model_factory</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.openai">pykoi.llm.openai</a>
+</li>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.peft_huggingface">pykoi.llm.peft_huggingface</a>
+</li>
+          <li><a href="pykoi.rlhf.html#module-pykoi.rlhf">pykoi.rlhf</a>
+</li>
+          <li><a href="pykoi.rlhf.html#module-pykoi.rlhf.rlhf">pykoi.rlhf.rlhf</a>
+</li>
+          <li><a href="pykoi.html#module-pykoi.state">pykoi.state</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.InferenceRankingTable.n">n (pykoi.application.InferenceRankingTable attribute)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.abs_llm.AbsLlm.name">name (pykoi.llm.abs_llm.AbsLlm property)</a>
+
+        <ul>
+          <li><a href="pykoi.llm.html#pykoi.llm.huggingface.HuggingfaceModel.name">(pykoi.llm.huggingface.HuggingfaceModel property)</a>
+</li>
+          <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel.name">(pykoi.llm.openai.OpenAIModel property)</a>
+</li>
+          <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel.name">(pykoi.llm.peft_huggingface.PeftHuggingfacemodel property)</a>
+</li>
+          <li><a href="pykoi.html#pykoi.state.Store.name">(pykoi.state.Store attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#pykoi.llm.abs_llm.AbsLlm.None">None (pykoi.llm.abs_llm.AbsLlm attribute)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.num_proc">num_proc (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#id1">OPENAI (pykoi.llm.constants.ModelSource attribute)</a>, <a href="pykoi.llm.html#pykoi.llm.constants.ModelSource.OPENAI">[1]</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel">OpenAIModel (class in pykoi.llm.openai)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.llm.html#id2">PEFT_HUGGINGFACE (pykoi.llm.constants.ModelSource attribute)</a>, <a href="pykoi.llm.html#pykoi.llm.constants.ModelSource.PEFT_HUGGINGFACE">[1]</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel">PeftHuggingfacemodel (class in pykoi.llm.peft_huggingface)</a>
+</li>
+        <li><a href="pykoi.llm.html#pykoi.llm.abs_llm.AbsLlm.predict">predict() (pykoi.llm.abs_llm.AbsLlm method)</a>
+
+        <ul>
+          <li><a href="pykoi.llm.html#pykoi.llm.huggingface.HuggingfaceModel.predict">(pykoi.llm.huggingface.HuggingfaceModel method)</a>
+</li>
+          <li><a href="pykoi.llm.html#pykoi.llm.openai.OpenAIModel.predict">(pykoi.llm.openai.OpenAIModel method)</a>
+</li>
+          <li><a href="pykoi.llm.html#pykoi.llm.peft_huggingface.PeftHuggingfacemodel.predict">(pykoi.llm.peft_huggingface.PeftHuggingfacemodel method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.prepare_sample_text">prepare_sample_text() (pykoi.rlhf.rlhf.SFT method)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.print_table">print_table() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.print_table">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.component.html#pykoi.component.base.Component.props">props (pykoi.component.base.Component attribute)</a>
+</li>
+        <li>
+    pykoi
+
+        <ul>
+          <li><a href="pykoi.html#module-pykoi">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.application
+
+        <ul>
+          <li><a href="pykoi.html#module-pykoi.application">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.component
+
+        <ul>
+          <li><a href="pykoi.component.html#module-pykoi.component">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.component.base
+
+        <ul>
+          <li><a href="pykoi.component.html#module-pykoi.component.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.component.chatbot_database_factory
+
+        <ul>
+          <li><a href="pykoi.component.html#module-pykoi.component.chatbot_database_factory">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.component.constants
+
+        <ul>
+          <li><a href="pykoi.component.html#module-pykoi.component.constants">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.db
+
+        <ul>
+          <li><a href="pykoi.db.html#module-pykoi.db">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    pykoi.db.qa_database
+
+        <ul>
+          <li><a href="pykoi.db.html#module-pykoi.db.qa_database">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.db.ranking_database
+
+        <ul>
+          <li><a href="pykoi.db.html#module-pykoi.db.ranking_database">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm.abs_llm
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.abs_llm">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm.constants
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.constants">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm.huggingface
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.huggingface">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm.model_factory
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.model_factory">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm.openai
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.openai">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.llm.peft_huggingface
+
+        <ul>
+          <li><a href="pykoi.llm.html#module-pykoi.llm.peft_huggingface">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.rlhf
+
+        <ul>
+          <li><a href="pykoi.rlhf.html#module-pykoi.rlhf">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.rlhf.rlhf
+
+        <ul>
+          <li><a href="pykoi.rlhf.html#module-pykoi.rlhf.rlhf">module</a>
+</li>
+        </ul></li>
+        <li>
+    pykoi.state
+
+        <ul>
+          <li><a href="pykoi.html#module-pykoi.state">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Q" class="genindex-section">
+  <h2>Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.ModelAnswer.qid">qid (pykoi.application.ModelAnswer attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.RankingTableUpdate.question">question (pykoi.application.RankingTableUpdate attribute)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase">QuestionAnswerDatabase (class in pykoi.db.qa_database)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.ModelAnswer.rank">rank (pykoi.application.ModelAnswer attribute)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.constants.FeedbackType.RANK">RANK (pykoi.component.constants.FeedbackType attribute)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase">RankingDatabase (class in pykoi.db.ranking_database)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.RankingTableUpdate">RankingTableUpdate (class in pykoi.application)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.read_json_file">read_json_file() (in module pykoi.rlhf.rlhf)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.retrieve_all_question_answers">retrieve_all_question_answers() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.retrieve_all_question_answers">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.retrieve_all_question_answers_as_pandas">retrieve_all_question_answers_as_pandas() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.retrieve_all_question_answers_as_pandas">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardDataCollatorWithPadding">RewardDataCollatorWithPadding (class in pykoi.rlhf.rlhf)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer">RewardTrainer (class in pykoi.rlhf.rlhf)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RL">RL (class in pykoi.rlhf.rlhf)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.rlhf_config">rlhf_config (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.Application.run">run() (pykoi.application.Application method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.save">save() (pykoi.rlhf.rlhf.RewardTrainer method)</a>
+
+        <ul>
+          <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.save">(pykoi.rlhf.rlhf.SFT method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.save_to_csv">save_to_csv() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+
+        <ul>
+          <li><a href="pykoi.db.html#pykoi.db.ranking_database.RankingDatabase.save_to_csv">(pykoi.db.ranking_database.RankingDatabase method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT">SFT (class in pykoi.rlhf.rlhf)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.state.State">State (class in pykoi.state)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.state.Store">Store (class in pykoi.state)</a>
+</li>
+        <li><a href="pykoi.component.html#pykoi.component.base.Component.svelte_component">svelte_component (pykoi.component.base.Component attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.tokenizer">tokenizer (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.torch_dtype">torch_dtype (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RL.train">train() (pykoi.rlhf.rlhf.RL method)</a>
+
+        <ul>
+          <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.train">(pykoi.rlhf.rlhf.SFT method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.RewardTrainer.train_and_save">train_and_save() (pykoi.rlhf.rlhf.RewardTrainer method)</a>
+
+        <ul>
+          <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.train_and_save">(pykoi.rlhf.rlhf.SFT method)</a>
+</li>
+        </ul></li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.trainer">trainer (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+        <li><a href="pykoi.rlhf.html#pykoi.rlhf.rlhf.SFT.training_args">training_args (pykoi.rlhf.rlhf.SFT attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.RankingTableUpdate.up_ranking_answer">up_ranking_answer (pykoi.application.RankingTableUpdate attribute)</a>
+</li>
+        <li><a href="pykoi.db.html#pykoi.db.qa_database.QuestionAnswerDatabase.update_vote_status">update_vote_status() (pykoi.db.qa_database.QuestionAnswerDatabase method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.html#pykoi.application.UpdateQATable">UpdateQATable (class in pykoi.application)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.UserInDB">UserInDB (class in pykoi.application)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.component.html#pykoi.component.base.Dropdown.value_column">value_column (pykoi.component.base.Dropdown attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="pykoi.component.html#pykoi.component.constants.FeedbackType.VOTE">VOTE (pykoi.component.constants.FeedbackType attribute)</a>
+</li>
+        <li><a href="pykoi.html#pykoi.application.UpdateQATable.vote_status">vote_status (pykoi.application.UpdateQATable attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, CambioML
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/CambioML/pykoi" aria-label="Website">
+                <svg width="447" height="425" viewBox="0 0 447 425" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M436 212.5C436 323.269 341.39 414 223.5 414C105.61 414 11 323.269 11 212.5C11 101.731 105.61 11 223.5 11C341.39 11 436 101.731 436 212.5Z" stroke="#393939" stroke-width="22"/>
+                    <rect x="118" y="148" width="40" height="42.2633" rx="20" fill="#393939"/>
+                    <rect x="210" y="148" width="40" height="42.2633" rx="20" fill="#393939"/>
+                    <rect x="302" y="148" width="40" height="40" rx="20" fill="#393939"/>
+                    <path d="M184.646 212C184.646 212 171.914 285 259.488 285C347.062 285 357 212 357 212" stroke="#393939" stroke-width="22" stroke-linecap="round"/>
+                    <path d="M97.6462 212C97.6462 212 84.9137 285 172.488 285C260.062 285 270 212 270 212" stroke="#393939" stroke-width="22" stroke-linecap="round"/>
+                </svg>
+            </a>
+              <a class="muted-link " href="https://github.com/CambioML/pykoi" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>
