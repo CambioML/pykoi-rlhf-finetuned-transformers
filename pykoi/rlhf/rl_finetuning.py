@@ -10,7 +10,6 @@ import os
 
 import torch
 from pykoi.db.qa_database import QuestionAnswerDatabase
-from pykoi.llm.peft_huggingface import PeftHuggingfacemodel
 from accelerate import Accelerator
 from datasets import Dataset, load_dataset
 
@@ -52,26 +51,16 @@ class RLFinetuning(Trainer):
             # accelerator_kwargs=self._rlhf_config.accelerator_kwargs,
         )
 
-        ################################################################################
-        ## TODO: REMOVE
         ## Load the reward model and tokenizer and define the reward pipeline
-        # self.reward_model = AutoModelForSequenceClassification.from_pretrained(
-        #     rlhf_config.reward_model_path,
-        #     num_labels=1,
-        #     # torch_dtype=torch.bfloat16,
-        #     load_in_8bit=True,
-        #     device_map={"": Accelerator().local_process_index},
-        # )
-        # self.reward_tokenizer = self.create_tokenizer(rlhf_config.reward_model_path)
-        ################################################################################
-
-        ## Load the reward model and tokenizer and define the reward pipeline
-        ## TODO: need to be AutoModelForSequenceClassification
-        step2_rw_model = PeftHuggingfacemodel(base_model_path=rlhf_config.base_model_path, 
-                                             lora_model_path=rlhf_config.step2_reward_model_path)
-        self.reward_model = step2_rw_model._model
-        self.reward_tokenizer = step2_rw_model._tokenizer
+        self.reward_tokenizer = self.create_tokenizer(rlhf_config.reward_model_path)
         self.reward_dataset = self.create_dataset(self.reward_tokenizer)
+        self.reward_model = AutoModelForSequenceClassification.from_pretrained(
+            rlhf_config.reward_model_path,
+            num_labels=1,
+            # torch_dtype=torch.bfloat16,
+            load_in_8bit=True,
+            device_map={"": Accelerator().local_process_index},
+        )
         self.reward_kwargs = {
             "top_k": None,  ## TODO `return_all_scores` is now deprecated,  if want a similar functionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
             "function_to_apply": "none",
@@ -88,12 +77,10 @@ class RLFinetuning(Trainer):
             tokenizer=self.reward_tokenizer,
             return_token_type_ids=False,
         )
-        
-        ################################################################################
-        ## TODO: REMOVE
+
         ## Load the base model and tokenizer and define the PPO Trainer for RL
         self.base_tokenizer = self.create_tokenizer(rlhf_config.base_model_path)
-        
+        self.base_dataset = self.create_dataset(self.base_tokenizer)
         self.base_model = AutoModelForCausalLMWithValueHead.from_pretrained(
             rlhf_config.base_model_path,
             load_in_8bit=rlhf_config.load_in_8bit,
@@ -102,16 +89,6 @@ class RLFinetuning(Trainer):
             device_map={"": Accelerator().local_process_index},
             peft_config=rlhf_config.lora_config_rl,
         )
-        ################################################################################
-        ## Load the base model and tokenizer and define the PPO Trainer for RL
-        step1_sft_model = PeftHuggingfacemodel(base_model_path=rlhf_config.base_model_path, 
-                                               lora_model_path=rlhf_config.step1_sft_model_path,
-                                               load_in_8bit=rlhf_config.load_in_8bit,
-                                               device_map={"": Accelerator().local_process_index})
-        self.base_tokenizer = step1_sft_model._tokenizer
-        self.base_dataset = self.create_dataset(self.base_tokenizer)
-        self.base_model =step1_sft_model._model
-        ################################################################################
         self.ppo_trainer = PPOTrainer(
             config=self.ppo_config,
             model=self.base_model,
