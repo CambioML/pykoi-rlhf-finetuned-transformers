@@ -20,9 +20,9 @@ class PeftHuggingfacemodel(AbsLlm):
 
     def __init__(
         self,
-        name: str,
         base_model_path: str,
         lora_model_path: str,
+        name: str = None,
         trust_remote_code: bool = True,
         load_in_8bit: bool = True,
         max_length: int = 100,
@@ -32,9 +32,9 @@ class PeftHuggingfacemodel(AbsLlm):
         The constructor for PeftHuggingfacemodel class.
 
         Args:
-            name (str): The name of the model.
             base_model_path (str): The path to the base model.
             lora_model_path (str): The path to the lora model.
+            name (str): The name of the model. Defaults to None.
             trust_remote_code (bool, optional): Whether to trust remote code. Defaults to True.
             load_in_8bit (bool, optional): Whether to load in 8bit. Defaults to True.
             max_length (int, optional): The maximum length of the generated text. Defaults to 100.

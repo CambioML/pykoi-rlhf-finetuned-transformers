@@ -21,8 +21,8 @@ class OpenAIModel(AbsLlm):
 
     def __init__(
         self,
-        name: str,
         api_key: str,
+        name: str = None,
         engine: str = "davinci",
         max_tokens: int = 100,
         temperature: float = 0.5,
@@ -31,8 +31,8 @@ class OpenAIModel(AbsLlm):
         Initializes the OpenAI model with the given parameters.
 
         Args:
-            name (str): The name of the model.
             api_key (str): The API key for the OpenAI model.
+            name (str): The name of the model. Defaults to None.
             engine (str, optional): The engine to use for the OpenAI model. Defaults to "davinci".
             max_tokens (int, optional): The maximum number of tokens to generate. Defaults to 100.
             temperature (float, optional): The temperature to use for the OpenAI model. Defaults to 0.5.
