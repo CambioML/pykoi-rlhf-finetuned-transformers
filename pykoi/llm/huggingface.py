@@ -13,6 +13,7 @@ class HuggingfaceModel(AbsLlm):
 
     def __init__(
         self,
+        name: str,
         pretrained_model_name_or_path: str,
         trust_remote_code: bool = True,
         load_in_8bit: bool = True,
@@ -23,6 +24,7 @@ class HuggingfaceModel(AbsLlm):
         Initialize the Huggingface model.
 
         Args:
+            name (str): The name of the model
             pretrained_model_name_or_path (str): The name or path of the pretrained model.
             trust_remote_code (bool): Whether to trust the remote code. Default is True.
             load_in_8bit (bool): Whether to load the model in 8-bit. Default is True.
@@ -46,10 +48,13 @@ class HuggingfaceModel(AbsLlm):
         )
         self._max_length = max_length
         self._pretrained_model_name_or_path = pretrained_model_name_or_path
+        self._name = name
         super().__init__()
 
     @property
     def name(self):
+        if self._name:
+            return self._name
         return "_".join([
             str(HuggingfaceModel.model_source),
             str(self._pretrained_model_name_or_path),
