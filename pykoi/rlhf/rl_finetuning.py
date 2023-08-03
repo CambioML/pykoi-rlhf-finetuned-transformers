@@ -140,22 +140,26 @@ class RLFinetuning(Trainer):
 
     def create_dataset(self, tokenizer):
         """
-        Build dataset for finetuning. This builds the dataset from `load_dataset`, one should
-        customize this function to train the model on its own dataset.
+        Build dataset for finetuning. This builds the dataset from `load_dataset`, 
+        one should customize this function to train the model on its own dataset.
 
         Args:
-            tokenizer (transformers.tokenization_utils_base.PreTrainedTokenizerBase): The tokenizer to load a given dataset.
+            tokenizer (transformers.tokenization_utils_base.PreTrainedTokenizerBase): 
+            The tokenizer to load a given dataset.
 
         Returns:
             dataset (datasets.Dataset): The dataset for finetuning.
         """
         args = self._rlhf_config
         if args.dataset_type == "local_db":
-            qa_database = QuestionAnswerDatabase(db_file=self._rlhf_config.dataset_name)
+            qa_database = QuestionAnswerDatabase(
+                db_file=self._rlhf_config.dataset_name)
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
             my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"]
             my_data_pd = my_data_pd[
-                [QA_CSV_HEADER_ID, QA_CSV_HEADER_QUESTION, QA_CSV_HEADER_ANSWER]
+                [QA_CSV_HEADER_ID, 
+                 QA_CSV_HEADER_QUESTION, 
+                 QA_CSV_HEADER_ANSWER]
             ]
             print("My local database has {} samples".format(my_data_pd.shape[0]))
             dataset = Dataset.from_dict(my_data_pd)
@@ -177,6 +181,15 @@ class RLFinetuning(Trainer):
             )
 
         def preprocess_function(examples):
+            """
+            Preprocess a batch of examples for finetuning.
+
+            Args:
+                examples (Dict[str, Any]): A dictionary containing the examples to preprocess.
+
+            Returns:
+                new_examples (Dict[str, List[Any]]): A dictionary containing the preprocessed examples.
+            """
             new_examples = {
                 "query": [],
                 "input_ids": [],
@@ -207,7 +220,8 @@ class RLFinetuning(Trainer):
         Finetune the RL model using PPO algorithm.
 
         Args:
-            save_checkpoints_path (str, optional): Path to save the model checkpoints. Defaults to None.
+            save_checkpoints_path (str, optional): Path to save the model checkpoints. 
+            Default to None.
         """
         ## Initialize accelerator
         self.ppo_trainer.dataloader = self.accelerator.prepare(
@@ -243,7 +257,7 @@ class RLFinetuning(Trainer):
             ## log stats
             self.log_stats_to_json(epoch=epoch, stats=stats, reward=rewards[0])
             # self.ppo_trainer.log_stats(stats, batch, rewards)
-            print("stats: {}\n\n\n rewards: {}\n\n\n".format(stats, rewards))
+            print("\n\n\nstats: {}\n\n\n".format(stats))
 
             ## save weights
             if (
@@ -290,8 +304,8 @@ class RLFinetuning(Trainer):
 
     def save(self, output_path=None):
         """
-        Saves the RL findtuned model to the specified output path. If no output path is provided, the model is saved to the
-        output directory specified in the RLHFConfig object.
+        Saves the RL findtuned model to the specified output path. If no output path is provided, 
+        the model is saved to the output directory specified in the RLHFConfig object.
 
         Args:
             output_path (str, optional): The path to save the model to. Default to None.
@@ -305,8 +319,9 @@ class RLFinetuning(Trainer):
 
     def train_and_save(self, output_path=None):
         """
-        Finetune the model with RL and save it to the specified output path. If no output path is provided, the model
-        is saved to the output directory specified in the RLHFConfig object.
+        Finetune the model with RL and save it to the specified output path. 
+        If no output path is provided, the model is saved to the output directory 
+        specified in the RLHFConfig object.
 
         Args:
             output_path (str, optional): The path to save the model to. Default to None.
