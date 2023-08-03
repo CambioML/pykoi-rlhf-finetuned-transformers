@@ -9,6 +9,7 @@ class HuggingfaceModel(AbsLlm):
     This class is a wrapper for the Huggingface model for Language Model (LLM) Chain.
     It inherits from the abstract base class AbsLlm.
     """
+
     model_source = "huggingface"
 
     def __init__(
@@ -55,11 +56,13 @@ class HuggingfaceModel(AbsLlm):
     def name(self):
         if self._name:
             return self._name
-        return "_".join([
-            str(HuggingfaceModel.model_source),
-            str(self._pretrained_model_name_or_path),
-            str(self._max_length)
-        ])
+        return "_".join(
+            [
+                str(HuggingfaceModel.model_source),
+                str(self._pretrained_model_name_or_path),
+                str(self._max_length),
+            ]
+        )
 
     def predict(self, message: str, num_of_response: int = 1):
         """
@@ -72,14 +75,16 @@ class HuggingfaceModel(AbsLlm):
         Returns:
             List[str]: List of response.
         """
-        ## TODO: need to refractor and include all the derivatives of dolly family
+        # TODO: need to refractor and include all the derivatives of dolly family
         if "dolly" in self._pretrained_model_name_or_path:
             from pykoi.llm.instruct_pipeline import InstructionTextGenerationPipeline
-            generate_text = InstructionTextGenerationPipeline(model=self._model, 
-                                                              tokenizer=self._tokenizer)
+
+            generate_text = InstructionTextGenerationPipeline(
+                model=self._model, tokenizer=self._tokenizer
+            )
             res = generate_text(message)
             response = [res[0]["generated_text"]]
-        ## all other models except dolly family
+        # all other models except dolly family
         else:
             print("[HuggingfaceModel] encode...")
             input_ids = self._tokenizer.encode(message, return_tensors="pt")
@@ -94,7 +99,8 @@ class HuggingfaceModel(AbsLlm):
             )
             print("[HuggingfaceModel] decode...")
             response = [
-                self._tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids
+                self._tokenizer.decode(ids, skip_special_tokens=True)
+                for ids in output_ids
             ]
 
             response = [resp.split("\n")[1] for resp in response if "\n" in resp]

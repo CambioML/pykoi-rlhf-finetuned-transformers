@@ -1,65 +1,40 @@
-"""
-Test the ModelFactory class.
-"""
-
 import unittest
-from unittest.mock import MagicMock, patch
-
-from pykoi.llm.model_factory import ModelSource, ModelFactory
+from unittest.mock import patch
+from pykoi.llm.constants import ModelSource
+from pykoi.llm.factory import ModelFactory
 
 
 class TestModelFactory(unittest.TestCase):
-    """
-    Test the ModelFactory class.
-    """
-
-    def test_create_model_openai(self):
+    @patch("pykoi.llm.factory.OpenAIModel")
+    def test_create_model_openai(self, mock_model):
         """
-        Test creating an OpenAI model instance.
+        Test that the factory creates an OpenAIModel instance when the model
         """
-        model_source = ModelSource.OPENAI
+        ModelFactory.create_model(ModelSource.OPENAI, model_name="gpt3")
+        mock_model.assert_called_once_with(model_name="gpt3")
 
-        # Mock the OpenAIModel behavior
-        mock_openai_model = MagicMock()
-        openaimodel_mock = MagicMock(return_value=mock_openai_model)
-
-        # Patch the OpenAIModel class to use the mocked version
-        with patch("pykoi.llm.model_factory.OpenAIModel", openaimodel_mock):
-            result = ModelFactory.create_model(model_source)
-
-        # Check if the OpenAIModel class was called with the correct arguments
-        openaimodel_mock.assert_called_once()
-        self.assertEqual(result, mock_openai_model)
-
-    def test_create_model_huggingface(self):
+    @patch("pykoi.llm.factory.HuggingfaceModel")
+    def test_create_model_huggingface(self, mock_model):
         """
-        Test creating a Huggingface model instance.
+        Test that the factory creates a HuggingfaceModel instance when the model
         """
-        model_source = ModelSource.HUGGINGFACE
+        ModelFactory.create_model(ModelSource.HUGGINGFACE, model_name="gpt2")
+        mock_model.assert_called_once_with(model_name="gpt2")
 
-        # Mock the HuggingfaceModel behavior
-        mock_huggingface_model = MagicMock()
-        huggingface_model_mock = MagicMock(return_value=mock_huggingface_model)
-
-        # Patch the HuggingfaceModel class to use the mocked version
-        with patch(
-            "pykoi.llm.model_factory.HuggingfaceModel", huggingface_model_mock
-        ):
-            result = ModelFactory.create_model(model_source)
-
-        # Check if the HuggingfaceModel class was called with the correct arguments
-        huggingface_model_mock.assert_called_once()
-        self.assertEqual(result, mock_huggingface_model)
-
-    def test_create_model_invalid_name(self):
+    @patch("pykoi.llm.factory.PeftHuggingfacemodel")
+    def test_create_model_peft_huggingface(self, mock_model):
         """
-        Test creating a model with an invalid name.
+        Test that the factory creates a PeftHuggingfaceModel instance when the model
         """
-        model_source = "invalid_model_name"
+        ModelFactory.create_model(ModelSource.PEFT_HUGGINGFACE, model_name="gpt2")
+        mock_model.assert_called_once_with(model_name="gpt2")
 
-        # Assert that a ValueError is raised when an invalid model name is provided
+    def test_create_model_invalid_model_source(self):
+        """
+        Test that the factory raises a ValueError when the model source is invalid.
+        """
         with self.assertRaises(ValueError):
-            ModelFactory.create_model(model_source)
+            ModelFactory.create_model("INVALID_SOURCE")
 
 
 if __name__ == "__main__":
