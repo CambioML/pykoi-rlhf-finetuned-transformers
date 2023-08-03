@@ -10,13 +10,13 @@ api_key = ""
 
 # Creating an OpenAI model
 openai_model_1 = pykoi.ModelFactory.create_model(
-    model_source="openai", api_key=api_key, engine="babbage"
+    model_source="openai", name="openai_babbage", api_key=api_key, engine="babbage"
 )
 openai_model_2 = pykoi.ModelFactory.create_model(
-    model_source="openai", api_key=api_key, engine="curie"
+    model_source="openai", name="openai_curie", api_key=api_key, engine="curie"
 )
 openai_model_3 = pykoi.ModelFactory.create_model(
-    model_source="openai", api_key=api_key, engine="davinci"
+    model_source="openai", name="openai_davinci", api_key=api_key, engine="davinci"
 )
 
 ###################################################################################

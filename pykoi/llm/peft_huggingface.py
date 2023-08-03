@@ -20,6 +20,7 @@ class PeftHuggingfacemodel(AbsLlm):
 
     def __init__(
         self,
+        name: str,
         base_model_path: str,
         lora_model_path: str,
         trust_remote_code: bool = True,
@@ -31,6 +32,7 @@ class PeftHuggingfacemodel(AbsLlm):
         The constructor for PeftHuggingfacemodel class.
 
         Args:
+            name (str): The name of the model.
             base_model_path (str): The path to the base model.
             lora_model_path (str): The path to the lora model.
             trust_remote_code (bool, optional): Whether to trust remote code. Defaults to True.
@@ -63,12 +65,15 @@ class PeftHuggingfacemodel(AbsLlm):
         self._max_length = max_length
         self._base_model_path = base_model_path
         self._lora_model_path = lora_model_path
+        self._name = name
         self._model.to("cuda")
         self._model.eval()
         super().__init__()
 
     @property
     def name(self):
+        if self._name:
+            return self._name
         return "_".join([
             str(PeftHuggingfacemodel.model_source),
             str(self._base_model_path),
