@@ -18,7 +18,7 @@ class TestRankingDatabase(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary database for testing
-        self.ranking_db = RankingDatabase(db_file=TEST_DB_FILE, debug=True)
+        self.ranking_db = RankingDatabase(db_file=TEST_DB_FILE, debug=False)
 
     def tearDown(self):
         # Remove the temporary database and close connections after each test

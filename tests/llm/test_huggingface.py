@@ -3,7 +3,7 @@ from unittest.mock import patch, Mock
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from pykoi.llm.abs_llm import AbsLlm
-from pykoi.llm.huggingface_model import HuggingfaceModel
+from pykoi.llm.huggingface import HuggingfaceModel
 
 
 class TestHuggingfaceModel(unittest.TestCase):
