@@ -109,7 +109,7 @@ class RLFinetuning(Trainer):
             "pad_token_id": self.base_tokenizer.pad_token_id,
             "eos_token_id": rlhf_config.eos_token_id,
         }
-        self.ppo_log_stats_dict = {} # initialize the log stats dict
+        self.ppo_log_stats_dict = {}  # initialize the log stats dict
 
     def create_tokenizer(self, model_name):
         """
@@ -244,7 +244,6 @@ class RLFinetuning(Trainer):
             self.log_stats_to_json(epoch=epoch, stats=stats, reward=rewards[0])
             # self.ppo_trainer.log_stats(stats, batch, rewards)
             print("stats: {}\n\n\n rewards: {}\n\n\n".format(stats, rewards))
-            
 
             ## save weights
             if (
@@ -262,7 +261,7 @@ class RLFinetuning(Trainer):
 
     def log_stats_to_json(self, epoch, stats, reward, filename="ppo_log_stats.json"):
         """
-        Logs the PPO stats to a json file.        
+        Log the PPO stats to a json file.
         Args:
             epoch (int): The current epoch.
             stats (dict): The PPO stats.
@@ -278,8 +277,10 @@ class RLFinetuning(Trainer):
             elif isinstance(value, (int, float, str, bool)) or value is None:
                 new_log[stat_name] = value
             else:
-                print(f"Warning: Skipping non-serializable stat '{stat_name}' of type {type(value).__name__}")
-        new_log['reward'] = reward.tolist()
+                print(
+                    f"Warning: Skipping non-serializable stat '{stat_name}' of type {type(value).__name__}"
+                )
+        new_log["reward"] = reward.tolist()
         # Write logs to file
         logs[f"epoch{epoch}"] = new_log
         with open(filename, "w") as json_file:
