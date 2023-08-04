@@ -10,9 +10,6 @@ Welcome to pykoi!
 Pykoi lets you easily collect and understand user data and feedback, train RLHF on that data, 
 and compare different models to each other.
 
-To learn more, check out the **Getting Started** link below, or navigate to the page of your 
-interest:
-
 .. toctree::
    :maxdepth: 4
    :caption: Getting Started
@@ -27,7 +24,7 @@ interest:
 
    data_collection_feedback
    model_comparison
-   reinforment_learning_with_human_feedback_rlhf
+   rlhf
    data_labeling_annotation
    knowledge_retrieval
    analytics

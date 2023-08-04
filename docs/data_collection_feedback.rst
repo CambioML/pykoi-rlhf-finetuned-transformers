@@ -1,8 +1,8 @@
-Chat UI & Feedback 
+Collecting User Feedback via a Chat Interface
 ===================================
 
 pykoi allows you to easily launch an chat interface and collect feedback on your own 
-language models:
+finetuned language models:
 
 .. code:: python
 
@@ -21,10 +21,13 @@ language models:
 
 This will launch a sharable chat interface to your model. 
 
-img
+.. image:: ./_image/chatbot_vote_trim_4x_crop.gif
+   :alt: optional alt text
+   :scale: 25 %
+   :align: center
 
-
-You can optionally specify feedback that you can use to collect feedback.
+You can optionally specify feedback that you can use to collect feedback. This will give an updated UI with the provided feedback option. Currently, two feedback 
+options are supported, `vote` and `rank`.
 
 .. code:: python
 
@@ -32,11 +35,6 @@ You can optionally specify feedback that you can use to collect feedback.
   # add feedback option to model
   chatbot = pk.Chatbot(model, feedback='vote')
   ...
-
-This will give an updated UI with the provided feedback option. Currently, two feedback 
-options are supported, `vote` and `rank`.
-
-img 
 
 All interaction data and feedback will automatically be collected and stored to a database on 
 the machine that hosted the UI. The data can be easily explored or exported thereafter.
@@ -111,7 +109,9 @@ Next, to create a sharable Chatbot, import the chatbot model of your choice. We 
 different feedback options:
 
 
-### Sharing Your Model
+Sharing Your Model
+^^^^^^^^
+
 
 To collect feedback from users, you must share your model. There are two options for this:
 
@@ -121,7 +121,8 @@ To collect feedback from users, you must share your model. There are two options
 
 3. Coming Soon ??: Deploy the model to our cloud.
 
-### Feedback options
+Feedback options
+^^^^^^^^
 
 We currently provide two different feedback options: `vote` and `rank`.
 
@@ -130,7 +131,8 @@ Vote: The voting UI allows users to upvote or downvote individual model response
 Rank: The rank feedback option allows users to select ('rank') which of two responses is better.
 
 
-### Usage Dashboard
+Usage Dashboard
+^^^^^^^^
 
 pykoi comes with a dashboard you can use to automatically understand how users are interacting 
 with your model. This is available via the `pk.Dashboard` class. 
