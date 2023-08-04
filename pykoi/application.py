@@ -489,7 +489,11 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
+        if self._debug:
+            port = 5000
+        else:
+            port = find_free_port()
+
         if self._share:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
