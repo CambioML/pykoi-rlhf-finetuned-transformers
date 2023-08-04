@@ -6,15 +6,9 @@
 Welcome to pykoi!
 ===================================
 
-**pykoi** (/py'koi/) is a Python library for cooks and food lovers that
-creates recipes mixing random ingredients.  It pulls data from the `Open Food
-Facts database <https://world.openfoodfacts.org/>`_ and offers a *simple* and
-*intuitive* API.
-collecting and using feedback
-should be part of the inference process itself.
-
-To learn more, check out the **Getting Started** link below, or navigate to the page of your 
-interest:
+**pykoi** (/py'koi/) is an open-source python library for ML scientists and practitioners. 
+Pykoi lets you easily collect and understand user data and feedback, train RLHF on that data, 
+and compare different models to each other.
 
 .. toctree::
    :maxdepth: 4
