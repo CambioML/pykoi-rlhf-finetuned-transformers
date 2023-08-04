@@ -6,6 +6,7 @@ from pykoi.retrieval.llm.embedding_factory import EmbeddingFactory
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 from pykoi.retrieval.vectordb.chroma import ChromaDb
 from pykoi.retrieval.vectordb.constants import VectorDbName
+from pykoi.retrieval.vectordb.epsilla import Epsilla
 
 
 class VectorDbFactory:
@@ -33,6 +34,8 @@ class VectorDbFactory:
             model_embedding = EmbeddingFactory.create_embedding(model_name.value)
             if vector_db_name == VectorDbName.CHROMA:
                 return ChromaDb(model_embedding)
+            if vector_db_name == VectorDbName.EPSILLA:
+                return Epsilla(model_name, model_embedding)
 
         except Exception as ex:
             raise Exception("Unknown db: {}".format(vector_db_name)) from ex
