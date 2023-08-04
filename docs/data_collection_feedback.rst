@@ -1,5 +1,5 @@
 Collecting User Feedback via a Chat Interface
-===================================
+=============================================
 
 pykoi allows you to easily launch an chat interface and collect feedback on your own 
 finetuned language models:
@@ -110,7 +110,7 @@ different feedback options:
 
 
 Sharing Your Model
-^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 
 To collect feedback from users, you must share your model. There are two options for this:
@@ -122,7 +122,7 @@ To collect feedback from users, you must share your model. There are two options
 3. Coming Soon ??: Deploy the model to our cloud.
 
 Feedback options
-^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 We currently provide two different feedback options: `vote` and `rank`.
 
@@ -132,7 +132,7 @@ Rank: The rank feedback option allows users to select ('rank') which of two resp
 
 
 Usage Dashboard
-^^^^^^^^
+^^^^^^^^^^^^^^^
 
 pykoi comes with a dashboard you can use to automatically understand how users are interacting 
 with your model. This is available via the `pk.Dashboard` class. 

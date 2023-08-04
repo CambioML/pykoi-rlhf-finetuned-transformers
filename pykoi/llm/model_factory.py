@@ -12,10 +12,6 @@ class ModelFactory:
 
     This class provides a static method `create_model` which creates a
     language model instance based on the given name.
-
-    Methods:
-        create_model(model_source: Union[str, ModelSource], **kwargs) -> AbsLlm:
-            Creates a language model based on the given name.
     """
 
     @staticmethod

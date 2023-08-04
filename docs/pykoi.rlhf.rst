@@ -4,10 +4,10 @@ pykoi.rlhf package
 Submodules
 ----------
 
-pykoi.rlhf.rlhf module
-----------------------
+pykoi.rlhf module
+-----------------
 
-.. automodule:: pykoi.rlhf.rlhf
+.. automodule:: pykoi.rlhf
    :members:
    :undoc-members:
    :show-inheritance:
