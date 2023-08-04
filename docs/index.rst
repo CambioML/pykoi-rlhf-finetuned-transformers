@@ -14,7 +14,7 @@ and compare different models to each other.
    :maxdepth: 4
    :caption: Getting Started
 
-   getting_started
+   installation
    tour
 
 

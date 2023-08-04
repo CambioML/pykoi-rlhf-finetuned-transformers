@@ -1,4 +1,4 @@
-Getting Started
+Installation
 ===================================
 
 **pykoi** is an open-source data curation platform for LLMs. Using pykoi,
