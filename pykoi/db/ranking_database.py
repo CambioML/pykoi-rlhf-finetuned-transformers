@@ -86,7 +86,9 @@ class RankingDatabase:
         """
         with self._lock:
             cursor = self.get_cursor()
-            cursor.execute(query, (question, up_ranking_answer, low_ranking_answer))
+            cursor.execute(
+                query, (question, up_ranking_answer, low_ranking_answer)
+            )
             self.get_connection().commit()
 
         if self._debug:

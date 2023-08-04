@@ -3,17 +3,14 @@ import os
 from typing import Optional
 import torch
 
-from datasets import (
-    Dataset,
-    load_dataset)
-from peft import (
-    PeftConfig,
-    PeftModel)
+from datasets import Dataset, load_dataset
+from peft import PeftConfig, PeftModel
 from transformers import (
     AutoModelForCausalLM,
     AutoModelForSequenceClassification,
     AutoTokenizer,
-    TrainingArguments)
+    TrainingArguments,
+)
 
 from trl import SFTTrainer
 from trl.trainer.utils import ConstantLengthDataset
@@ -21,12 +18,13 @@ from pykoi.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,
-    QA_CSV_HEADER_VOTE_STATUS)
+    QA_CSV_HEADER_VOTE_STATUS,
+)
 from pykoi.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
 
 
-class SupervisedFinetuning():
+class SupervisedFinetuning:
     """
     A class representing the supervised finetuning trainer.
 
@@ -40,6 +38,7 @@ class SupervisedFinetuning():
         model (AutoModelForCausalLM): The model to train.
         trainer (SFTTrainer): The trainer object used for training the model.
     """
+
     def __init__(self, rlhf_config: RLHFConfig):
         """
         Initializes the SFTTrainer object.
@@ -48,12 +47,18 @@ class SupervisedFinetuning():
             rlhf_config (RLHFConfig): The RLHF configuration object.
         """
         self._rlhf_config = rlhf_config
-        self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.base_model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            rlhf_config.base_model_path
+        )
         self.num_proc = (
-            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
+            self._rlhf_config.num_workers
+            if not self._rlhf_config.streaming
+            else None
         )
         self.dataset = self.create_datasets(self.tokenizer, self._rlhf_config)
-        self.torch_dtype = torch.bfloat16 if self._rlhf_config.bf16 else torch.float16
+        self.torch_dtype = (
+            torch.bfloat16 if self._rlhf_config.bf16 else torch.float16
+        )
         # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
         self.training_args = TrainingArguments(
             output_dir=self._rlhf_config.output_dir,
@@ -96,10 +101,11 @@ class SupervisedFinetuning():
         """
         self.trainer.train()
 
-    def load_lora(self,
-                  base_model_path: Optional[str] = None,
-                  lora_model_path: Optional[str] = None):
-
+    def load_lora(
+        self,
+        base_model_path: Optional[str] = None,
+        lora_model_path: Optional[str] = None,
+    ):
         if base_model_path is None:
             base_model_path = self._rlhf_config.base_model_path
 
@@ -114,7 +120,9 @@ class SupervisedFinetuning():
         if lora_config.task_type == "SEQ_CLS":
             # peft is for reward model so load sequence classification
             base_model = AutoModelForSequenceClassification.from_pretrained(
-                base_model_path, num_labels=1, torch_dtype=self._rlhf_config.torch_dtype
+                base_model_path,
+                num_labels=1,
+                torch_dtype=self._rlhf_config.torch_dtype,
             )
         elif lora_config.task_type == "CAUSAL_LM":
             base_model = AutoModelForCausalLM.from_pretrained(
@@ -130,7 +138,6 @@ class SupervisedFinetuning():
         return model, tokenizer
 
     def save(self, output_path=None):
-
         if output_path is None:
             output_path = os.path.join(
                 self._rlhf_config.output_dir, self._rlhf_config.sft_lora_path
@@ -143,22 +150,30 @@ class SupervisedFinetuning():
 
     def prepare_sample_text(self, example):
         """Prepare the text from a sample of the dataset."""
-        text = f"Question: {example[self._rlhf_config.question_title]}\n\n\
-            Answer: {example[self._rlhf_config.answer_title]}"
+        text = (
+            f"Question: {example[self._rlhf_config.question_title]}\n\n        "
+            f"    Answer: {example[self._rlhf_config.answer_title]}"
+        )
         return text
 
     def create_datasets(self, tokenizer, args):
         if args.dataset_type == "local_db":
             qa_database = QuestionAnswerDatabase()
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
-            my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"]
-            my_data_pd = my_data_pd[[QA_CSV_HEADER_ID,
-                                     QA_CSV_HEADER_QUESTION,
-                                     QA_CSV_HEADER_ANSWER]]
-            print("My local database has {} up vote samples for SFT".format(my_data_pd.shape[0]))
+            my_data_pd = my_data_pd[
+                my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"
+            ]
+            my_data_pd = my_data_pd[
+                [QA_CSV_HEADER_ID, QA_CSV_HEADER_QUESTION, QA_CSV_HEADER_ANSWER]
+            ]
+            print(
+                "My local database has {} up vote samples for SFT".format(
+                    my_data_pd.shape[0]
+                )
+            )
             dataset = Dataset.from_dict(my_data_pd)
         elif args.dataset_type == "local_csv":
-            dataset = load_dataset('csv', data_files=args.dataset_name)
+            dataset = load_dataset("csv", data_files=args.dataset_name)
             dataset = dataset[args.split]  # Convert DatasetDict to Dataset
         elif args.dataset_type == "huggingface":
             dataset = load_dataset(
@@ -171,12 +186,18 @@ class SupervisedFinetuning():
             )
             dataset = dataset[args.split]  # Convert DatasetDict to Dataset
         else:
-            raise FileNotFoundError(f"No (supported) data files or dataset script found {args.dataset_type}")
+            raise FileNotFoundError(
+                "No (supported) data files or dataset script found"
+                f" {args.dataset_type}"
+            )
 
-        dataset = dataset.train_test_split(test_size=args.train_test_split_ratio, 
-                                           seed=args.seed)
-        print(f"Size of the train set: {len(dataset['train'])}. \
-              Size of the validation set: {len(dataset['test'])}")
+        dataset = dataset.train_test_split(
+            test_size=args.train_test_split_ratio, seed=args.seed
+        )
+        print(
+            f"Size of the train set: {len(dataset['train'])}.              "
+            f" Size of the validation set: {len(dataset['test'])}"
+        )
 
         train_dataset = ConstantLengthDataset(
             tokenizer,

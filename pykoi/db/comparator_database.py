@@ -2,10 +2,7 @@
 import datetime
 import os
 
-from typing import (
-    List,
-    Tuple
-)
+from typing import List, Tuple
 
 from pykoi.db.abs_database import AbsDatabase
 
@@ -13,9 +10,11 @@ from pykoi.db.abs_database import AbsDatabase
 class ComparatorQuestionDatabase(AbsDatabase):
     """Comparator Question Database class"""
 
-    def __init__(self,
-                 db_file: str = os.path.join(os.getcwd(), "comparator.db"),
-                 debug: bool = False) -> None:
+    def __init__(
+        self,
+        db_file: str = os.path.join(os.getcwd(), "comparator.db"),
+        debug: bool = False,
+    ) -> None:
         """
         Initializes a new instance of the ComparatorQuestionDatabase class.
 
@@ -66,7 +65,8 @@ class ComparatorQuestionDatabase(AbsDatabase):
         Updates the database.
         """
         raise NotImplementedError(
-            "ComparatorQuestionDatabase does not support update.")
+            "ComparatorQuestionDatabase does not support update."
+        )
 
     def retrieve_all(self) -> List[Tuple]:
         """
@@ -93,17 +93,17 @@ class ComparatorQuestionDatabase(AbsDatabase):
                         Each tuple contains five elements: ID, Question.
         """
         for row in rows:
-            print(
-                f"ID: {row[0]}, Question: {row[1]}, Timestamp: {row[2]}"
-            )
+            print(f"ID: {row[0]}, Question: {row[1]}, Timestamp: {row[2]}")
 
 
 class ComparatorDatabase(AbsDatabase):
     """ComparatorDatabase class."""
 
-    def __init__(self,
-                 db_file: str = os.path.join(os.getcwd(), "comparator.db"),
-                 debug: bool = False) -> None:
+    def __init__(
+        self,
+        db_file: str = os.path.join(os.getcwd(), "comparator.db"),
+        debug: bool = False,
+    ) -> None:
         query = """
         CREATE TABLE IF NOT EXISTS comparator (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -135,18 +135,25 @@ class ComparatorDatabase(AbsDatabase):
             existing_row = cursor.fetchone()
 
             if existing_row is not None:
-                raise ValueError(f"Row with model={kwargs['model']} and qid={kwargs['qid']} already exists")
+                raise ValueError(
+                    f"Row with model={kwargs['model']} and"
+                    f" qid={kwargs['qid']} already exists"
+                )
 
             query = """
             INSERT INTO comparator (model, qid, rank, answer, timestamp)
             VALUES (?, ?, ?, ?, ?);
             """
-            cursor.execute(query,
-                           (kwargs["model"],
-                            kwargs["qid"],
-                            kwargs["rank"],
-                            kwargs["answer"],
-                            timestamp))
+            cursor.execute(
+                query,
+                (
+                    kwargs["model"],
+                    kwargs["qid"],
+                    kwargs["rank"],
+                    kwargs["answer"],
+                    timestamp,
+                ),
+            )
             self.get_connection().commit()
 
         if self._debug:
@@ -169,10 +176,8 @@ class ComparatorDatabase(AbsDatabase):
         with self._lock:
             cursor = self.get_cursor()
             cursor.execute(
-                query,
-                (kwargs["rank"],
-                 kwargs["qid"],
-                 kwargs["model"]))
+                query, (kwargs["rank"], kwargs["qid"], kwargs["model"])
+            )
             self.get_connection().commit()
         if self._debug:
             rows = self.retrieve_all()

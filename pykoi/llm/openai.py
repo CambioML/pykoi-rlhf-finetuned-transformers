@@ -17,6 +17,7 @@ class OpenAIModel(AbsLlm):
         __init__(self, api_key: str, engine: str, max_tokens: int, temperature: float): Initializes the OpenAI model.
         predict(self, message: str): Predicts the next word based on the given message.
     """
+
     model_source = "openai"
 
     def __init__(
@@ -48,11 +49,14 @@ class OpenAIModel(AbsLlm):
     def name(self):
         if self._name:
             return self._name
-        return "_".join([
-            str(OpenAIModel.model_source),
-            str(self._engine),
-            str(self._max_tokens),
-            str(self._temperature)])
+        return "_".join(
+            [
+                str(OpenAIModel.model_source),
+                str(self._engine),
+                str(self._max_tokens),
+                str(self._temperature),
+            ]
+        )
 
     def predict(self, message: str, num_of_response: int = 1):
         """

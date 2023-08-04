@@ -102,7 +102,9 @@ class Application:
             and password is not None
             and len(username) != len(password)
         ):
-            raise ValueError("The length of username and password must be the same.")
+            raise ValueError(
+                "The length of username and password must be the same."
+            )
         self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
         self._fake_users_db = {}
@@ -124,7 +126,9 @@ class Application:
         else:
             return "no_auth"
 
-    def auth_required(self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
+    def auth_required(
+        self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)
+    ):
         user = self.authenticate_user(
             self._fake_users_db, credentials.username, credentials.password
         )
@@ -227,7 +231,9 @@ class Application:
         ):
             try:
                 num_of_response = request_body.n
-                output = component["component"].model.predict(message, num_of_response)
+                output = component["component"].model.predict(
+                    message, num_of_response
+                )
                 # Check the type of each item in the output list
                 return {
                     "log": "Inference complete",
@@ -259,7 +265,9 @@ class Application:
         ):
             try:
                 print("retrieve_ranking_table")
-                rows = component["component"].database.retrieve_all_question_answers()
+                rows = component[
+                    "component"
+                ].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -278,7 +286,9 @@ class Application:
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
         ):
             try:
-                rows = component["component"].database.retrieve_all_question_answers()
+                rows = component[
+                    "component"
+                ].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -293,7 +303,9 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
-    def create_chatbot_comparator_route(self, app: FastAPI, component: Dict[str, Any]):
+    def create_chatbot_comparator_route(
+        self, app: FastAPI, component: Dict[str, Any]
+    ):
         """
         Create chatbot comparator routes for the application.
 
@@ -437,7 +449,9 @@ class Application:
 
             @app.get(f"/data/{id}")
             async def get_data(
-                user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+                user: Union[None, UserInDB] = Depends(
+                    self.get_auth_dependency()
+                )
             ):
                 data = data_source.fetch_func()
                 return JSONResponse(data)
@@ -466,7 +480,8 @@ class Application:
 
         @app.get("/{path:path}")
         async def read_item(
-            path: str, user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+            path: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
         ):
             return {"path": path}
 

@@ -30,5 +30,5 @@ class ChatbotDatabaseFactory:
         else:
             raise ValueError(
                 f"Invalid feedback name: {feedback}. "
-                f"Valid values are: 'question_answer', 'ranking'."
+                "Valid values are: 'question_answer', 'ranking'."
             )

@@ -77,7 +77,9 @@ class HuggingfaceModel(AbsLlm):
         """
         # TODO: need to refractor and include all the derivatives of dolly family
         if "dolly" in self._pretrained_model_name_or_path:
-            from pykoi.llm.instruct_pipeline import InstructionTextGenerationPipeline
+            from pykoi.llm.instruct_pipeline import (
+                InstructionTextGenerationPipeline,
+            )
 
             generate_text = InstructionTextGenerationPipeline(
                 model=self._model, tokenizer=self._tokenizer
@@ -103,6 +105,8 @@ class HuggingfaceModel(AbsLlm):
                 for ids in output_ids
             ]
 
-            response = [resp.split("\n")[1] for resp in response if "\n" in resp]
+            response = [
+                resp.split("\n")[1] for resp in response if "\n" in resp
+            ]
 
         return response

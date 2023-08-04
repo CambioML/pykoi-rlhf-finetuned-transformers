@@ -42,16 +42,19 @@ class ModelFactory:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
                 from pykoi.llm.openai import OpenAIModel
+
                 return OpenAIModel(**kwargs)
             elif model_source == ModelSource.HUGGINGFACE:
                 from pykoi.llm.huggingface import HuggingfaceModel
+
                 return HuggingfaceModel(**kwargs)
             elif model_source == ModelSource.PEFT_HUGGINGFACE:
                 from pykoi.llm.peft_huggingface import PeftHuggingfacemodel
+
                 return PeftHuggingfacemodel(**kwargs)
             else:
                 raise ValueError(
-                    f"[llm_factory]: Unknown model source " f"{model_source}"
+                    f"[llm_factory]: Unknown model source {model_source}"
                 )
         except ValueError as ex:
             raise ValueError("[llm_factory]: initialize model failure") from ex

@@ -41,7 +41,9 @@ class Component:
         props (Dict[str, Any]): Additional properties for the component.
     """
 
-    def __init__(self, fetch_func: Optional[Callable], svelte_component: str, **kwargs):
+    def __init__(
+        self, fetch_func: Optional[Callable], svelte_component: str, **kwargs
+    ):
         """
         Initialize a new instance of Component.
 
@@ -51,7 +53,9 @@ class Component:
             kwargs: Additional properties for the component.
         """
         self.id = str(uuid.uuid4())  # Generate a unique ID
-        self.data_source = DataSource(self.id, fetch_func) if fetch_func else None
+        self.data_source = (
+            DataSource(self.id, fetch_func) if fetch_func else None
+        )
         self.svelte_component = svelte_component
         self.props = kwargs
 

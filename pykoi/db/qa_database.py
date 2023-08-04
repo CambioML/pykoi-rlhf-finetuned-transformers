@@ -14,7 +14,9 @@ class QuestionAnswerDatabase:
     """Question Answer Database class"""
 
     def __init__(
-        self, db_file: str = os.path.join(os.getcwd(), "qd.db"), debug: bool = False
+        self,
+        db_file: str = os.path.join(os.getcwd(), "qd.db"),
+        debug: bool = False,
     ):
         """
         Initializes a new instance of the QuestionAnswerDatabase class.

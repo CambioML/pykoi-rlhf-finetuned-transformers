@@ -5,7 +5,10 @@ import pandas as pd
 from typing import List
 
 from pykoi.component.base import Component
-from pykoi.db.comparator_database import ComparatorDatabase, ComparatorQuestionDatabase
+from pykoi.db.comparator_database import (
+    ComparatorDatabase,
+    ComparatorQuestionDatabase,
+)
 from pykoi.llm.abs_llm import AbsLlm
 from pykoi.interactives.barchart import Barchart
 
@@ -37,7 +40,13 @@ class Compare(Component):
         self.question_db = ComparatorQuestionDatabase()
         self.comparator_db = ComparatorDatabase()
         self.inference_results = pd.DataFrame(
-            columns=["question", "model", "answer", "latency", "length_in_tokens"]
+            columns=[
+                "question",
+                "model",
+                "answer",
+                "latency",
+                "length_in_tokens",
+            ]
         )  # Added this line
 
     def add(self, model: AbsLlm):
@@ -85,13 +94,25 @@ class Compare(Component):
 
                 # Store the question, model name, response, latency, and length in the results list
                 results.append(
-                    [question, model_name, response[0], latency, length_in_tokens]
+                    [
+                        question,
+                        model_name,
+                        response[0],
+                        latency,
+                        length_in_tokens,
+                    ]
                 )
 
         # Convert the results into a DataFrame
         self.inference_results = pd.DataFrame(
             results,
-            columns=["question", "model", "answer", "latency", "length_in_tokens"],
+            columns=[
+                "question",
+                "model",
+                "answer",
+                "latency",
+                "length_in_tokens",
+            ],
         )
 
         return self.inference_results

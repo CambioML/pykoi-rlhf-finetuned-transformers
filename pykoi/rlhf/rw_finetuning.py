@@ -90,7 +90,9 @@ class RewardFinetuning(Trainer):
         # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
 
         # Load the tokenizer and the model
-        self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.reward_model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            rlhf_config.reward_model_path
+        )
         self.tokenizer.pad_token = self.tokenizer.eos_token
 
         self.base_model = AutoModelForSequenceClassification.from_pretrained(
@@ -100,19 +102,24 @@ class RewardFinetuning(Trainer):
             load_in_8bit=rlhf_config.load_in_8bit,
             device_map=rlhf_config.device_map,
         )
-        self.model = get_peft_model(self.base_model, rlhf_config.lora_config_reward)
+        self.model = get_peft_model(
+            self.base_model, rlhf_config.lora_config_reward
+        )
         self.model.print_trainable_parameters()
         self.model.config.pad_token_id = self.tokenizer.eos_token_id
         self.model.config.use_cache = not rlhf_config.gradient_checkpointing
         self.num_proc = (
-            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
+            self._rlhf_config.num_workers
+            if not self._rlhf_config.streaming
+            else None
         )
 
         self.dataset = self.create_datasets()
 
         self.compute_metrics = self._compute_metrics
         self.data_collator = RewardDataCollatorWithPadding(
-            tokenizer=self.tokenizer, max_length=self._rlhf_config.max_seq_length_reward
+            tokenizer=self.tokenizer,
+            max_length=self._rlhf_config.max_seq_length_reward,
         )
         super().__init__(
             model=self.model,
@@ -172,7 +179,9 @@ class RewardFinetuning(Trainer):
         # based on dataset_type (e.g. "huggingface", "csv", etc.), load the data
         if self._rlhf_config.dataset_type == "local_db":
             ranking_database = RankingDatabase()
-            my_data_pd = ranking_database.retrieve_all_question_answers_as_pandas()
+            my_data_pd = (
+                ranking_database.retrieve_all_question_answers_as_pandas()
+            )
             my_data_pd = my_data_pd[
                 [
                     RANKING_CSV_HEADER_ID,
@@ -198,10 +207,13 @@ class RewardFinetuning(Trainer):
         #         streaming=self._rlhf_config.streaming,
         #     )
         elif self._rlhf_config.dataset_type == "csv":
-            dataset = load_dataset("csv", data_files=self._rlhf_config.dataset_name)
+            dataset = load_dataset(
+                "csv", data_files=self._rlhf_config.dataset_name
+            )
         else:
             raise FileNotFoundError(
-                f"No (supported) data files or dataset script found {self._rlhf_config.dataset_type}"
+                "No (supported) data files or dataset script found"
+                f" {self._rlhf_config.dataset_type}"
             )
 
         # Preprocess the dataset and filter out QAs that are longer than max_length
@@ -211,7 +223,8 @@ class RewardFinetuning(Trainer):
             num_proc=self.num_proc,
         )
         dataset = dataset.filter(
-            lambda x: len(x["input_ids_x"]) <= self._rlhf_config.max_seq_length_reward
+            lambda x: len(x["input_ids_x"])
+            <= self._rlhf_config.max_seq_length_reward
             and len(x["input_ids_y"]) <= self._rlhf_config.max_seq_length_reward
         )
 
@@ -228,8 +241,8 @@ class RewardFinetuning(Trainer):
             seed=self._rlhf_config.seed,
         )
         print(
-            f"Size of the train set: {len(dataset['train'])}. \
-                Size of the validation set: {len(dataset['test'])}"
+            f"Size of the train set: {len(dataset['train'])}.                "
+            f" Size of the validation set: {len(dataset['test'])}"
         )
 
         return {"train": dataset["train"], "eval": dataset["test"]}
@@ -238,10 +251,12 @@ class RewardFinetuning(Trainer):
     # https://arxiv.org/abs/2203.02155
     def compute_loss(self, model, inputs, return_outputs=False):
         rewards_x = model(
-            input_ids=inputs["input_ids_x"], attention_mask=inputs["attention_mask_x"]
+            input_ids=inputs["input_ids_x"],
+            attention_mask=inputs["attention_mask_x"],
         )[0]
         rewards_y = model(
-            input_ids=inputs["input_ids_y"], attention_mask=inputs["attention_mask_y"]
+            input_ids=inputs["input_ids_y"],
+            attention_mask=inputs["attention_mask_y"],
         )[0]
         loss = -torch.nn.functional.logsigmoid(rewards_x - rewards_y).mean()
         if return_outputs:
@@ -276,7 +291,8 @@ class RewardFinetuning(Trainer):
         """
         if output_path is None:
             output_path = os.path.join(
-                self._rlhf_config.output_dir, self._rlhf_config.reward_merged_path
+                self._rlhf_config.output_dir,
+                self._rlhf_config.reward_merged_path,
             )
         self.save_model(output_path)
 
