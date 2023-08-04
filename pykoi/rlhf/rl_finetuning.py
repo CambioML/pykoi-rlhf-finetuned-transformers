@@ -8,7 +8,8 @@ from pykoi.db.constants import (
 )
 
 import os
-
+import json
+import numpy as np
 import torch
 from pykoi.db.qa_database import QuestionAnswerDatabase
 from accelerate import Accelerator
@@ -108,6 +109,7 @@ class RLFinetuning(Trainer):
             "pad_token_id": self.base_tokenizer.pad_token_id,
             "eos_token_id": rlhf_config.eos_token_id,
         }
+        self.ppo_log_stats_dict = {}  # initialize the log stats dict
 
     def create_tokenizer(self, model_name):
         """
@@ -138,22 +140,26 @@ class RLFinetuning(Trainer):
 
     def create_dataset(self, tokenizer):
         """
-        Build dataset for finetuning. This builds the dataset from `load_dataset`, one should
-        customize this function to train the model on its own dataset.
+        Build dataset for finetuning. This builds the dataset from `load_dataset`, 
+        one should customize this function to train the model on its own dataset.
 
         Args:
-            tokenizer (transformers.tokenization_utils_base.PreTrainedTokenizerBase): The tokenizer to load a given dataset.
+            tokenizer (transformers.tokenization_utils_base.PreTrainedTokenizerBase): 
+            The tokenizer to load a given dataset.
 
         Returns:
             dataset (datasets.Dataset): The dataset for finetuning.
         """
         args = self._rlhf_config
         if args.dataset_type == "local_db":
-            qa_database = QuestionAnswerDatabase(db_file=self._rlhf_config.dataset_name)
+            qa_database = QuestionAnswerDatabase(
+                db_file=self._rlhf_config.dataset_name)
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
             my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"]
             my_data_pd = my_data_pd[
-                [QA_CSV_HEADER_ID, QA_CSV_HEADER_QUESTION, QA_CSV_HEADER_ANSWER]
+                [QA_CSV_HEADER_ID, 
+                 QA_CSV_HEADER_QUESTION, 
+                 QA_CSV_HEADER_ANSWER]
             ]
             print("My local database has {} samples".format(my_data_pd.shape[0]))
             dataset = Dataset.from_dict(my_data_pd)
@@ -175,6 +181,15 @@ class RLFinetuning(Trainer):
             )
 
         def preprocess_function(examples):
+            """
+            Preprocess a batch of examples for finetuning.
+
+            Args:
+                examples (Dict[str, Any]): A dictionary containing the examples to preprocess.
+
+            Returns:
+                new_examples (Dict[str, List[Any]]): A dictionary containing the preprocessed examples.
+            """
             new_examples = {
                 "query": [],
                 "input_ids": [],
@@ -205,7 +220,8 @@ class RLFinetuning(Trainer):
         Finetune the RL model using PPO algorithm.
 
         Args:
-            save_checkpoints_path (str, optional): Path to save the model checkpoints. Defaults to None.
+            save_checkpoints_path (str, optional): Path to save the model checkpoints. 
+            Default to None.
         """
         ## Initialize accelerator
         self.ppo_trainer.dataloader = self.accelerator.prepare(
@@ -237,8 +253,11 @@ class RLFinetuning(Trainer):
                 for output in pipe_outputs
             ]
             stats = self.ppo_trainer.step(question_tensors, response_tensors, rewards)
-            self.ppo_trainer.log_stats(stats, batch, rewards)
-            print("stats: {}\n\n\n rewards: {}\n\n\n".format(stats, rewards))
+
+            ## log stats
+            self.log_stats_to_json(epoch=epoch, stats=stats, reward=rewards[0])
+            # self.ppo_trainer.log_stats(stats, batch, rewards)
+            print("\n\n\nstats: {}\n\n\n".format(stats))
 
             ## save weights
             if (
@@ -252,15 +271,44 @@ class RLFinetuning(Trainer):
                         "checkpoints",
                         f"checkpoints_epoch_{epoch}",
                     )
-                self.ppo_trainer.model.save(save_checkpoints_path)
+                self.ppo_trainer.save_pretrained(save_checkpoints_path)
+
+    def log_stats_to_json(self, epoch, stats, reward, filename="ppo_log_stats.json"):
+        """
+        Log the PPO stats to a json file.
+        Args:
+            epoch (int): The current epoch.
+            stats (dict): The PPO stats.
+            reward (float): The reward.
+            filename (str, optional): The name of the json file. Defaults to "ppo_log_stats.json".
+        """
+        logs = self.ppo_log_stats_dict
+        # Add new logs
+        new_log = {}
+        for stat_name, value in stats.items():
+            if isinstance(value, np.ndarray) or isinstance(value, torch.Tensor):
+                new_log[stat_name] = value.tolist()
+            elif isinstance(value, (int, float, str, bool)) or value is None:
+                new_log[stat_name] = value
+            else:
+                print(
+                    f"Warning: Skipping non-serializable stat '{stat_name}' of type {type(value).__name__}"
+                )
+        new_log["reward"] = reward.tolist()
+        # Write logs to file
+        logs[f"epoch{epoch}"] = new_log
+        with open(filename, "w") as json_file:
+            json.dump(logs, json_file)
+        # Update the class attribute
+        self.ppo_log_stats_dict = logs
 
     def save(self, output_path=None):
         """
-        Saves the RL findtuned model to the specified output path. If no output path is provided, the model is saved to the
-        output directory specified in the RLHFConfig object.
+        Saves the RL findtuned model to the specified output path. If no output path is provided, 
+        the model is saved to the output directory specified in the RLHFConfig object.
 
         Args:
-            output_path (str, optional): The path to save the model to. Defaults to None.
+            output_path (str, optional): The path to save the model to. Default to None.
         """
         if output_path is None:
             output_path = os.path.join(
@@ -271,11 +319,12 @@ class RLFinetuning(Trainer):
 
     def train_and_save(self, output_path=None):
         """
-        Finetune the model with RL and save it to the specified output path. If no output path is provided, the model
-        is saved to the output directory specified in the RLHFConfig object.
+        Finetune the model with RL and save it to the specified output path. 
+        If no output path is provided, the model is saved to the output directory 
+        specified in the RLHFConfig object.
 
         Args:
-            output_path (str, optional): The path to save the model to. Defaults to None.
+            output_path (str, optional): The path to save the model to. Default to None.
         """
         self.train(save_checkpoints_path=output_path)
         self.save(output_path)
