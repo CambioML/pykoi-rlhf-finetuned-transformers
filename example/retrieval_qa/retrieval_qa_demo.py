@@ -6,7 +6,7 @@ import argparse
 
 def main(vector_db_name, host, port):
     # enter openai api key here
-    os.environ["OPENAI_API_KEY"] = "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"
+    os.environ["OPENAI_API_KEY"] = ""
     os.environ["DOC_PATH"] = os.path.join(os.getcwd(), "temp/docs")
     os.environ["VECTORDB_PATH"] = os.path.join(os.getcwd(), "temp/vectordb")
     MODEL_NAME = "openai"
