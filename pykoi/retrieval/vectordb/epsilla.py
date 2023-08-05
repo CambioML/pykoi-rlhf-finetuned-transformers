@@ -1,19 +1,16 @@
+"""Vector store Epsilla module"""
 import os
 import numpy as np
 import types
 
-from typing import List, Union
+from typing import List
 from langchain.embeddings.base import Embeddings
 from langchain.schema import BaseRetriever, Document
+from langchain.embeddings import OpenAIEmbeddings
 from sklearn.decomposition import PCA
 from pyepsilla import vectordb
 
-from pykoi.retrieval.llm.constants import LlmName
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
-
-model_map = {
-    LlmName.OPENAI: 1536
-}
 
 class EpsillaRetriever(BaseRetriever):
     def __init__(self, vector_db, embedding, limit):
@@ -42,11 +39,32 @@ class EpsillaRetriever(BaseRetriever):
         pass
 
 class Epsilla(AbsVectorDb):
-    def __init__(self, model_name: Union[str, LlmName], embedding: Embeddings):
+    """Vector store Epsilla class"""
+    def __init__(self, embedding: Embeddings, host: str, port: int):
+        """
+        Initializes a new instance of the Epsilla class.
+        Connect to Epsilla vector database.
+        Creat/load and use DB "PykoiDB" and create/use table "RetrievalQA" with fields:
+            - file_name: STRING
+            - text: STRING
+            - embeddings: VECTOR_FLOAT (with corresponding dimensions for different model name)
+
+        Args:
+            embedding (Ebeddings): The embedding.
+            host (str): The host address of the Epsilla vector database. Default is "localhost".
+            port (int): The port number of the Epsilla vector database. Default is 8888.
+        """
+        if (not isinstance(embedding, OpenAIEmbeddings)):
+            raise TypeError("Invalid type for 'embedding'. Expected OpenAIEmbeddings instance.")
+        if (embedding.model == "text-embedding-ada-002"):
+            dimensions = 1536
+        else:
+            raise NotImplementedError(f"Unsupported embedding model: {embedding.model}")
+
         self._embedding = embedding
         self._vector_db = vectordb.Client(
-            host="localhost",
-            port=8888,
+            host=host,
+            port=port,
         )
 
         def as_retriever(search_kwargs) -> BaseRetriever:
@@ -58,14 +76,14 @@ class Epsilla(AbsVectorDb):
 
         self._vector_db.as_retriever = types.MethodType(as_retriever_wrapper, self._vector_db)
 
-        self._vector_db.load_db(db_name="PykoiDB", db_path="/tmp/pykoi")
+        self._vector_db.load_db(db_name="PykoiDB", db_path="{}/epsilla".format(os.getenv("VECTORDB_PATH")))
         self._vector_db.use_db(db_name="PykoiDB")
         result = self._vector_db.create_table(
             table_name="RetrievalQA",
             table_fields=[
             {"name": "file_name", "dataType": "STRING"},
             {"name": "text", "dataType": "STRING"},
-            {"name": "embeddings", "dataType": "VECTOR_FLOAT", "dimensions": model_map[model_name]}
+            {"name": "embeddings", "dataType": "VECTOR_FLOAT", "dimensions": dimensions}
             ]
         )
         if (result[1]['message'] == "Table already exists: RetrievalQA"):
@@ -73,6 +91,7 @@ class Epsilla(AbsVectorDb):
         super().__init__()
 
     def _get_file_names(self):
+        """Return a set of file names."""
         status_code, response = self._vector_db.get(table_name="RetrievalQA", response_fields=["file_name"])
         if (status_code != 200):
             print(f"Error: {response['message']}.")
@@ -81,6 +100,14 @@ class Epsilla(AbsVectorDb):
             return set(metadata_dict["file_name"] for metadata_dict in response["result"])
 
     def _index(self, texts, metadatas):
+        """
+        Create embeddings for a list of text.
+        Inserts the embeddings with file name and original text into database.
+
+        Args:
+            texts (List[str]): The texts to insert.
+            metadatas (List[dict]): The file names to insert.
+        """
         embeddings = self._embedding.embed_documents(texts)
         records = []
         for index, metadata_dict in enumerate(metadatas):
@@ -90,12 +117,26 @@ class Epsilla(AbsVectorDb):
                 "embeddings": embeddings[index]
             }
             records.append(record)
-        self._vector_db.insert(table_name="RetrievalQA", records=records)
+        status_code, response = self._vector_db.insert(table_name="RetrievalQA", records=records)
+        if (status_code != 200):
+            print(f"Error: {response['message']}.")
+            raise Exception("Error: {}.".format(response['message']))
 
     def _persist(self):
         pass
 
     def get_embedding(self):
+        """
+        Retrieves embeddings from the vector database and performs PCA dimensionality reduction.
+        Returns a dictionary containing the PCA results, label indices, and file names.
+
+        Returns:
+            Dict[str, Union[List[int], List[str], List[List[float]]]]: A dictionary with the following keys:
+                - 'labels': A list of integers representing unique indices for each file name.
+                - 'labelNames': A list of strings containing the unique file names.
+                - 'projection': A list of lists of floats representing the PCA projection results.
+                                Each inner list corresponds to an embedded data point.
+        """
         status_code, response = self._vector_db.get(table_name="RetrievalQA", response_fields=["file_name", "embeddings"])
         if (status_code != 200):
             print(f"Error: {response['message']}.")
