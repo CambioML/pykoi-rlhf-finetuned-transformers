@@ -106,7 +106,8 @@ class HuggingfaceModel(AbsLlm):
             ]
 
             response = [
-                resp.split("\n")[1] for resp in response if "\n" in resp
+                "\n".join(resp.split("\n")[1:]) 
+                for resp in response if "\n" in resp
             ]
 
         return response

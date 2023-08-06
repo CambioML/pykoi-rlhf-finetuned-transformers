@@ -18,7 +18,7 @@ class RLHFConfig:
     """
 
     base_model_path: str = field(
-        default="meta-llama/Llama-2-7b-hf",
+        default="elinas/llama-7b-hf-transformers-4.29",
         metadata={
             "help": "Huggingface model name or a local path to the base model."
         },
