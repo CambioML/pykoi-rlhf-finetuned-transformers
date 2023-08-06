@@ -1,7 +1,8 @@
 """Application module."""
 import os
 import socket
-
+import time
+from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -13,7 +14,9 @@ from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
 from pykoi.telemetry.telemetry import Telemetry
-from pykoi.telemetry.events import AppStartEvent
+from pykoi.telemetry.events import (
+    AppStartEvent,
+    AppStopEvent)
 
 
 class UpdateQATable(BaseModel):
@@ -499,7 +502,11 @@ class Application:
         else:
             port = find_free_port()
 
-        self._telemetry.capture(AppStartEvent())
+        start_event = AppStartEvent(
+            start_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time())
+        )
+        self._telemetry.capture(start_event)
 
         if self._share:
             public_url = ngrok.connect(port)
@@ -513,3 +520,8 @@ class Application:
             import uvicorn
 
             uvicorn.run(app, host="127.0.0.1", port=port)
+        self._telemetry.capture(AppStopEvent(
+            end_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time()),
+            duration=time.time() - start_event.start_time
+        ))
