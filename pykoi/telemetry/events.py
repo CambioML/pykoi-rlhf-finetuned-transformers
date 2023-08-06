@@ -1,10 +1,4 @@
-"""This module contains telemetry events for PyKoi.
-
-The module contains the following classes:
-    - TelemetryEvent: Represents a telemetry event.
-    - AppStartEvent: A telemetry event that is triggered when the application starts.
-    - AppStopEvent: A telemetry event that is triggered when the application stops.
-"""
+"""This module contains telemetry events for PyKoi."""
 
 import os
 from dataclasses import asdict, dataclass

@@ -1,4 +1,4 @@
-""" Telemetry module for Posthog """
+"""This module contains telemetry for PyKoi."""
 import os
 import sys
 import uuid
