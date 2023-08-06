@@ -1,7 +1,8 @@
 """Application module."""
 import os
 import socket
-
+import time
+from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -12,6 +13,10 @@ from pydantic import BaseModel
 from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
+from pykoi.telemetry.telemetry import Telemetry
+from pykoi.telemetry.events import (
+    AppStartEvent,
+    AppStopEvent)
 
 
 class UpdateQATable(BaseModel):
@@ -75,6 +80,7 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
+        enable_telemetry: bool = True,
     ):
         """
         Initialize the Application.
@@ -84,6 +90,7 @@ class Application:
             debug (bool, optional): If True, the application will run in debug mode. Defaults to False.
             username (str, optional): The username for authentication. Defaults to None.
             password (str, optional): The password for authentication. Defaults to None.
+            enable_telemetry (bool, optional): If True, enable_telemetry will be enabled. Defaults to True.
         """
         self._debug = debug
         self._share = share
@@ -114,6 +121,7 @@ class Application:
                     username=user_name,
                     hashed_password=self._pwd_context.hash(pass_word),
                 )
+        self._telemetry = Telemetry(enable_telemetry)
 
     def authenticate_user(self, fake_db, username: str, password: str):
         if self._auth:
@@ -494,6 +502,12 @@ class Application:
         else:
             port = find_free_port()
 
+        start_event = AppStartEvent(
+            start_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time())
+        )
+        self._telemetry.capture(start_event)
+
         if self._share:
             public_url = ngrok.connect(port)
             print("Public URL:", public_url)
@@ -506,3 +520,8 @@ class Application:
             import uvicorn
 
             uvicorn.run(app, host="127.0.0.1", port=port)
+        self._telemetry.capture(AppStopEvent(
+            end_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time()),
+            duration=time.time() - start_event.start_time
+        ))
