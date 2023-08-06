@@ -495,7 +495,7 @@ class Application:
         self._telemetry.capture(start_event)
 
         if self._share:
-            public_url = ngrok.connect(self._port)
+            public_url = ngrok.connect(self._host + ":" + str(self._port))
             print("Public URL:", public_url)
             import uvicorn
 
