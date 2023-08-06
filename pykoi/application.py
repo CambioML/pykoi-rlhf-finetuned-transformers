@@ -19,6 +19,9 @@ from pykoi.telemetry.events import (
     AppStopEvent)
 
 
+oauth_scheme = HTTPBasic()
+
+
 class UpdateQATable(BaseModel):
     id: int
     vote_status: str
@@ -45,24 +48,6 @@ class ComparatorInsertRequest(BaseModel):
     data: List[ModelAnswer]
 
 
-def find_free_port():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("", 0))  # binds to an arbitrary free port
-        return s.getsockname()[1]
-
-
-# def find_free_port():
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.bind(("", 0))  # binds to an arbitrary free port
-#     s.listen(1)
-#     port = s.getsockname()[1]
-#     s.close()
-#     return port
-
-
-oauth_scheme = HTTPBasic()
-
-
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
         self.username = username
@@ -80,6 +65,8 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
+        host: str = "127.0.0.1",
+        port: int = 5000,
         enable_telemetry: bool = True,
     ):
         """
@@ -90,10 +77,14 @@ class Application:
             debug (bool, optional): If True, the application will run in debug mode. Defaults to False.
             username (str, optional): The username for authentication. Defaults to None.
             password (str, optional): The password for authentication. Defaults to None.
+            host (str): The host to run the application on. Defaults to None.
+            port (int): The port to run the application on. Defaults to None.
             enable_telemetry (bool, optional): If True, enable_telemetry will be enabled. Defaults to True.
         """
         self._debug = debug
         self._share = share
+        self._host = host
+        self._port = port
         self.data_sources = {}
         self.components = []
         if username and password:
@@ -497,11 +488,6 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        if self._debug:
-            port = 5000
-        else:
-            port = find_free_port()
-
         start_event = AppStartEvent(
             start_time=time.time(),
             date_time=datetime.utcfromtimestamp(time.time())
@@ -509,17 +495,17 @@ class Application:
         self._telemetry.capture(start_event)
 
         if self._share:
-            public_url = ngrok.connect(port)
+            public_url = ngrok.connect(self._port)
             print("Public URL:", public_url)
             import uvicorn
 
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._host, port=self._port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
             import uvicorn
 
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._host, port=self._port)
         self._telemetry.capture(AppStopEvent(
             end_time=time.time(),
             date_time=datetime.utcfromtimestamp(time.time()),
