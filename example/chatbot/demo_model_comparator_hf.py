@@ -26,12 +26,12 @@ huggingface_model_3 = pykoi.ModelFactory.create_model(
 )
 
 ###################################################################################
-# Creating a Huggingface model meta-llama/Llama-2-7b-hf (EC2 g4.2xlarge with 100GB space) #
+# Creating a Huggingface model elinas/llama-7b-hf-transformers-4.29 (EC2 g4.2xlarge with 100GB space) #
 ###################################################################################
 # only run this after run rlfh/sft_demo.py to fine tune the model
 # peft_huggingface_model = pykoi.ModelFactory.create_model(
 #     model_source="peft_huggingface",
-#     base_model_path="meta-llama/Llama-2-7b-hf",
+#     base_model_path="elinas/llama-7b-hf-transformers-4.29",
 #     lora_model_path="/home/ubuntu/pykoi/models/rlhf_step1_sft",
 # )
 # questions = [...]

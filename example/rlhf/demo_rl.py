@@ -5,7 +5,7 @@ import pykoi
 
 # use huggingface sft and reward model
 config = pykoi.RLHFConfig(
-    base_model_path="elinas/llama-7b-hf-transformers-4.29",  # "meta-llama/Llama-2-7b-hf",
+    base_model_path="elinas/llama-7b-hf-transformers-4.29",  # "elinas/llama-7b-hf-transformers-4.29",
     dataset_type="huggingface", 
     dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
     dataset_subset_rl="data",
