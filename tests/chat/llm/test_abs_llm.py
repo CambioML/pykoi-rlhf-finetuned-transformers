@@ -3,7 +3,7 @@ Test the AbsLlm class.
 """
 import unittest
 
-from pykoi.llm.abs_llm import AbsLlm
+from pykoi.chat.llm.abs_llm import AbsLlm
 
 
 class DummyLlm(AbsLlm):

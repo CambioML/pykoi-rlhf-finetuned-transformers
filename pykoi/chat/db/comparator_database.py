@@ -4,7 +4,7 @@ import os
 
 from typing import List, Tuple
 
-from pykoi.db.abs_database import AbsDatabase
+from pykoi.chat.db.abs_database import AbsDatabase
 
 
 class ComparatorQuestionDatabase(AbsDatabase):

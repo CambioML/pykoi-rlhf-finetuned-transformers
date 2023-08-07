@@ -1,7 +1,7 @@
 """This module provides a wrapper for the OpenAI model."""
 import openai
 
-from pykoi.llm.abs_llm import AbsLlm
+from pykoi.chat.llm.abs_llm import AbsLlm
 
 
 class OpenAIModel(AbsLlm):

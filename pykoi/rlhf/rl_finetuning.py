@@ -1,6 +1,6 @@
 """rl finetuning."""
 from pykoi.rlhf.config import RLHFConfig
-from pykoi.db.constants import (
+from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,
@@ -11,7 +11,7 @@ import os
 import json
 import numpy as np
 import torch
-from pykoi.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from accelerate import Accelerator
 from datasets import Dataset, load_dataset
 

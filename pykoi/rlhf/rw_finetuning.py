@@ -18,13 +18,13 @@ from transformers import (
 )
 
 from pykoi.rlhf.config import RLHFConfig
-from pykoi.db.constants import (
+from pykoi.chat.db.constants import (
     RANKING_CSV_HEADER_ID,
     RANKING_CSV_HEADER_QUESTION,
     RANKING_CSV_HEADER_LOW_RANKING_ANSWER,
     RANKING_CSV_HEADER_UP_RANKING_ANSWER,
 )
-from pykoi.db.ranking_database import RankingDatabase
+from pykoi.chat.db.ranking_database import RankingDatabase
 
 
 @dataclass

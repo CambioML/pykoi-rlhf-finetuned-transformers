@@ -2,7 +2,7 @@
 
 import pykoi
 
-from pykoi.db.constants import (
+from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,

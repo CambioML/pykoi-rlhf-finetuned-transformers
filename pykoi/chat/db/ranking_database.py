@@ -6,7 +6,7 @@ import threading
 
 import pandas as pd
 
-from pykoi.db.constants import RANKING_CSV_HEADER
+from pykoi.chat.db.constants import RANKING_CSV_HEADER
 
 
 class RankingDatabase:

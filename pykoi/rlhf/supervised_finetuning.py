@@ -14,13 +14,13 @@ from transformers import (
 
 from trl import SFTTrainer
 from trl.trainer.utils import ConstantLengthDataset
-from pykoi.db.constants import (
+from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,
     QA_CSV_HEADER_VOTE_STATUS,
 )
-from pykoi.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
 
 

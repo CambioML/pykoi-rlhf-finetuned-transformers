@@ -4,7 +4,7 @@ import os
 import sqlite3
 import unittest
 
-from pykoi.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 
 # Define a temporary database file for testing
 TEST_DB_FILE = "test_qd.db"

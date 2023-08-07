@@ -1,7 +1,7 @@
 """Huggingface model for Language Model (LLM)."""
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from pykoi.llm.abs_llm import AbsLlm
+from pykoi.chat.llm.abs_llm import AbsLlm
 
 
 class HuggingfaceModel(AbsLlm):
@@ -77,7 +77,7 @@ class HuggingfaceModel(AbsLlm):
         """
         # TODO: need to refractor and include all the derivatives of dolly family
         if "dolly" in self._pretrained_model_name_or_path:
-            from pykoi.llm.instruct_pipeline import (
+            from pykoi.chat.llm.instruct_pipeline import (
                 InstructionTextGenerationPipeline,
             )
 

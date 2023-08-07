@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch, Mock
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from pykoi.llm.abs_llm import AbsLlm
-from pykoi.llm.huggingface import HuggingfaceModel
+from pykoi.chat.llm.abs_llm import AbsLlm
+from pykoi.chat.llm.huggingface import HuggingfaceModel
 
 
 class TestHuggingfaceModel(unittest.TestCase):
