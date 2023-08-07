@@ -2,8 +2,8 @@
 
 from typing import Union
 
-from pykoi.llm.abs_llm import AbsLlm
-from pykoi.llm.constants import ModelSource
+from pykoi.chat.llm.abs_llm import AbsLlm
+from pykoi.chat.llm.constants import ModelSource
 
 
 class ModelFactory:
@@ -37,15 +37,15 @@ class ModelFactory:
         try:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
-                from pykoi.llm.openai import OpenAIModel
+                from pykoi.chat.llm.openai import OpenAIModel
 
                 return OpenAIModel(**kwargs)
             elif model_source == ModelSource.HUGGINGFACE:
-                from pykoi.llm.huggingface import HuggingfaceModel
+                from pykoi.chat.llm.huggingface import HuggingfaceModel
 
                 return HuggingfaceModel(**kwargs)
             elif model_source == ModelSource.PEFT_HUGGINGFACE:
-                from pykoi.llm.peft_huggingface import PeftHuggingfacemodel
+                from pykoi.chat.llm.peft_huggingface import PeftHuggingfacemodel
 
                 return PeftHuggingfacemodel(**kwargs)
             else:

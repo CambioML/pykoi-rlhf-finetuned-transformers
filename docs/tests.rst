@@ -1,4 +1,4 @@
-pykoi package
+tests package
 =============
 
 Subpackages
@@ -7,28 +7,24 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   pykoi.chat
-   pykoi.rlhf
-   pykoi.component
-   pykoi.interactives
-   pykoi.telemetry
-   tests
+   tests.chat
+   tests.component
 
 Submodules
 ----------
 
-pykoi.application module
-------------------------
+tests.test\_application module
+------------------------------
 
-.. automodule:: pykoi.application
+.. automodule:: tests.test_application
    :members:
    :undoc-members:
    :show-inheritance:
 
-pykoi.state module
-------------------
+tests.test\_state module
+------------------------
 
-.. automodule:: pykoi.state
+.. automodule:: tests.test_state
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,7 +32,7 @@ pykoi.state module
 Module contents
 ---------------
 
-.. automodule:: pykoi
+.. automodule:: tests
    :members:
    :undoc-members:
    :show-inheritance:

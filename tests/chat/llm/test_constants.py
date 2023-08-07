@@ -3,7 +3,7 @@ Test the constants of the LLM module.
 """
 import unittest
 
-from pykoi.llm.constants import ModelSource
+from pykoi.chat.llm.constants import ModelSource
 
 
 class TestLlmName(unittest.TestCase):

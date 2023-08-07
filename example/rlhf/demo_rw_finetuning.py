@@ -2,7 +2,7 @@
 
 import pykoi
 
-from pykoi.db.constants import (
+from pykoi.chat.db.constants import (
     RANKING_CSV_HEADER_ID,
     RANKING_CSV_HEADER_QUESTION,
     RANKING_CSV_HEADER_UP_RANKING_ANSWER,

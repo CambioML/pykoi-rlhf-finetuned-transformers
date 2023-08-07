@@ -7,7 +7,7 @@ import threading
 
 import pandas as pd
 
-from pykoi.db.constants import QA_CSV_HEADER
+from pykoi.chat.db.constants import QA_CSV_HEADER
 
 
 class QuestionAnswerDatabase:

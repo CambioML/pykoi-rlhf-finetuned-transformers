@@ -4,9 +4,9 @@ from typing import Callable, List, Optional, Union
 
 from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
 from pykoi.component.constants import FeedbackType
-from pykoi.db.qa_database import QuestionAnswerDatabase
-from pykoi.db.ranking_database import RankingDatabase
-from pykoi.llm.abs_llm import AbsLlm
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.ranking_database import RankingDatabase
+from pykoi.chat.llm.abs_llm import AbsLlm
 
 
 class DataSource:
