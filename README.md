@@ -52,16 +52,16 @@ Here are some common applications:
 
 Are you concerned about storing your chat history with chatbots from OpenAI, Amazon Bedrock(:woman_technologist: building now :man_technologist:), or Huggingface? With just three lines of code, we enable you to store it locally, ensuring 100% privacy. This includes launching a chatbot UI, automatically saving your chat history, and visualizing it on a dashboard. Explore the demos below:
 
-- If you're using a CPU instance, check out [demo_launch_app_api.ipynb](example/chatbot/demo_launch_app_api.ipynb)
-- If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](example/chatbot/demo_launch_app_gpu.ipynb)
+- If you're using a CPU instance, check out [demo_launch_app_api.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_api.ipynb)
+- If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_gpu.ipynb)
 - Alternatively, read our [blog](https://www.cambioml.com/docs/data_collection_feedback.html) for more information!
 
 ### :speech_balloon: Model comparison
 
 Comparing models is a difficult task. `pykoi` makes it easy by allowing one to directly compare the performance of multiple models to each other, with just 1 line of code. If you have multiple language models that you’d like to compare to each other on a set of prompts or via an interactive session, you can use `pk.Compare`. Check out any of the demo below: 
 
-- If you're using a CPU instance, check out [demo_launch_app_api.ipynb](example/chatbot/demo_model_comparator_openai.ipynb)
-- If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](example/chatbot/demo_model_comparator_hf.ipynb)
+- If you're using a CPU instance, check out [demo_launch_app_api.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_model_comparator_openai.ipynb)
+- If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_model_comparator_hf.ipynb)
 - Alternatively, read our [blog](https://www.cambioml.com/docs/model_comparison.html) for more information!
  
 ### :speech_balloon: 1-step RLHF
