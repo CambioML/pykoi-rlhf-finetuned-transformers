@@ -1,7 +1,8 @@
 """Application module."""
 import os
 import socket
-
+import time
+from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -12,6 +13,13 @@ from pydantic import BaseModel
 from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
+from pykoi.telemetry.telemetry import Telemetry
+from pykoi.telemetry.events import (
+    AppStartEvent,
+    AppStopEvent)
+
+
+oauth_scheme = HTTPBasic()
 
 
 class UpdateQATable(BaseModel):
@@ -40,24 +48,6 @@ class ComparatorInsertRequest(BaseModel):
     data: List[ModelAnswer]
 
 
-def find_free_port():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("", 0))  # binds to an arbitrary free port
-        return s.getsockname()[1]
-
-
-# def find_free_port():
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.bind(("", 0))  # binds to an arbitrary free port
-#     s.listen(1)
-#     port = s.getsockname()[1]
-#     s.close()
-#     return port
-
-
-oauth_scheme = HTTPBasic()
-
-
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
         self.username = username
@@ -75,6 +65,9 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
+        host: str = "127.0.0.1",
+        port: int = 5000,
+        enable_telemetry: bool = True,
     ):
         """
         Initialize the Application.
@@ -84,9 +77,14 @@ class Application:
             debug (bool, optional): If True, the application will run in debug mode. Defaults to False.
             username (str, optional): The username for authentication. Defaults to None.
             password (str, optional): The password for authentication. Defaults to None.
+            host (str): The host to run the application on. Defaults to None.
+            port (int): The port to run the application on. Defaults to None.
+            enable_telemetry (bool, optional): If True, enable_telemetry will be enabled. Defaults to True.
         """
         self._debug = debug
         self._share = share
+        self._host = host
+        self._port = port
         self.data_sources = {}
         self.components = []
         if username and password:
@@ -102,7 +100,9 @@ class Application:
             and password is not None
             and len(username) != len(password)
         ):
-            raise ValueError("The length of username and password must be the same.")
+            raise ValueError(
+                "The length of username and password must be the same."
+            )
         self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
         self._fake_users_db = {}
@@ -112,6 +112,7 @@ class Application:
                     username=user_name,
                     hashed_password=self._pwd_context.hash(pass_word),
                 )
+        self._telemetry = Telemetry(enable_telemetry)
 
     def authenticate_user(self, fake_db, username: str, password: str):
         if self._auth:
@@ -124,7 +125,9 @@ class Application:
         else:
             return "no_auth"
 
-    def auth_required(self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
+    def auth_required(
+        self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)
+    ):
         user = self.authenticate_user(
             self._fake_users_db, credentials.username, credentials.password
         )
@@ -227,7 +230,9 @@ class Application:
         ):
             try:
                 num_of_response = request_body.n
-                output = component["component"].model.predict(message, num_of_response)
+                output = component["component"].model.predict(
+                    message, num_of_response
+                )
                 # Check the type of each item in the output list
                 return {
                     "log": "Inference complete",
@@ -259,7 +264,9 @@ class Application:
         ):
             try:
                 print("retrieve_ranking_table")
-                rows = component["component"].database.retrieve_all_question_answers()
+                rows = component[
+                    "component"
+                ].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -278,7 +285,9 @@ class Application:
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
         ):
             try:
-                rows = component["component"].database.retrieve_all_question_answers()
+                rows = component[
+                    "component"
+                ].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -293,7 +302,9 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
-    def create_chatbot_comparator_route(self, app: FastAPI, component: Dict[str, Any]):
+    def create_chatbot_comparator_route(
+        self, app: FastAPI, component: Dict[str, Any]
+    ):
         """
         Create chatbot comparator routes for the application.
 
@@ -543,7 +554,9 @@ class Application:
 
             @app.get(f"/data/{id}")
             async def get_data(
-                user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+                user: Union[None, UserInDB] = Depends(
+                    self.get_auth_dependency()
+                )
             ):
                 data = data_source.fetch_func()
                 return JSONResponse(data)
@@ -574,7 +587,8 @@ class Application:
 
         @app.get("/{path:path}")
         async def read_item(
-            path: str, user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+            path: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
         ):
             return {"path": path}
 
@@ -582,16 +596,26 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
+        start_event = AppStartEvent(
+            start_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time())
+        )
+        self._telemetry.capture(start_event)
+
         if self._share:
-            public_url = ngrok.connect(port)
+            public_url = ngrok.connect(self._host + ":" + str(self._port))
             print("Public URL:", public_url)
             import uvicorn
 
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._host, port=self._port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
             import uvicorn
 
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._host, port=self._port)
+        self._telemetry.capture(AppStopEvent(
+            end_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time()),
+            duration=time.time() - start_event.start_time
+        ))

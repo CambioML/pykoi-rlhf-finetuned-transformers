@@ -7,10 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   pykoi.component
-   pykoi.db
-   pykoi.llm
+   pykoi.chat
    pykoi.rlhf
+   pykoi.component
+   pykoi.interactives
+   pykoi.telemetry
+   tests
 
 Submodules
 ----------

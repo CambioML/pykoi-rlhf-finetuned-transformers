@@ -2,7 +2,7 @@
 
 import pykoi
 
-from pykoi.db.constants import (
+from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
     QA_CSV_HEADER_ANSWER,
@@ -22,6 +22,6 @@ print(my_data_pd)
 print("My local database has {} samples in total".format(my_data_pd.shape[0]))
 
 # run supervised finetuning
-config = pykoi.RLHFConfig(base_model_path="meta-llama/Llama-2-7b-hf", dataset_type="local_db")
+config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29", dataset_type="local_db")
 rlhf_step1_sft = pykoi.SupervisedFinetuning(config)
 rlhf_step1_sft.train_and_save("./models/rlhf_step1_sft")
