@@ -17,6 +17,15 @@ class ChromaDb(AbsVectorDb):
         )
         super().__init__()
 
+    def _get_file_names(self):
+        vector_db_list = self._vector_db.get(include=["metadatas"])
+        return set(
+            [
+                metadata_dict["file_name"]
+                for metadata_dict in vector_db_list["metadatas"]
+            ]
+        )
+
     def _index(self, texts, metadatas):
         self._vector_db.add_texts(texts=texts, metadatas=metadatas)
 

@@ -11,13 +11,7 @@ class AbsVectorDb(ABC):
     def __init__(self):
         self._texts = []
         self._file_names = []
-        vector_db_list = self._vector_db.get(include=["metadatas"])
-        self._indexed_file_names = set(
-            [
-                metadata_dict["file_name"]
-                for metadata_dict in vector_db_list["metadatas"]
-            ]
-        )
+        self._indexed_file_names = self._get_file_names()
 
     @property
     def vector_db(self):
@@ -87,6 +81,10 @@ class AbsVectorDb(ABC):
     def _reset(self):
         self._file_names = []
         self._texts = []
+
+    @abstractmethod
+    def _get_file_names(self):
+        raise NotImplementedError
 
     @abstractmethod
     def _index(self, docs, metadatas):
