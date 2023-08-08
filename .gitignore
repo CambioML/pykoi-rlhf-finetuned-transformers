@@ -185,3 +185,6 @@ models/
 
 # poetry dist only
 /dist/
+
+# retrieval
+temp/
