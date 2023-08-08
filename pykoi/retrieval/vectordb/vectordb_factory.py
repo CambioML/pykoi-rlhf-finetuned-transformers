@@ -16,7 +16,9 @@ class VectorDbFactory:
 
     @staticmethod
     def create(
-        model_name: Union[str, LlmName], vector_db_name: Union[str, VectorDbName], host: str, port: int
+        model_name: Union[str, LlmName],
+        vector_db_name: Union[str, VectorDbName],
+        **kargs
     ) -> AbsVectorDb:
         """
         Create a vector database.
@@ -37,7 +39,7 @@ class VectorDbFactory:
             if vector_db_name == VectorDbName.CHROMA:
                 return ChromaDb(model_embedding)
             if vector_db_name == VectorDbName.EPSILLA:
-                return Epsilla(model_embedding, host, port)
+                return Epsilla(model_embedding, kargs.get("host"), kargs.get("port"))
 
         except Exception as ex:
             raise Exception("Unknown db: {}".format(vector_db_name)) from ex
