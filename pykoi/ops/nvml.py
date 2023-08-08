@@ -220,20 +220,22 @@ class Nvml:
             self._has_gpu = False
             # raise RuntimeError("Failed to initialize NVML library.")
 
-    def get(self) -> List[Dict[str, Any]]:
+    def get(self) -> Dict[str, Any]:
         """
         Get device status.
 
         Returns:
-            list: Device status.
+            Dict: Device status.
         """
         if self._has_gpu:
             device_count = pynvml.nvmlDeviceGetCount()
-            return [
-                DeviceStatus(i, pynvml.nvmlDeviceGetHandleByIndex(i)).to_dict()
-                for i in range(device_count)
-            ]
-        return []
+            return {
+                "device_status": [
+                    DeviceStatus(i, pynvml.nvmlDeviceGetHandleByIndex(i)).to_dict()
+                    for i in range(device_count)
+                ]
+            }
+        return {"device_status": []}
 
     def __del__(self):
         """Shutdown NVML."""

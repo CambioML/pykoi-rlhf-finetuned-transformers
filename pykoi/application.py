@@ -14,9 +14,7 @@ from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
 from pykoi.telemetry.telemetry import Telemetry
-from pykoi.telemetry.events import (
-    AppStartEvent,
-    AppStopEvent)
+from pykoi.telemetry.events import AppStartEvent, AppStopEvent
 
 
 oauth_scheme = HTTPBasic()
@@ -100,9 +98,7 @@ class Application:
             and password is not None
             and len(username) != len(password)
         ):
-            raise ValueError(
-                "The length of username and password must be the same."
-            )
+            raise ValueError("The length of username and password must be the same.")
         self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
         self._fake_users_db = {}
@@ -125,9 +121,7 @@ class Application:
         else:
             return "no_auth"
 
-    def auth_required(
-        self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)
-    ):
+    def auth_required(self, credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
         user = self.authenticate_user(
             self._fake_users_db, credentials.username, credentials.password
         )
@@ -230,9 +224,7 @@ class Application:
         ):
             try:
                 num_of_response = request_body.n
-                output = component["component"].model.predict(
-                    message, num_of_response
-                )
+                output = component["component"].model.predict(message, num_of_response)
                 # Check the type of each item in the output list
                 return {
                     "log": "Inference complete",
@@ -264,9 +256,7 @@ class Application:
         ):
             try:
                 print("retrieve_ranking_table")
-                rows = component[
-                    "component"
-                ].database.retrieve_all_question_answers()
+                rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -285,9 +275,7 @@ class Application:
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
         ):
             try:
-                rows = component[
-                    "component"
-                ].database.retrieve_all_question_answers()
+                rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
@@ -302,9 +290,7 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
-    def create_chatbot_comparator_route(
-        self, app: FastAPI, component: Dict[str, Any]
-    ):
+    def create_chatbot_comparator_route(self, app: FastAPI, component: Dict[str, Any]):
         """
         Create chatbot comparator routes for the application.
 
@@ -403,6 +389,7 @@ class Application:
             app (FastAPI): The FastAPI application.
             component (Dict[str, Any]): The component for which the routes are being created.
         """
+
         @app.get("/retrieval/file/get")
         async def get_files(
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
@@ -420,7 +407,9 @@ class Application:
                 size = os.path.getsize(
                     os.path.join(dir_path, file)
                 )  # get size of file in bytes
-                _, ext = os.path.splitext(file)  # split the file name into name and extension
+                _, ext = os.path.splitext(
+                    file
+                )  # split the file name into name and extension
                 file_data.append(
                     {
                         "name": file,
@@ -431,8 +420,10 @@ class Application:
             return {"files": file_data}
 
         @app.post("/retrieval/file/upload")
-        async def upload_files(files: List[UploadFile],
-                               user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def upload_files(
+            files: List[UploadFile],
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
             try:
                 # create folder if it doesn't exist
                 if not os.path.exists(os.getenv("DOC_PATH")):
@@ -452,33 +443,37 @@ class Application:
 
                     print(f"[/retrieval/file/upload]: saving file {file.filename}")
                     # Save or process the file
-                    with open(os.path.join(os.getenv("DOC_PATH"), file.filename), "wb") as buffer:
+                    with open(
+                        os.path.join(os.getenv("DOC_PATH"), file.filename), "wb"
+                    ) as buffer:
                         buffer.write(await file.read())
                     filenames.append(file.filename)
 
                 # List all files in the DOC_PATH directory
                 file_list = os.listdir(os.getenv("DOC_PATH"))
 
-                return JSONResponse({"status": "ok", "filenames": filenames, "files": file_list})
+                return JSONResponse(
+                    {"status": "ok", "filenames": filenames, "files": file_list}
+                )
 
             except Exception as e:
                 return JSONResponse({"status": "error", "message": str(e)})
 
         @app.post("/retrieval/vector_db/index")
-        async def index_vector_db(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def index_vector_db(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 print("[/retrieval/vector_db/index]: indexing files...")
                 component["component"].vector_db.index()
-                return {'log': 'Indexing complete',
-                        'status': '200'}
+                return {"log": "Indexing complete", "status": "200"}
             except Exception as ex:
-                return {'log': f'Indexing failed: {ex}',
-                        'status': '500'}
+                return {"log": f"Indexing failed: {ex}", "status": "500"}
 
         @app.get("/retrieval/{message}")
         async def inference(
             message: str,
-            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
         ):
             try:
                 print("[/retrieval]: model inference...")
@@ -494,18 +489,44 @@ class Application:
                     "answer": output,
                 }
             except Exception as ex:
-                return {'log': f'Inference failed: {ex}',
-                        'status': '500'}
+                return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.get("/retrieval/vector_db/get")
-        async def get_vector_db(user: Union[None, UserInDB] = Depends(self.get_auth_dependency())):
+        async def get_vector_db(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
             try:
                 print("[/retrieval/vector_db/get]: get embedding...")
                 response_dict = component["component"].vector_db.get_embedding()
                 return response_dict
             except Exception as ex:
-                return {"log": "Failed to get embedding: {}".format(ex),
-                        "status": "500"}
+                return {
+                    "log": "Failed to get embedding: {}".format(ex),
+                    "status": "500",
+                }
+
+    def create_nvml_route(self, app: FastAPI, component: Dict[str, Any]):
+        """
+        Create NVML routes for the application.
+
+        Args:
+            app (FastAPI): The FastAPI application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
+
+        @app.get("/nvml")
+        async def get_nvml_info(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            try:
+                print("[/nvml]: get nvml info...")
+                response_dict = component["component"].nvml.get()
+                return response_dict
+            except Exception as ex:
+                return {
+                    "log": "Failed to get nvml info: {}".format(ex),
+                    "status": "500",
+                }
 
     def run(self):
         """
@@ -560,9 +581,7 @@ class Application:
 
             @app.get(f"/data/{id}")
             async def get_data(
-                user: Union[None, UserInDB] = Depends(
-                    self.get_auth_dependency()
-                )
+                user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
             ):
                 data = data_source.fetch_func()
                 return JSONResponse(data)
@@ -579,6 +598,8 @@ class Application:
                 self.create_chatbot_comparator_route(app, component)
             if component["svelte_component"] == "RetrievalQA":
                 self.create_qa_retrieval_route(app, component)
+            if component["svelte_component"] == "Nvml":
+                self.create_nvml_route(app, component)
 
         app.mount(
             "/",
@@ -603,8 +624,7 @@ class Application:
 
         # Set the ngrok tunnel if share is True
         start_event = AppStartEvent(
-            start_time=time.time(),
-            date_time=datetime.utcfromtimestamp(time.time())
+            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
         )
         self._telemetry.capture(start_event)
 
@@ -620,8 +640,10 @@ class Application:
             import uvicorn
 
             uvicorn.run(app, host=self._host, port=self._port)
-        self._telemetry.capture(AppStopEvent(
-            end_time=time.time(),
-            date_time=datetime.utcfromtimestamp(time.time()),
-            duration=time.time() - start_event.start_time
-        ))
+        self._telemetry.capture(
+            AppStopEvent(
+                end_time=time.time(),
+                date_time=datetime.utcfromtimestamp(time.time()),
+                duration=time.time() - start_event.start_time,
+            )
+        )
