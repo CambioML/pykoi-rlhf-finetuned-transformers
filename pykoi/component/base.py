@@ -80,6 +80,22 @@ class Dropdown(Component):
         super().__init__(fetch_func, "Dropdown", **kwargs)
         self.value_column = value_column
 
+class RAG(Component):
+    """
+    RAG class represents a RAG component.
+
+    Attributes:
+
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Initialize a new instance of RAG.
+
+        Args:
+        """
+        super().__init__(None, "RAG", **kwargs)
+
 
 class Chatbot(Component):
     """

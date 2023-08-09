@@ -7,6 +7,7 @@
   import ComparisonChart from "./lib/Comparison/ComparisonChart.svelte";
   import QuestionRating from "./lib/Annotations/QuestionRating.svelte";
   import RankedChatbot from "./lib/Chatbots/RankedChatbot.svelte";
+  import RAG from "./lib/RAG/RAG.svelte";
 
   const components = writable([]);
   const selectedPage = writable(null);
@@ -16,6 +17,7 @@
     Dropdown: Dropdown,
     Feedback: Feedback,
     Compare: ComparisonChat,
+    RetrievalQA: RAG,
   };
 
   const setSelectedPage = (component) => {
