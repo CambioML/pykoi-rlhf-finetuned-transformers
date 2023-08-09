@@ -1,8 +1,8 @@
 <script>
-  // import Bubble from "$lib/components/Charts/Bubble.svelte";
-  // import Table from "$lib/components/tanstackTable/Table.svelte"; // Import Table component
+  import Bubble from "./Components/Charts/Bubble.svelte";
+  import Table from "./Components/tanstackTable/Table.svelte";
   import { onMount } from "svelte";
-  import { uploadedFiles, projections } from "../../store.js";
+  import { uploadedFiles, projections } from "../store.js";
 
   let selectedFiles = [];
   let indexed = false;
@@ -90,9 +90,9 @@
     </div>
   </div>
   <div class="charts-container">
-    <!-- <Bubble /> -->
+    <Bubble />
     {#if selectedFiles}
-      <!-- <Table /> -->
+      <Table />
     {/if}
   </div>
 </div>
