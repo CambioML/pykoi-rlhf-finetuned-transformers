@@ -12,9 +12,9 @@
     const formData = new FormData();
     // iterate over selectedFiles and add them to array
     for (let i = 0; i < selectedFiles.length; i++) {
-      formData.append("file", selectedFiles[i]);
+      formData.append("files", selectedFiles[i]);
     }
-    const response = await fetch("objects/upload", {
+    const response = await fetch("/retrieval/file/upload", {
       method: "POST",
       body: formData,
     });
@@ -24,7 +24,7 @@
   }
 
   async function loadServerData() {
-    const response = await fetch("objects/get");
+    const response = await fetch("/retrieval/file/get");
     const data = await response.json();
     // Transform the received data
     const filesData = data.files.map((file) => {
@@ -40,15 +40,17 @@
   async function indexFiles() {
     console.log("index!");
     indexing = true;
-    const response = await fetch("objects/index");
+    const response = await fetch("/retrieval/vector_db/index", {
+      method: "POST",
+    });
     const data = await response.json();
     indexed = true;
     indexing = false;
   }
 
   async function getEmbeddings() {
-    console.log("getting embeddings");
-    const response = await fetch("embedding/get");
+    console.log("getting embeddings...");
+    const response = await fetch("/retrieval/vector_db/get");
     const embeddingData = await response.json();
     console.log("embeddingData", embeddingData);
     $projections = embeddingData;
@@ -124,6 +126,7 @@
     gap: 0;
     margin: auto;
     max-width: 1200px;
+    padding-top: 20px;
   }
 
   .upload-box {

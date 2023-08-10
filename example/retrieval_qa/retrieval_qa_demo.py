@@ -40,8 +40,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-vectordb",
         type=str,
-        default="epsilla",
-        help="Name of the vector database (default: 'epsilla')",
+        default="chroma",
+        help="Name of the vector database (default: 'chroma')",
     )
     parser.add_argument(
         "-host",
