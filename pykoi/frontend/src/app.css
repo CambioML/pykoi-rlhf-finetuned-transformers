@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Work+Sans:400|Lato:400|Inconsolata:400');
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -87,7 +88,6 @@ button:focus-visible {
 
 
 
-@import url('https://fonts.googleapis.com/css?family=Work+Sans:400|Lato:400|Inconsolata:400');
 
 :root {
 /* colors */
@@ -430,7 +430,7 @@ button.small {
         --grey: #bfbfbf;
         --lightGrey: #f2f4f6;
         --white: white;
-    
+
         /* color intentions */
         --primary: var(--green);
         --danger: var(--red);
@@ -443,12 +443,12 @@ button.small {
         --footerTextColor: var(--lightGrey);
         --buttonColor: var(--primary);
         --buttonTextColor: var(--textColor);
-    
-    
-    
+
+
+
         /* Styles */
         --line: solid 1px var(--lineColor);
-    
+
         /* Typography */
         --headingFont: 'Lato', monospace;
         --bodyFont: 'Work Sans', sans-serif;
@@ -460,13 +460,13 @@ button.small {
         --h4: 1.563em;
         --h5: 1.25em;
         --smallText: 0.8em;
-    
+
         /* Elevation 1: base, 4: xl*/
         --shadow-s: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    
+
         /* Positioning */
         --containerPadding: 2.5%;
         --headerHeight: 3rem;
@@ -486,13 +486,13 @@ button.small {
 :root {
 	--left: 300px;
   }
-  
+
   .grid-sidemenu {
 	--gridCols: 2;
 	display: grid; /* reset here for mobile override */
 	grid-template-columns: var(--left) 1fr;
   }
-  
+
   header {
 	padding: 0;
 	padding-right: 15px;
@@ -500,26 +500,26 @@ button.small {
   header nav a + a {
 	margin-left: 15px;
   }
-  
-  
+
+
   .corner {
 	margin-left: var(--left);
   }
-  
+
   header nav a {
 	color: var(--black);
 	text-decoration: none;
   }
-  
+
   .page {
 	padding: 3em;
   }
-  
+
   .page-title {
 	text-decoration: none;
 	border-bottom: var(--borderBottom);
   }
-  
+
   .card {
 	padding: 2em;
 	background: var(--cardBg);
@@ -528,11 +528,11 @@ button.small {
 	font-size: var(--smallText);
 	/* max-width: 30em; */
   }
-  
+
   .card:hover {
 	box-shadow: var(--shadow-xl);
   }
-  
+
   /* first item never has margin top */
   .card > *:first-child {
 	margin-top: 0;
@@ -541,7 +541,7 @@ button.small {
   .card > *:last-child {
 	margin-bottom: 0;
   }
-  
+
   table {
 	margin: auto;
   }

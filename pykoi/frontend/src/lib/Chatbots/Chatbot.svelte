@@ -4,6 +4,7 @@
   import { select } from "d3-selection";
 
   export let feedback = false;
+  export let is_retrieval= false;
 
   let mymessage = "";
   let messageplaceholder = "";
@@ -39,15 +40,18 @@
     };
     $chatLog = [...$chatLog, currentEntry];
 
-    const response = await fetch(`/chat/${mymessage}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt: mymessage,
-      }),
-    });
+    const response = is_retrieval ?
+      await fetch(`/retrieval/${mymessage}`)
+      :
+      await fetch(`/chat/${mymessage}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: mymessage,
+        }),
+      });
 
     if (response.ok) {
       const data = await response.json();
