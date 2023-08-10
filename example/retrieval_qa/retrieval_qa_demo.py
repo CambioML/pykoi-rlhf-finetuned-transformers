@@ -1,8 +1,8 @@
 """Demo for the retrieval_qa application."""
 
 import os
-import pykoi
 import argparse
+import pykoi
 
 
 def main(**kargs):
@@ -15,23 +15,30 @@ def main(**kargs):
     #####################################
     # Creating a retrieval QA component #
     #####################################
+    # vector database
     vector_db = pykoi.VectorDbFactory.create(
         model_name=MODEL_NAME, vector_db_name=kargs.get("vectordb"), **kargs
     )
 
+    # retrieval model with vector database
     retrieval_model = pykoi.RetrievalFactory.create(
         model_name=MODEL_NAME, vector_db=vector_db
     )
+
+    # sql database
+    database = pykoi.QuestionAnswerDatabase(debug=True)
+    dashboard = pykoi.Dashboard(database=database)
 
     # Creating an OpenAI model
     model = pykoi.ModelFactory.create_model(
         model_source=MODEL_NAME,
         api_key=os.environ["OPENAI_API_KEY"])
 
+    # retrieval and chatbot components
     retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
     chatbot = pykoi.Chatbot(
         model=model,
-        feedback="rank",
+        feedback="vote",
         is_retrieval=True)
 
     ############################################################
@@ -41,6 +48,7 @@ def main(**kargs):
     app = pykoi.Application(debug=False, share=False)
     app.add_component(retriever)
     app.add_component(chatbot)
+    app.add_component(dashboard)
     app.run()
 
 

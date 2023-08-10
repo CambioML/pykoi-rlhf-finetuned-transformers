@@ -483,10 +483,16 @@ class Application:
             try:
                 print("[/retrieval]: model inference...")
                 output = component["component"].retrieval_model.run(message)
-                return {'log': 'Inference complete',
-                        'status': '200',
-                        'question': message,
-                        'answer': output}
+                id = component["component"].database.insert_question_answer(
+                    message, output
+                )
+                return {
+                    "id": id,
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": message,
+                    "answer": output,
+                }
             except Exception as ex:
                 return {'log': f'Inference failed: {ex}',
                         'status': '500'}
