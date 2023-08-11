@@ -4,7 +4,7 @@ from typing import Union
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings import OpenAIEmbeddings
 
-from pykoi.retrieval.llm.constants import LlmName
+from pykoi.retrieval.llm.constants import ModelSource
 
 
 class EmbeddingFactory:
@@ -13,19 +13,19 @@ class EmbeddingFactory:
     """
 
     @staticmethod
-    def create_embedding(model_name: Union[str, LlmName]) -> Embeddings:
+    def create_embedding(model_source: Union[str, ModelSource]) -> Embeddings:
         """
         Create an embedding.
 
         Args:
-            model_name: The name of the model.
+            model_source: The name of the model.
 
         Returns:
             Embeddings: The embedding.
         """
         try:
-            model_name = LlmName(model_name)
-            if model_name == LlmName.OPENAI:
+            model_source = ModelSource(model_source)
+            if model_source == ModelSource.OPENAI:
                 return OpenAIEmbeddings()
         except Exception as ex:
-            raise Exception(f"Unknown embedding: {model_name}") from ex
+            raise Exception(f"Unknown embedding: {model_source}") from ex

@@ -1,7 +1,7 @@
 """ A factory for creating vector databases."""
 from typing import Union
 
-from pykoi.retrieval.llm.constants import LlmName
+from pykoi.retrieval.llm.constants import ModelSource
 from pykoi.retrieval.llm.embedding_factory import EmbeddingFactory
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 from pykoi.retrieval.vectordb.chroma import ChromaDb
@@ -16,7 +16,7 @@ class VectorDbFactory:
 
     @staticmethod
     def create(
-        model_name: Union[str, LlmName],
+        model_source: Union[str, ModelSource],
         vector_db_name: Union[str, VectorDbName],
         **kargs
     ) -> AbsVectorDb:
@@ -24,7 +24,7 @@ class VectorDbFactory:
         Create a vector database.
 
         Args:
-            model_name: The name of the model.
+            model_source: The name of the model.
             vector_db_name: The name of the vector database.
             host: The host address if using Epsilla vector database.
             port: The port number if using Epsilla vector database.
@@ -34,8 +34,8 @@ class VectorDbFactory:
         """
         try:
             vector_db_name = VectorDbName(vector_db_name)
-            model_name = LlmName(model_name)
-            model_embedding = EmbeddingFactory.create_embedding(model_name.value)
+            model_source = ModelSource(model_source)
+            model_embedding = EmbeddingFactory.create_embedding(model_source.value)
             if vector_db_name == VectorDbName.CHROMA:
                 return ChromaDb(model_embedding)
             if vector_db_name == VectorDbName.EPSILLA:

@@ -2,7 +2,7 @@
 from enum import Enum
 
 
-class LlmName(Enum):
+class ModelSource(Enum):
     """
     An enum representing the name of a language model.
     """
