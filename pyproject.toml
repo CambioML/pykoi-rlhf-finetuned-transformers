@@ -36,6 +36,7 @@ tiktoken = "0.4.0"
 pyepsilla = ">=0.1.1"
 torch = "2.0.1"
 posthog = "3.0.1"
+pynvml = "11.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
