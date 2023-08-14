@@ -1,5 +1,8 @@
 """ NVML (NVIDIA Management Library). """
 
+import time
+
+from datetime import datetime
 from typing import Any, Dict, List
 
 import pynvml
@@ -22,6 +25,7 @@ class DeviceStatus:
 
         """
         self.device_id = device_id
+        self.timestamp = datetime.utcfromtimestamp(time.time())
         self.ecc_errors = self.get_ecc_errors(handle)
         self.utilization = self.get_utilization(handle)
         self.processes = self.get_active_processes(handle)
@@ -194,6 +198,7 @@ class DeviceStatus:
             dict: Dictionary.
         """
         return {
+            "timestamp": self.timestamp,
             "device_id": self.device_id,
             "ecc_errors": self.ecc_errors,
             "utilization": self.utilization,
