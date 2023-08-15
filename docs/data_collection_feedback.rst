@@ -6,7 +6,7 @@ finetuned language models:
 
 .. code:: python
 
-  import pykpi as pk
+  import pykoi as pk
 
   # assume you have some model, endpoint, or api
   model = your_model
@@ -41,7 +41,7 @@ the machine that hosted the UI. The data can be easily explored or exported ther
 
 .. code:: python
 
-  import pykpi as pk
+  import pykoi as pk
 
   # assume you have some model, endpoint, or api
   model = your_model
