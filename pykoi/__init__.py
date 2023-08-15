@@ -1,3 +1,5 @@
+from pykoi import chat
+
 from pykoi.application import Application
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.chat.db.ranking_database import RankingDatabase
