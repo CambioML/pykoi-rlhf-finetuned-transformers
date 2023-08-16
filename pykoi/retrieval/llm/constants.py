@@ -8,3 +8,4 @@ class ModelSource(Enum):
     """
 
     OPENAI = "openai"
+    HUGGINGFACE = "huggingface"

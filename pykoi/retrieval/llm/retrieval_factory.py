@@ -3,6 +3,7 @@ from typing import Union
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.llm.openai import OpenAIModel
+from pykoi.retrieval.llm.huggingface import HuggingFaceModel
 from pykoi.retrieval.llm.constants import ModelSource
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 
@@ -13,7 +14,9 @@ class RetrievalFactory:
     """
 
     @staticmethod
-    def create(model_source: Union[str, ModelSource], vector_db: AbsVectorDb) -> AbsLlm:
+    def create(
+        model_source: Union[str, ModelSource], vector_db: AbsVectorDb, **kwargs
+    ) -> AbsLlm:
         """Create a language model for retrieval.
 
         Args:
@@ -27,5 +30,7 @@ class RetrievalFactory:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
                 return OpenAIModel(vector_db)
+            if model_source == ModelSource.HUGGINGFACE:
+                return HuggingFaceModel(vector_db, **kwargs)
         except Exception as ex:
             raise Exception(f"Unknown model: {model_source}") from ex

@@ -2,7 +2,7 @@
 from typing import Union
 
 from langchain.embeddings.base import Embeddings
-from langchain.embeddings import OpenAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceEmbeddings
 
 from pykoi.retrieval.llm.constants import ModelSource
 
@@ -13,12 +13,13 @@ class EmbeddingFactory:
     """
 
     @staticmethod
-    def create_embedding(model_source: Union[str, ModelSource]) -> Embeddings:
+    def create_embedding(model_source: Union[str, ModelSource], **kwargs) -> Embeddings:
         """
         Create an embedding.
 
         Args:
             model_source: The name of the model.
+            **kwargs: Keyword arguments for the model.
 
         Returns:
             Embeddings: The embedding.
@@ -27,5 +28,9 @@ class EmbeddingFactory:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
                 return OpenAIEmbeddings()
+            elif model_source == ModelSource.HUGGINGFACE:
+                return HuggingFaceEmbeddings(
+                    model_name=kwargs.get("model_name"),
+                )
         except Exception as ex:
             raise Exception(f"Unknown embedding: {model_source}") from ex
