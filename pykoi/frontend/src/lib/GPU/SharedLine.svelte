@@ -1,3 +1,4 @@
+<!-- Line plot with shared tooltip -->
 <script>
   import { extent } from "d3-array";
   import { scaleLinear, scaleTime, scaleOrdinal } from "d3-scale";

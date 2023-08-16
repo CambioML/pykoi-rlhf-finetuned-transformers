@@ -1,7 +1,7 @@
 <script>
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
-  import Line from "./Line.svelte";
+  import SharedLine from "./SharedLine.svelte";
   import { gpu_data } from "./data.js";
 
   let initialDeviceData = gpu_data["device_status"];
@@ -18,14 +18,18 @@
     const response = await fetch("/chat/comparator/db/retrieve");
     const data = await response.json();
     console.log("uploooo", data);
-    // const dbRows = data["data"];
-    // const formattedRows = dbRows.map((d) => ({
-    //   model: d.model,
-    //   answer: d.answer,
-    //   qid: parseInt(d.qid),
-    //   rank: parseInt(d.rank),
-    // }));
-    // $comparisonData = [...formattedRows];
+
+    // const data = await response.json();
+    //     console.log("uploooo", data);
+
+    //     // Assuming that the returned data has a similar structure to gpu_data.device_status
+    //     const formattedData = data.device_status.map((d) => ({
+    //       timestamp: d.timestamp,
+    //       gpu: d.utilization.gpu,
+    //       memory: d.utilization.memory,
+    //     }));
+
+    //     dataStore.set(formattedData);
   }
 
   let interval;
@@ -33,8 +37,8 @@
   onMount(() => {
     interval = setInterval(() => {
       let newTimestamp = new Date().toISOString();
-      let newGpuValue = Math.floor(Math.random() * 100); // Generate a random value between 0 and 100 for the sake of this example
-      let newMemoryValue = Math.floor(Math.random() * 100); // Generate a random value between 0 and 100
+      let newGpuValue = Math.floor(Math.random() * 100);
+      let newMemoryValue = Math.floor(Math.random() * 100);
 
       // Update the store with the new data
       gpuData.update((data) => [
@@ -54,8 +58,60 @@
   });
 </script>
 
+<h3>GPU Monitoring</h3>
+
 <div id="chart">
-  <Line
+  <SharedLine
+    data={$gpuData}
+    x="timestamp"
+    y="gpu"
+    color="red"
+    strokeWidth="4"
+    gradient="false"
+    tick_opacity=".04"
+    yAxisLine="false"
+    xAxisText="Timestamp"
+    yAxisText="GPU"
+    xTicks="true"
+    yTicks="true"
+    title="GPU Usage"
+    subtitle=""
+  />
+  <SharedLine
+    data={$gpuData}
+    x="timestamp"
+    y="memory"
+    color="red"
+    strokeWidth="4"
+    gradient="false"
+    tick_opacity=".04"
+    yAxisLine="false"
+    xAxisText="Timestamp"
+    yAxisText="Memory"
+    xTicks="true"
+    yTicks="true"
+    title="Memory Usage"
+    subtitle=""
+    points="false"
+  />
+  <SharedLine
+    data={$gpuData}
+    x="timestamp"
+    y="memory"
+    color="red"
+    strokeWidth="4"
+    gradient="false"
+    tick_opacity=".04"
+    yAxisLine="false"
+    xAxisText="Timestamp"
+    yAxisText="Memory"
+    xTicks="true"
+    yTicks="true"
+    title="Memory Usage"
+    subtitle=""
+    points="false"
+  />
+  <SharedLine
     data={$gpuData}
     x="timestamp"
     y="gpu"
@@ -68,17 +124,61 @@
     yAxisText="Memory"
     xTicks="true"
     yTicks="true"
-    title="GPU Usage"
-    subtitle="Measured every 4 seconds"
+    title="Memory Usage"
+    subtitle=""
+    points="false"
+  />
+  <SharedLine
+    data={$gpuData}
+    x="timestamp"
+    y="memory"
+    color="red"
+    strokeWidth="4"
+    gradient="false"
+    tick_opacity=".04"
+    yAxisLine="false"
+    xAxisText="Timestamp"
+    yAxisText="Memory"
+    xTicks="true"
+    yTicks="true"
+    title="Memory Usage"
+    subtitle=""
+    points="false"
+  />
+  <SharedLine
+    data={$gpuData}
+    x="timestamp"
+    y="gpu"
+    color="red"
+    strokeWidth="4"
+    gradient="false"
+    tick_opacity=".04"
+    yAxisLine="false"
+    xAxisText="Timestamp"
+    yAxisText="Memory"
+    xTicks="true"
+    yTicks="true"
+    title="Memory Usage"
+    subtitle=""
+    points="false"
   />
 </div>
 
 <style>
-  #chart {
+  /* #chart {
     display: flex;
     height: 50vh;
     width: 50vw;
     margin: auto;
+    justify-content: center;
+  } */
+  #chart {
+    display: grid;
+    grid-template-columns: repeat(3, 33%);
+    grid-template-rows: repeat(4, 40%);
+    height: 100vh;
+    width: 90vw;
+    margin: 3rem auto;
     justify-content: center;
   }
 </style>
