@@ -114,7 +114,7 @@ class Epsilla(AbsVectorDb):
             db_name="PykoiDB", db_path="{}/epsilla".format(os.getenv("VECTORDB_PATH"))
         )
         self._vector_db.use_db(db_name="PykoiDB")
-        result = self._vector_db.create_table(
+        status_code, result = self._vector_db.create_table(
             table_name="RetrievalQA",
             table_fields=[
                 {"name": "file_name", "dataType": "STRING"},
@@ -126,10 +126,11 @@ class Epsilla(AbsVectorDb):
                 },
             ],
         )
-        if result[1]["message"] == "Table already exists: RetrievalQA":
+        if status_code == 409:
             print(
-                "Table RetrievalQA already exists. Continuing with the existing table."
+                f"{result['message']}. Continuing with the existing table."
             )
+
         super().__init__()
 
     def _get_file_names(self):
