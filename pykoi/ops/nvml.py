@@ -101,7 +101,6 @@ class DeviceStatus:
         return [
             {
                 "pid": process.pid,
-                "name": process.name,
                 "memory_used": process.usedGpuMemory,
             }
             for process in processes
