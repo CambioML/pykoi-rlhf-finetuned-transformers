@@ -14,7 +14,7 @@ predefined summaries, for example, ...
 
 .. code:: python
 
-  import pykpi as pk
+  import pykoi as pk
 
   # assume you have some model, endpoint, or api
   model = your_model
@@ -36,7 +36,7 @@ predefined summaries, for example, ...
 
 .. code:: python
 
-  import pykpi as pk
+  import pykoi as pk
 
   # assume you have some model, endpoint, or api
   model = your_model
@@ -58,7 +58,7 @@ predefined summaries, for example, ...
 
 .. code:: python
 
-  import pykpi as pk
+  import pykoi as pk
 
   # assume you have some model, endpoint, or api
   model = your_model
