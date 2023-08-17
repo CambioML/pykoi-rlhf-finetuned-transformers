@@ -1,5 +1,6 @@
 """OpenAI language model for retrieval"""
 import os
+import torch
 
 from langchain.chains import RetrievalQA
 from langchain.llms import HuggingFacePipeline
@@ -23,10 +24,13 @@ class HuggingFaceModel(AbsLlm):
             llm = HuggingFacePipeline.from_model_id(
                 model_id=kwargs.get("model_name"),
                 task="text-generation",
+                device=torch.cuda.device_count() - 1,
+                pipeline_kwargs={"device_map": "auto"},
                 model_kwargs={
                     "temperature": 0,
-                    "max_length": 500,
-                    "trust_remote_code": True,
+                    "max_length": kwargs.get("max_length", 500),
+                    "trust_remote_code": kwargs.get("trust_remote_code", True),
+                    # "load_in_8bit": True,
                 },
             )
 
@@ -36,6 +40,7 @@ class HuggingFaceModel(AbsLlm):
                 llm=llm,
                 chain_type="stuff",
                 retriever=vector_db.as_retriever(search_kwargs={"k": MIN_DOCS}),
+                verbose=True,
             )
             print("HuggingFaceModel initialized successfully")
             super().__init__(retrieve_qa)

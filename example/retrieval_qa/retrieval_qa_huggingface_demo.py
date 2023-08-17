@@ -17,7 +17,7 @@ def main(**kwargs):
     vector_db = pykoi.VectorDbFactory.create(
         model_source=MODEL_SOURCE,
         vector_db_name=kwargs.get("vectordb"),
-        model_name="bigscience/bloom-1b7",
+        model_name="BAAI/bge-large-en",
         trust_remote_code=True,
         **kwargs
     )
@@ -25,8 +25,9 @@ def main(**kwargs):
     retrieval_model = pykoi.RetrievalFactory.create(
         model_source=MODEL_SOURCE,
         vector_db=vector_db,
-        model_name="tiiuae/falcon-7b",
+        model_name="databricks/dolly-v2-3b",
         trust_remote_code=True,
+        max_length=1000
     )
 
     # retrieval and chatbot components
