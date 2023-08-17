@@ -25,8 +25,8 @@ pip3 install torch
 
 If you are on EC2, you can launch a GPU instance with the following config:
 - EC2 `g4dn.xlarge` (if you want to run a pretrained model with 7B parameters)
-- Deep Learning Base GPU AMI
-    <img src="example/image/readme_ec2_ami.png" alt="Alt text" width="50%" height="50%"/>
+- Deep Learning AMI PyTorch GPU 2.0.1 (Ubuntu 20.04)
+    <img src="example/image/readme_ec2_ami.jpg" alt="Alt text" width="50%" height="50%"/>
 - EBS: at least 100G
     <img src="example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 
