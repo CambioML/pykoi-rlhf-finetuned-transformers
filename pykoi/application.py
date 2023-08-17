@@ -22,6 +22,7 @@ from pykoi.telemetry.events import AppStartEvent, AppStopEvent
 
 oauth_scheme = HTTPBasic()
 
+
 class UpdateQATable(BaseModel):
     id: int
     vote_status: str
@@ -640,6 +641,7 @@ class Application:
             ngrok.disconnect(public_url)
         else:
             import uvicorn
+
             uvicorn.run(app, host=self._host, port=self._port)
         self._telemetry.capture(
             AppStopEvent(
@@ -747,18 +749,15 @@ class Application:
             print("Public URL:", public_url)
             import uvicorn
 
-            # Chatbot()
-            uvicorn.run(app, host=self._port, port=self._port)
+            uvicorn.run(app, host=self._host, port=self._port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
             import uvicorn
 
             def run_uvicorn():
-                uvicorn.run(app, host=self._port, port=self._port)
+                uvicorn.run(app, host=self._host, port=self._port)
 
             t = threading.Thread(target=run_uvicorn)
             t.start()
-
-            return Chatbot()()
-
+            return Chatbot()(port=self._host)
