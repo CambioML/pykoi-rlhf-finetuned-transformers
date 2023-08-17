@@ -742,21 +742,20 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
         if self._share:
-            public_url = ngrok.connect(port)
+            public_url = ngrok.connect(self._port)
             print("Public URL:", public_url)
             import uvicorn
 
             # Chatbot()
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._port, port=self._port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
             import uvicorn
 
             def run_uvicorn():
-                uvicorn.run(app, host="127.0.0.1", port=port)
+                uvicorn.run(app, host=self._port, port=self._port)
 
             t = threading.Thread(target=run_uvicorn)
             t.start()
