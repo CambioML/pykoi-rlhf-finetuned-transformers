@@ -5,38 +5,36 @@ import argparse
 import pykoi
 
 
-def main(**kargs):
-    # enter openai api key here
-    os.environ["OPENAI_API_KEY"] = ""
+def main(**kwargs):
     os.environ["DOC_PATH"] = os.path.join(os.getcwd(), "temp/docs")
     os.environ["VECTORDB_PATH"] = os.path.join(os.getcwd(), "temp/vectordb")
-    MODEL_SOURCE = "openai"
+    MODEL_SOURCE = "huggingface"
 
     #####################################
     # Creating a retrieval QA component #
     #####################################
     # vector database
     vector_db = pykoi.VectorDbFactory.create(
-        model_source=MODEL_SOURCE, vector_db_name=kargs.get("vectordb"), **kargs
+        model_source=MODEL_SOURCE,
+        vector_db_name=kwargs.get("vectordb"),
+        model_name="bigscience/bloom-1b7",
+        trust_remote_code=True,
+        **kwargs
     )
-
     # retrieval model with vector database
     retrieval_model = pykoi.RetrievalFactory.create(
-        model_source=MODEL_SOURCE, vector_db=vector_db
-    )
-
-    # sql database
-    database = pykoi.QuestionAnswerDatabase(debug=True)
-    dashboard = pykoi.Dashboard(database=database)
-
-    # Creating an OpenAI model
-    model = pykoi.ModelFactory.create_model(
-        model_source=MODEL_SOURCE, api_key=os.environ["OPENAI_API_KEY"]
+        model_source=MODEL_SOURCE,
+        vector_db=vector_db,
+        model_name="tiiuae/falcon-7b",
+        trust_remote_code=True,
     )
 
     # retrieval and chatbot components
     retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
-    chatbot = pykoi.Chatbot(model=model, feedback="vote", is_retrieval=True)
+    chatbot = pykoi.Chatbot(None, feedback="vote", is_retrieval=True)
+    # sql database components
+    database = pykoi.QuestionAnswerDatabase(debug=True)
+    dashboard = pykoi.Dashboard(database=database)
 
     ############################################################
     # Starting the application and retrieval qa as a component #
