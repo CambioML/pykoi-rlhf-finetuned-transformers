@@ -7,6 +7,7 @@ from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 from pykoi.retrieval.vectordb.chroma import ChromaDb
 from pykoi.retrieval.vectordb.constants import VectorDbName
 from pykoi.retrieval.vectordb.epsilla import Epsilla
+from pykoi.retrieval.vectordb.milvus import MilvusDb
 
 
 class VectorDbFactory:
@@ -40,8 +41,10 @@ class VectorDbFactory:
             )
             if vector_db_name == VectorDbName.CHROMA:
                 return ChromaDb(model_embedding)
-            if vector_db_name == VectorDbName.EPSILLA:
+            elif vector_db_name == VectorDbName.EPSILLA:
                 return Epsilla(model_embedding, kwargs.get("host"), kwargs.get("port"))
+            elif vector_db_name == VectorDbName.MILVUS:
+                return MilvusDb(model_embedding)
 
         except Exception as ex:
             raise Exception("Unknown db: {}".format(vector_db_name)) from ex
