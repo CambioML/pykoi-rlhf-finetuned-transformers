@@ -1,6 +1,8 @@
 """Application module."""
 import os
 import socket
+import threading
+
 
 from typing import List, Optional, Any, Dict, Union
 from fastapi import FastAPI, Depends, HTTPException, status
@@ -12,6 +14,7 @@ from pydantic import BaseModel
 from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
+from pykoi.interactives.chatbot import Chatbot
 
 
 class UpdateQATable(BaseModel):
@@ -487,3 +490,117 @@ class Application:
             import uvicorn
 
             uvicorn.run(app, host="127.0.0.1", port=port)
+
+    def display(self):
+        """
+        Run the application.
+        """
+        import nest_asyncio
+
+        nest_asyncio.apply()
+        app = FastAPI()
+
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
+        @app.post("/token")
+        def login(credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
+            user = self.authenticate_user(
+                self._fake_users_db, credentials.username, credentials.password
+            )
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Incorrect username or password",
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+            return {"message": "Logged in successfully"}
+
+        @app.get("/components")
+        async def get_components(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            return JSONResponse(
+                [
+                    {
+                        "id": component["id"],
+                        "svelte_component": component["svelte_component"],
+                        "props": component["props"],
+                    }
+                    for component in self.components
+                ]
+            )
+
+        def create_data_route(id: str, data_source: Any):
+            """
+            Create data route for the application.
+
+            Args:
+                id (str): The id of the data source.
+                data_source (Any): The data source.
+            """
+
+            @app.get(f"/data/{id}")
+            async def get_data(
+                user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+            ):
+                data = data_source.fetch_func()
+                return JSONResponse(data)
+
+        for id, data_source in self.data_sources.items():
+            create_data_route(id, data_source)
+
+        for component in self.components:
+            if component["svelte_component"] == "Chatbot":
+                self.create_chatbot_route(app, component)
+            if component["svelte_component"] == "Feedback":
+                self.create_feedback_route(app, component)
+            if component["svelte_component"] == "Compare":
+                self.create_chatbot_comparator_route(app, component)
+
+        app.mount(
+            "/",
+            StaticFiles(
+                directory=os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)), "frontend/dist"
+                ),
+                html=True,
+            ),
+            name="static",
+        )
+
+        @app.get("/{path:path}")
+        async def read_item(
+            path: str, user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            return {"path": path}
+
+        # debug mode should be set to False in production because
+        # it will start two processes when debug mode is enabled.
+
+        # Set the ngrok tunnel if share is True
+        port = find_free_port()
+        if self._share:
+            public_url = ngrok.connect(port)
+            print("Public URL:", public_url)
+            import uvicorn
+
+            # Chatbot()
+            uvicorn.run(app, host="127.0.0.1", port=port)
+            print("Stopping server...")
+            ngrok.disconnect(public_url)
+        else:
+            import uvicorn
+
+            def run_uvicorn():
+                uvicorn.run(app, host="127.0.0.1", port=port)
+
+            t = threading.Thread(target=run_uvicorn)
+            t.start()
+
+            return Chatbot()()
