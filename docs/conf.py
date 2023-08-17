@@ -39,13 +39,19 @@ html_css_files = [
     "css/custom.css",
 ]
 
-html_logo = "logo.svg"
-
 html_theme_options = {
     "light_css_variables": {
         "color-admonition-title--note": "#00ebc7",
         "color-admonition-title-background--note": "#a2fff1",
     },
+    "dark_css_variables": {
+        "color-admonition-title--note": "#a2fff1",
+        "color-admonition-title-background--note": "#00C9AB",
+        "background": "#333",
+        "textColor": "var(--color-foreground-primary)",
+    },
+    "light_logo": "logo-light-mode.svg",
+    "dark_logo": "logo-dark-mode.svg",
     "sidebar_hide_name": True,
     "footer_icons": [
         {

@@ -2,10 +2,11 @@
 import os
 import socket
 import threading
+import time
 
-
+from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from passlib.context import CryptContext
 from fastapi.responses import JSONResponse
@@ -15,7 +16,11 @@ from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
 from pykoi.component.base import Dropdown
 from pykoi.interactives.chatbot import Chatbot
+from pykoi.telemetry.telemetry import Telemetry
+from pykoi.telemetry.events import AppStartEvent, AppStopEvent
 
+
+oauth_scheme = HTTPBasic()
 
 class UpdateQATable(BaseModel):
     id: int
@@ -43,24 +48,6 @@ class ComparatorInsertRequest(BaseModel):
     data: List[ModelAnswer]
 
 
-def find_free_port():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("", 0))  # binds to an arbitrary free port
-        return s.getsockname()[1]
-
-
-# def find_free_port():
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.bind(("", 0))  # binds to an arbitrary free port
-#     s.listen(1)
-#     port = s.getsockname()[1]
-#     s.close()
-#     return port
-
-
-oauth_scheme = HTTPBasic()
-
-
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
         self.username = username
@@ -78,6 +65,9 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
+        host: str = "127.0.0.1",
+        port: int = 5000,
+        enable_telemetry: bool = True,
     ):
         """
         Initialize the Application.
@@ -87,9 +77,14 @@ class Application:
             debug (bool, optional): If True, the application will run in debug mode. Defaults to False.
             username (str, optional): The username for authentication. Defaults to None.
             password (str, optional): The password for authentication. Defaults to None.
+            host (str): The host to run the application on. Defaults to None.
+            port (int): The port to run the application on. Defaults to None.
+            enable_telemetry (bool, optional): If True, enable_telemetry will be enabled. Defaults to True.
         """
         self._debug = debug
         self._share = share
+        self._host = host
+        self._port = port
         self.data_sources = {}
         self.components = []
         if username and password:
@@ -115,6 +110,7 @@ class Application:
                     username=user_name,
                     hashed_password=self._pwd_context.hash(pass_word),
                 )
+        self._telemetry = Telemetry(enable_telemetry)
 
     def authenticate_user(self, fake_db, username: str, password: str):
         if self._auth:
@@ -387,6 +383,153 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
 
+    def create_qa_retrieval_route(self, app: FastAPI, component: Dict[str, Any]):
+        """
+        Create QA retrieval routes for the application.
+
+        Args:
+            app (FastAPI): The FastAPI application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
+
+        @app.get("/retrieval/file/get")
+        async def get_files(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            print("[/retrieval/file/get]: getting files...")
+            # create folder if it doesn't exist
+            dir_path = os.environ["DOC_PATH"]
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            files = os.listdir(dir_path)
+
+            # Create a list of dictionaries, each containing the file's name, size and type
+            file_data = []
+            for file in files:
+                size = os.path.getsize(
+                    os.path.join(dir_path, file)
+                )  # get size of file in bytes
+                _, ext = os.path.splitext(
+                    file
+                )  # split the file name into name and extension
+                file_data.append(
+                    {
+                        "name": file,
+                        "size": size,
+                        "type": ext[1:],  # remove the period from the extension
+                    }
+                )
+            return {"files": file_data}
+
+        @app.post("/retrieval/file/upload")
+        async def upload_files(
+            files: List[UploadFile],
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                # create folder if it doesn't exist
+                if not os.path.exists(os.getenv("DOC_PATH")):
+                    os.makedirs(os.getenv("DOC_PATH"))
+
+                print("[/retrieval/file/upload]: upload files...")
+                # Check if any file is sent
+                if not files:
+                    raise HTTPException(status_code=400, detail="No file part")
+
+                filenames = []
+                # Iterate over each file
+                for file in files:
+                    # Check if file is selected
+                    if not file.filename:
+                        raise HTTPException(status_code=400, detail="No selected file")
+
+                    print(f"[/retrieval/file/upload]: saving file {file.filename}")
+                    # Save or process the file
+                    with open(
+                        os.path.join(os.getenv("DOC_PATH"), file.filename), "wb"
+                    ) as buffer:
+                        buffer.write(await file.read())
+                    filenames.append(file.filename)
+
+                # List all files in the DOC_PATH directory
+                file_list = os.listdir(os.getenv("DOC_PATH"))
+
+                return JSONResponse(
+                    {"status": "ok", "filenames": filenames, "files": file_list}
+                )
+
+            except Exception as e:
+                return JSONResponse({"status": "error", "message": str(e)})
+
+        @app.post("/retrieval/vector_db/index")
+        async def index_vector_db(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            try:
+                print("[/retrieval/vector_db/index]: indexing files...")
+                component["component"].vector_db.index()
+                return {"log": "Indexing complete", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Indexing failed: {ex}", "status": "500"}
+
+        @app.get("/retrieval/{message}")
+        async def inference(
+            message: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                print("[/retrieval]: model inference...")
+                output = component["component"].retrieval_model.run(message)
+                id = component["component"].database.insert_question_answer(
+                    message, output
+                )
+                return {
+                    "id": id,
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": message,
+                    "answer": output,
+                }
+            except Exception as ex:
+                return {"log": f"Inference failed: {ex}", "status": "500"}
+
+        @app.get("/retrieval/vector_db/get")
+        async def get_vector_db(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            try:
+                print("[/retrieval/vector_db/get]: get embedding...")
+                response_dict = component["component"].vector_db.get_embedding()
+                return response_dict
+            except Exception as ex:
+                return {
+                    "log": "Failed to get embedding: {}".format(ex),
+                    "status": "500",
+                }
+
+    def create_nvml_route(self, app: FastAPI, component: Dict[str, Any]):
+        """
+        Create NVML routes for the application.
+
+        Args:
+            app (FastAPI): The FastAPI application.
+            component (Dict[str, Any]): The component for which the routes are being created.
+        """
+
+        @app.get("/nvml")
+        async def get_nvml_info(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            try:
+                print("[/nvml]: get nvml info...")
+                response_dict = component["component"].nvml.get()
+                return response_dict
+            except Exception as ex:
+                return {
+                    "log": "Failed to get nvml info: {}".format(ex),
+                    "status": "500",
+                }
+
     def run(self):
         """
         Run the application.
@@ -455,6 +598,10 @@ class Application:
                 self.create_feedback_route(app, component)
             if component["svelte_component"] == "Compare":
                 self.create_chatbot_comparator_route(app, component)
+            if component["svelte_component"] == "RetrievalQA":
+                self.create_qa_retrieval_route(app, component)
+            if component["svelte_component"] == "Nvml":
+                self.create_nvml_route(app, component)
 
         app.mount(
             "/",
@@ -469,7 +616,8 @@ class Application:
 
         @app.get("/{path:path}")
         async def read_item(
-            path: str, user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+            path: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
         ):
             return {"path": path}
 
@@ -477,19 +625,29 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
-        port = find_free_port()
+        start_event = AppStartEvent(
+            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
+        )
+        self._telemetry.capture(start_event)
+
         if self._share:
-            public_url = ngrok.connect(port)
+            public_url = ngrok.connect(self._host + ":" + str(self._port))
             print("Public URL:", public_url)
             import uvicorn
 
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._host, port=self._port)
             print("Stopping server...")
             ngrok.disconnect(public_url)
         else:
             import uvicorn
-
-            uvicorn.run(app, host="127.0.0.1", port=port)
+            uvicorn.run(app, host=self._host, port=self._port)
+        self._telemetry.capture(
+            AppStopEvent(
+                end_time=time.time(),
+                date_time=datetime.utcfromtimestamp(time.time()),
+                duration=time.time() - start_event.start_time,
+            )
+        )
 
     def display(self):
         """
@@ -604,3 +762,4 @@ class Application:
             t.start()
 
             return Chatbot()()
+

@@ -4,9 +4,9 @@ from typing import Callable, List, Optional, Union
 
 from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
 from pykoi.component.constants import FeedbackType
-from pykoi.db.qa_database import QuestionAnswerDatabase
-from pykoi.db.ranking_database import RankingDatabase
-from pykoi.llm.abs_llm import AbsLlm
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.ranking_database import RankingDatabase
+from pykoi.chat.llm.abs_llm import AbsLlm
 
 
 class DataSource:
@@ -41,7 +41,9 @@ class Component:
         props (Dict[str, Any]): Additional properties for the component.
     """
 
-    def __init__(self, fetch_func: Optional[Callable], svelte_component: str, **kwargs):
+    def __init__(
+        self, fetch_func: Optional[Callable], svelte_component: str, **kwargs
+    ):
         """
         Initialize a new instance of Component.
 
@@ -51,7 +53,9 @@ class Component:
             kwargs: Additional properties for the component.
         """
         self.id = str(uuid.uuid4())  # Generate a unique ID
-        self.data_source = DataSource(self.id, fetch_func) if fetch_func else None
+        self.data_source = (
+            DataSource(self.id, fetch_func) if fetch_func else None
+        )
         self.svelte_component = svelte_component
         self.props = kwargs
 
@@ -75,6 +79,22 @@ class Dropdown(Component):
         """
         super().__init__(fetch_func, "Dropdown", **kwargs)
         self.value_column = value_column
+
+class RAG(Component):
+    """
+    RAG class represents a RAG component.
+
+    Attributes:
+
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Initialize a new instance of RAG.
+
+        Args:
+        """
+        super().__init__(None, "RAG", **kwargs)
 
 
 class Chatbot(Component):

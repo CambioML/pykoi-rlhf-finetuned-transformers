@@ -2,8 +2,8 @@
 from typing import Union
 
 from pykoi.component.constants import FeedbackType
-from pykoi.db.qa_database import QuestionAnswerDatabase
-from pykoi.db.ranking_database import RankingDatabase
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.ranking_database import RankingDatabase
 
 
 class ChatbotDatabaseFactory:
@@ -30,5 +30,5 @@ class ChatbotDatabaseFactory:
         else:
             raise ValueError(
                 f"Invalid feedback name: {feedback}. "
-                f"Valid values are: 'question_answer', 'ranking'."
+                "Valid values are: 'question_answer', 'ranking'."
             )
