@@ -9,16 +9,15 @@ from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 
 
 class MilvusDb(AbsVectorDb):
-    def __init__(self, embedding: Embeddings):
+    def __init__(self, embedding: Embeddings, host: str, port: int):
         self._embedding = embedding
-        print("before init")
         self._vector_db = Milvus(
             embedding_function=self._embedding,
             collection_name="milvus_collection",
-            connection_args={"host": "127.0.0.1", "port": 19530},
+            connection_args={"host": host, "port": port},
         )
-        print("after init")
         super().__init__()
+        print("[MilvusDb] Initialized successfully.")
 
     def _get_file_names(self):
         return set([])

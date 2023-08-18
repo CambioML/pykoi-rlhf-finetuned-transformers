@@ -44,7 +44,7 @@ class VectorDbFactory:
             elif vector_db_name == VectorDbName.EPSILLA:
                 return Epsilla(model_embedding, kwargs.get("host"), kwargs.get("port"))
             elif vector_db_name == VectorDbName.MILVUS:
-                return MilvusDb(model_embedding)
+                return MilvusDb(model_embedding, kwargs.get("host"), kwargs.get("port"))
 
         except Exception as ex:
             raise Exception("Unknown db: {}".format(vector_db_name)) from ex

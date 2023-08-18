@@ -29,14 +29,9 @@ def main(**kargs):
     database = pykoi.QuestionAnswerDatabase(debug=True)
     dashboard = pykoi.Dashboard(database=database)
 
-    # Creating an OpenAI model
-    model = pykoi.ModelFactory.create_model(
-        model_source=MODEL_SOURCE, api_key=os.environ["OPENAI_API_KEY"]
-    )
-
     # retrieval and chatbot components
     retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
-    chatbot = pykoi.Chatbot(model=model, feedback="vote", is_retrieval=True)
+    chatbot = pykoi.Chatbot(None, feedback="vote", is_retrieval=True)
 
     ############################################################
     # Starting the application and retrieval qa as a component #
