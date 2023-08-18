@@ -28,4 +28,8 @@ class AbsLlm(ABC):
         Returns:
             str: The response from the model.
         """
+        print("before get_relevant_documents")
+        result = self._retrieve_qa.retriever.get_relevant_documents(message)
+        print(result)
+        print("after get_relevant_documents")
         return self._retrieve_qa.run(message)
