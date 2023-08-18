@@ -1,5 +1,13 @@
-## running command:
-## accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/demo_rl.py
+"""
+accelerate config
+
+LOCAL_DIR=/home/ubuntu/pykoi # change this to your local path
+
+export PYTHONPATH=$PYTHONPATH:${LOCAL_DIR}
+
+accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 ${LOCAL_DIR}/example/rlhf/demo_rl.py
+"""
+# accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/demo_rl.py
 
 import pykoi
 
@@ -9,7 +17,7 @@ config = pykoi.RLHFConfig(
     dataset_type="huggingface", 
     dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
     dataset_subset_rl="data",
-    reward_model_path="goldmermaid/rlhf_reward_model",
+    reward_model_path="cambioml/rlhf-reward-model",
     save_freq=1,
     ppo_batch_size=32,
     ppo_epochs=4,
