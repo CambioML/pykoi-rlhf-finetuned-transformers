@@ -68,7 +68,7 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
-        host: str = "http://127.0.0.1",
+        host: str = "127.0.0.1",
         port: int = 5000,
         enable_telemetry: bool = True,
     ):
@@ -661,6 +661,8 @@ class Application:
         """
         import nest_asyncio
 
+        print("running display")
+
         nest_asyncio.apply()
         app = FastAPI()
 
@@ -672,8 +674,8 @@ class Application:
             allow_headers=["*"],
         )
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        # with warnings.catch_warnings():
+        #     warnings.simplefilter("ignore")
 
         @app.post("/token")
         def login(credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
