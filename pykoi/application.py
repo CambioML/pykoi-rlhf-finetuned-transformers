@@ -3,6 +3,8 @@ import os
 import socket
 import threading
 import time
+import subprocess
+import warnings
 
 from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
@@ -66,7 +68,7 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
-        host: str = "127.0.0.1",
+        host: str = "http://127.0.0.1",
         port: int = 5000,
         enable_telemetry: bool = True,
     ):
@@ -112,6 +114,8 @@ class Application:
                     hashed_password=self._pwd_context.hash(pass_word),
                 )
         self._telemetry = Telemetry(enable_telemetry)
+        self._stop_event = threading.Event()  # Initialize an Event object
+        self.server = None
 
     def authenticate_user(self, fake_db, username: str, password: str):
         if self._auth:
@@ -668,6 +672,9 @@ class Application:
             allow_headers=["*"],
         )
 
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+
         @app.post("/token")
         def login(credentials: HTTPBasicCredentials = Depends(oauth_scheme)):
             user = self.authenticate_user(
@@ -756,8 +763,27 @@ class Application:
             import uvicorn
 
             def run_uvicorn():
-                uvicorn.run(app, host=self._host, port=self._port)
+                config = uvicorn.Config(
+                    app=app, host=self._host, port=self._port, lifespan="on"
+                )
+                self.server = uvicorn.Server(config=config)
+
+                while not self._stop_event.is_set():
+                    self.server.run()
 
             t = threading.Thread(target=run_uvicorn)
             t.start()
-            return Chatbot()(port=self._host)
+
+            return Chatbot()(port="http://127.0.0.1:5000")
+
+    def kill(self):
+        """
+        Gracefully shutdown the FastAPI application running on uvicorn.
+        """
+        print("attemtping to kill")
+        if not self._stop_event.is_set():
+            self._stop_event.set()
+            print("1")
+            if self.server:
+                print("2")
+                self.server.should_exit = True
