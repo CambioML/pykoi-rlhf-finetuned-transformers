@@ -57,14 +57,7 @@ def identify_cloud_provider():
 
 @dataclass
 class TelemetryEvent:
-    """Represents a telemetry event.
-
-    Attributes:
-        name (ClassVar[str]): The name of the telemetry event.
-    """
-
-    name: ClassVar[str]
-
+    """Represents a telemetry event."""
     @property
     def properties(self) -> Dict[str, Any]:
         """Returns the properties of the telemetry event.
@@ -90,7 +83,7 @@ class AppStartEvent(TelemetryEvent):
         release (str): The release version of the operating system.
     """
 
-    name: ClassVar[str] = "app_start"
+    name: str
     start_time: float
     date_time: str
     gpu: bool = torch.cuda.is_available()
@@ -111,7 +104,7 @@ class AppStopEvent(TelemetryEvent):
         duration (str): The duration of the application.
     """
 
-    name: ClassVar[str] = "app_end"
+    name: str
     end_time: float
     date_time: str
     duration: str

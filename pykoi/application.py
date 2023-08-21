@@ -627,7 +627,9 @@ class Application:
 
         # Set the ngrok tunnel if share is True
         start_event = AppStartEvent(
-            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
+            name="app_start",
+            start_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time()),
         )
         self._telemetry.capture(start_event)
 
@@ -645,6 +647,7 @@ class Application:
             uvicorn.run(app, host=self._host, port=self._port)
         self._telemetry.capture(
             AppStopEvent(
+                name="app_stop",
                 end_time=time.time(),
                 date_time=datetime.utcfromtimestamp(time.time()),
                 duration=time.time() - start_event.start_time,
@@ -744,6 +747,14 @@ class Application:
         # it will start two processes when debug mode is enabled.
 
         # Set the ngrok tunnel if share is True
+        start_event = AppStartEvent(
+            name="app_display_start",
+            start_time=time.time(),
+            date_time=datetime.utcfromtimestamp(time.time()),
+        )
+        self._telemetry.capture(start_event)
+
+        # Set the ngrok tunnel if share is True
         if self._share:
             public_url = ngrok.connect(self._port)
             print("Public URL:", public_url)
@@ -761,3 +772,11 @@ class Application:
             t = threading.Thread(target=run_uvicorn)
             t.start()
             return Chatbot()(port=self._host)
+        self._telemetry.capture(
+            AppStopEvent(
+                name="app_display_stop",
+                end_time=time.time(),
+                date_time=datetime.utcfromtimestamp(time.time()),
+                duration=time.time() - start_event.start_time,
+            )
+        )
