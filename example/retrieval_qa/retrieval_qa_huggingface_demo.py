@@ -21,6 +21,7 @@ def main(**kwargs):
         trust_remote_code=True,
         **kwargs
     )
+
     # retrieval model with vector database
     retrieval_model = pykoi.RetrievalFactory.create(
         model_source=MODEL_SOURCE,
@@ -30,12 +31,10 @@ def main(**kwargs):
         max_length=1000
     )
 
-    # retrieval and chatbot components
+    # retrieval, chatbot, and dashboard pykoi components
     retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
     chatbot = pykoi.Chatbot(None, feedback="vote", is_retrieval=True)
-    # sql database components
-    database = pykoi.QuestionAnswerDatabase(debug=True)
-    dashboard = pykoi.Dashboard(database=database)
+    dashboard = pykoi.Dashboard(pykoi.QuestionAnswerDatabase())
 
     ############################################################
     # Starting the application and retrieval qa as a component #
