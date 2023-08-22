@@ -9,6 +9,7 @@
   import { onMount } from "svelte";
   import { bisector } from "d3-array";
   import { pointer, select, selectAll } from "d3-selection";
+  import { hoveredIndexData } from "./data.js";
 
   export let data;
   export let x = "myX";
@@ -111,23 +112,17 @@
   let m = { x: 0, y: 0 };
 
   function hideTooltip() {
-    select(`#${containerId}`).select("#annotation-tooltip").style("opacity", 0);
-    select(`#${containerId}`)
-      .select("#annotation-tooltip-text")
-      .style("opacity", 0);
-    select(`#${containerId}`)
-      .selectAll(".annotation-tooltip-circle")
-      .style("opacity", 0);
+    selectAll("#annotation-tooltip").style("opacity", 0);
+
+    selectAll("#annotation-tooltip-text").style("opacity", 0);
+
+    selectAll(".annotation-tooltip-circle").style("opacity", 0);
   }
 
   function showTooltip() {
-    select(`#${containerId}`).select("#annotation-tooltip").style("opacity", 1);
-    select(`#${containerId}`)
-      .select("#annotation-tooltip-text")
-      .style("opacity", 1);
-    select(`#${containerId}`)
-      .selectAll(".annotation-tooltip-circle")
-      .style("opacity", 1);
+    selectAll("#annotation-tooltip").style("opacity", 1);
+    selectAll("#annotation-tooltip-text").style("opacity", 1);
+    selectAll(".annotation-tooltip-circle").style("opacity", 1);
   }
 
   function handleMousemove(event) {
@@ -163,19 +158,21 @@
     const xPos = xScale.invert(mouseX);
     const dataBisector = bisector(xAccessor).left;
     const bisectionIndex = dataBisector(data, xPos);
-    const hoveredIndexData = data[bisectionIndex];
-    tooltipX = xScale(xAccessor(hoveredIndexData)) + margin.left;
-    tooltipY = yScale(hoveredIndexData[y]) + margin.top;
-    tooltipText = hoveredIndexData[y];
+    hoveredIndexData.set(data[bisectionIndex]);
+    console.log($hoveredIndexData);
+
+    tooltipText = $hoveredIndexData[y];
   }
 
   function handleHoverOut(event) {
     // hideTooltip()
   }
 
-  $: tooltipX = 0;
-  $: tooltipY = 0;
-  $: tooltipText = "hey";
+  // $: tooltipX = 0;
+  // $: tooltipY = 0;
+  $: tooltipX = xScale(xAccessor($hoveredIndexData)) + margin.left;
+  $: tooltipY = yScale($hoveredIndexData[y]) + margin.top;
+  $: tooltipText = $hoveredIndexData[y];
 </script>
 
 <div
@@ -357,7 +354,6 @@
       y2={margin.top}
       stroke-width="2"
       stroke="red"
-      opacity="0"
     />
     <circle
       class="annotation-tooltip-circle"
@@ -366,7 +362,6 @@
       cy={tooltipY}
       fill="red"
       stroke="white"
-      opacity="0"
     />
     <text
       x={tooltipX}
@@ -389,9 +384,11 @@
   #annotation-tooltip {
     pointer-events: none;
     stroke-dasharray: 4;
+    opacity: 0;
   }
   .annotation-tooltip-circle {
     pointer-events: none;
+    opacity: 0;
   }
   #annotation-tooltip-text {
     pointer-events: none;
