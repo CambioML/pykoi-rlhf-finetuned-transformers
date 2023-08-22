@@ -1,3 +1,8 @@
+import { writable } from "svelte/store";
+
+export const tooltipX = writable(0);
+export const hoveredIndexData = writable({});
+
 export const gpu_data = {
   device_status: [
     {
