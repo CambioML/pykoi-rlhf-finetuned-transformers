@@ -9,7 +9,7 @@
   import { onMount } from "svelte";
   import { bisector } from "d3-array";
   import { pointer, select, selectAll } from "d3-selection";
-  import { hoveredIndexData } from "./data.js";
+  import { hoveredIndexData, gpuData } from "./data.js";
 
   export let data;
   export let x = "myX";
@@ -18,7 +18,9 @@
   export let marginBottom = 70;
   export let marginLeft = 90;
   export let marginRight = 30;
-  export let color = "#fde24f";
+  export let stroke = "#fde24f";
+  export let tooltipColor = "red";
+  export let tooltipFontSize = "12";
   export let strokeWidth = 2;
   export let gradient = true;
   export let xAxisText = "x-axis";
@@ -152,16 +154,16 @@
   }
 
   function handleHover(event) {
-    const pEvent = pointer(event);
-    let [mouseX, mouseY] = pEvent;
-    mouseX = mouseX + margin.left * 0;
-    const xPos = xScale.invert(mouseX);
-    const dataBisector = bisector(xAccessor).left;
-    const bisectionIndex = dataBisector(data, xPos);
-    hoveredIndexData.set(data[bisectionIndex]);
-    console.log($hoveredIndexData);
-
-    tooltipText = $hoveredIndexData[y];
+    if ($gpuData.length > 0) {
+      const pEvent = pointer(event);
+      let [mouseX, mouseY] = pEvent;
+      mouseX = mouseX + margin.left * 0;
+      const xPos = xScale.invert(mouseX);
+      const dataBisector = bisector(xAccessor).left;
+      const bisectionIndex = dataBisector(data, xPos);
+      hoveredIndexData.set(data[bisectionIndex]);
+      tooltipText = $hoveredIndexData[y];
+    }
   }
 
   function handleHoverOut(event) {
@@ -195,7 +197,7 @@
     <g transform={`translate(${margin.left}, ${margin.top})`}>
       <defs>
         <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" style={`stop-color: ${color}; stop-opacity: 1`} />
+          <stop offset="0%" style={`stop-color: ${stroke}; stop-opacity: 1`} />
           <stop offset="70%" style="stop-color: white; stop-opacity: 1" />
         </linearGradient>
       </defs>
@@ -353,11 +355,11 @@
       x2={tooltipX}
       y2={margin.top}
       stroke-width="2"
-      stroke="red"
+      stroke={tooltipColor}
     />
     <circle
       class="annotation-tooltip-circle"
-      r="5"
+      r="0"
       cx={tooltipX}
       cy={tooltipY}
       fill="red"
@@ -368,7 +370,8 @@
       y={tooltipY}
       dy="0.3em"
       fill="black"
-      font-size="12px"
+      stroke={tooltipColor}
+      font-size={tooltipFontSize}
       opacity="1"
       id="annotation-tooltip-text"
     >
@@ -394,7 +397,6 @@
     pointer-events: none;
     stroke-linejoin: round;
     paint-order: stroke fill;
-    stroke: red;
     stroke-width: 6px;
     fill: white;
     font-size: 12;
