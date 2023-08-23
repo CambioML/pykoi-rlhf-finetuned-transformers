@@ -87,7 +87,7 @@ poetry install --no-root
 ### Frontend Dev Setup
 Frontend:
 ```
-cd frontend
-npm install vite
+cd pykoi/pykoi/frontend
+npm install
 npm run build
 ```
