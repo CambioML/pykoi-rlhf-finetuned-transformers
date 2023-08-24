@@ -23,6 +23,21 @@
     getEmbeddings();
   }
 
+  async function handleURLSubmit(event) {
+    event.preventDefault();
+    const data = {
+      url: event.target[0].value,
+    };
+    const response = await fetch("/retrieval/url/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    console.log("response", response);
+  }
+
   async function loadServerData() {
     const response = await fetch("/retrieval/file/get");
     const data = await response.json();
@@ -77,6 +92,7 @@
       <div class="upload-box">
         <h4>Upload Data</h4>
         <br />
+        <h5>File</h5>
         <form>
           <input type="file" multiple on:change={handleFileChange} />
         </form>
@@ -88,6 +104,11 @@
         {/if}
         <p>These are the files your model will use as context.</p>
         <p>Currently <strong>pdf</strong>, txt, and md are supported.</p>
+        <br />
+        <h5>URL</h5>
+        <form on:submit={handleURLSubmit}>
+          <input type="url" />
+        </form>
       </div>
     </div>
   </div>
@@ -135,10 +156,15 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    max-height: 50vh;
     margin: auto;
     border: 5px dashed var(--grey);
     padding: 20px;
     box-sizing: border-box;
+  }
+  h4 {
+    margin: 8px;
+  }
+  h5 {
+    margin: 4px;
   }
 </style>
