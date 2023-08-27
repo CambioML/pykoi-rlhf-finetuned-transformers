@@ -12,13 +12,12 @@ Installation on a CPU is simple if you have conda. If not, install [conda](https
 First, create a conda environment on your terminal using:
 ```
 conda create -n pykoi python=3.10 -y
-source activate pykoi
+conda activate pykoi
 ```
 
 Then install `pykoi` and the compatible torch version.
 ```
 pip3 install pykoi
-pip3 install torch
 ```
 
 ### Option 2:  GPU (e.g. EC2)
