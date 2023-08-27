@@ -3,8 +3,6 @@ import os
 import socket
 import threading
 import time
-import requests
-import re
 
 from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
@@ -20,7 +18,6 @@ from pykoi.component.base import Dropdown
 from pykoi.interactives.chatbot import Chatbot
 from pykoi.telemetry.telemetry import Telemetry
 from pykoi.telemetry.events import AppStartEvent, AppStopEvent
-from bs4 import BeautifulSoup
 
 
 oauth_scheme = HTTPBasic()
@@ -35,9 +32,6 @@ class RankingTableUpdate(BaseModel):
     question: str
     up_ranking_answer: str
     low_ranking_answer: str
-
-class URLUpdate(BaseModel):
-    url: str
 
 
 class InferenceRankingTable(BaseModel):
@@ -59,9 +53,6 @@ class UserInDB:
     def __init__(self, username: str, hashed_password: str):
         self.username = username
         self.hashed_password = hashed_password
-
-class URL(BaseModel):
-    url: str
 
 
 class Application:
@@ -470,40 +461,6 @@ class Application:
 
             except Exception as e:
                 return JSONResponse({"status": "error", "message": str(e)})
-
-        @app.post("/retrieval/url/upload")
-        async def upload_url(
-            url_request: URLUpdate,
-            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
-        ):
-            try:
-                print("[/retrieval/url/upload]: upload url...", url_request.url)
-                base_url = re.match(r'^.+?[^\/:](?=[?\/]|$)', url_request.url).group(0)
-                page = requests.get(url_request.url)
-                soup = BeautifulSoup(page.content, 'html.parser')
-                print(soup.text)
-
-                urls = [url_request.url]
-                visited_urls = set()
-
-                while (len(urls) > 0 and len(visited_urls) < 100):
-                    # get the page to visit from the list
-                    current_url = urls.pop()
-                    visited_urls.add(current_url)
-
-                    # crawling logic
-                    response = requests.get(current_url)
-                    soup = BeautifulSoup(response.content, "html.parser")
-
-                    link_elements = soup.select("a[href]")
-                    for link_element in link_elements:
-                        url = link_element['href']
-                        if (base_url in url and url not in visited_urls):
-                            urls.append(url)
-                print(visited_urls, len(visited_urls))
-                return {"uploaded url": url_request.url, "status": "200"}
-            except Exception as ex:
-                return {"log": f"Upload failed: {ex}", "status": "500"}
 
         @app.post("/retrieval/vector_db/index")
         async def index_vector_db(
