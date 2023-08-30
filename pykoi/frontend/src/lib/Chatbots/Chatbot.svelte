@@ -5,10 +5,12 @@
   import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import Dropdown from "./Components/Dropdown.svelte";
-  import { tooltip } from '../../utils.js'
+  import { tooltip } from "../../utils.js";
 
   export let feedback = false;
   export let is_retrieval = false;
+
+  const uploadedFiles = writable([]);
 
   let mymessage = "";
   let messageplaceholder = "";
@@ -17,7 +19,22 @@
 
   onMount(() => {
     getDataFromDB();
+    loadRetrievalFiles();
   });
+
+  async function loadRetrievalFiles() {
+    // /retrieval/file/get
+    const response = await fetch("/retrieval/file/get");
+    const data = await response.json();
+    console.log("data", data["files"]);
+    const fileData = data["files"];
+    const fileNames = fileData.map((row, index) => ({
+      id: String(index),
+      name: row.name,
+    }));
+    console.log("files", fileNames);
+    $uploadedFiles = [...fileNames];
+  }
 
   async function getDataFromDB() {
     const response = await fetch("/chat/qa_table/retrieve");
@@ -51,8 +68,7 @@
     $chatLog = [...$chatLog, currentEntry];
 
     const response = is_retrieval
-      ?
-        await fetch(`/retrieval/new_message`, {
+      ? await fetch(`/retrieval/new_message`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -150,7 +166,6 @@
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
   }
-
 </script>
 
 <div class="ranked-feedback-container">
@@ -181,7 +196,8 @@
                   <h5 class="bold">Question:</h5>
                   <p>{message.question}</p>
                   <div class="rag-sources">
-                    <p class="bold" use:tooltip={getRAGSources(message)}>ℹ️ RAG Sources
+                    <p class="bold" use:tooltip={getRAGSources(message)}>
+                      ℹ️ RAG Sources
                     </p>
                   </div>
                 </div>
@@ -232,7 +248,7 @@
 
     <div class="chat-input-holder">
       <div class="chat-and-question">
-        <Dropdown />
+        <Dropdown documents={$uploadedFiles} />
 
         <form on:submit={askModel} class="chat-input-form">
           <input
@@ -482,36 +498,35 @@
   }
 
   :global(.tooltip) {
-		white-space: nowrap;
-		position: relative;
-		padding-top: 0.35rem;
-		cursor: zoom-in;
-	}
+    white-space: nowrap;
+    position: relative;
+    padding-top: 0.35rem;
+    cursor: zoom-in;
+  }
 
-	:global(#tooltip) {
-		position: absolute;
-		bottom: 100%;
-		right: 0.78rem;
-		transform: translate(50%, 0);
-		padding: 0.2rem 0.35rem;
-		background: hsl(0, 0%, 20%);
-		color: hsl(0, 0%, 98%);
-		font-size: 0.95em;
-		border-radius: 0.25rem;
-		filter: drop-shadow(0 1px 2px hsla(0, 0%, 0%, 0.2));
-		width: max-content;
-	}
+  :global(#tooltip) {
+    position: absolute;
+    bottom: 100%;
+    right: 0.78rem;
+    transform: translate(50%, 0);
+    padding: 0.2rem 0.35rem;
+    background: hsl(0, 0%, 20%);
+    color: hsl(0, 0%, 98%);
+    font-size: 0.95em;
+    border-radius: 0.25rem;
+    filter: drop-shadow(0 1px 2px hsla(0, 0%, 0%, 0.2));
+    width: max-content;
+  }
 
-	:global(.tooltip #tooltip::before) {
-		content: '';
-		position: absolute;
-		top: 100%;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 0.6em;
-		height: 0.25em;
-		background: inherit;
-		clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-	}
-
+  :global(.tooltip #tooltip::before) {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0.6em;
+    height: 0.25em;
+    background: inherit;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  }
 </style>

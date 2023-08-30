@@ -1,14 +1,5 @@
 <script>
-  export let documents = [
-    { id: "id-1", name: "document-1" },
-    { id: "id-2", name: "document-2" },
-    { id: "id-3", name: "document-3" },
-    { id: "id-4", name: "document-4" },
-    { id: "id-5", name: "document-5" },
-    { id: "id-6", name: "document-6" },
-    { id: "id-7", name: "document-7" },
-    { id: "id-8", name: "document-8" },
-  ];
+  export let documents = [];
 
   let expanded = false;
   let checkboxes; // This will hold our dropdown reference
