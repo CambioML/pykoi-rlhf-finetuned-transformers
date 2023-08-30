@@ -2,13 +2,15 @@
   import { chatLog } from "../../store";
   import { onMount } from "svelte";
   import { select } from "d3-selection";
+  import { slide } from "svelte/transition";
 
   export let feedback = false;
-  export let is_retrieval= false;
+  export let is_retrieval = false;
 
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
+  let show_content = [];
 
   onMount(() => {
     getDataFromDB();
@@ -24,7 +26,9 @@
       answer: row[2],
       vote_status: row[3],
     }));
+    show_content = new Array(formattedRows.length).fill(false);
     $chatLog = [...formattedRows];
+
   }
 
   const askModel = async (event) => {
@@ -37,26 +41,40 @@
       question: mymessage,
       answer: "Loading...",
       vote_status: "na",
+      source: "Loading...",
+      source_content: "Loading...",
     };
     $chatLog = [...$chatLog, currentEntry];
 
-    const response = is_retrieval ?
-      await fetch(`/retrieval/${mymessage}`)
-      :
-      await fetch(`/chat/${mymessage}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: mymessage,
-        }),
-      });
+    const response = is_retrieval
+      ? // await fetch(`/retrieval/${mymessage}`)
+        await fetch(`/retrieval/new_message`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: mymessage,
+          }),
+        })
+      : await fetch(`/chat/${mymessage}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: mymessage,
+          }),
+        });
 
     if (response.ok) {
       const data = await response.json();
+      console.log("response data", data);
       currentEntry["answer"] = data["answer"];
+      currentEntry["source"] = data["source"];
+      currentEntry["source_content"] = data["source_content"];
       // $chatLog[$chatLog.length - 1] = currentEntry;
+      show_content.push(false);
       chatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
@@ -164,6 +182,24 @@
                         >
                       </div>
                     {/if}
+                  </div>
+                  <div class="source">
+                    <div
+                      class="source_tab"
+                      on:click={() => (show_content[index] = !show_content[index])}
+                    >
+                      <p class="bold">📖 Source: {message.source}</p>
+                      {#if show_content[index]}
+                        <p>&#8963;</p>
+                      {:else}
+                        <p>&#8964;</p>
+                      {/if}
+                    </div>
+                      {#if show_content[index]}
+                      <div class="source_content" transition:slide>
+                        <p class="bold">{message.source_content}</p>
+                      </div>
+                      {/if}
                   </div>
                 </div>
               </div>
@@ -380,6 +416,28 @@
     border: 1px solid var(--black);
   }
 
+  .message-content .source {
+    text-align: left;
+    border: 1px solid var(--grey);
+    padding: 5px;
+    background-color: var(--lightGrey);
+    color: var(--darkGrey);
+    box-sizing: border-box;
+  }
+
+  .source_tab {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .source_content {
+    background-color: white;
+    border: 1pt solid var(--grey);
+    padding: 5px;
+  }
+
   .message-content .answers {
     display: grid;
     grid-template-columns: 100%;
@@ -387,4 +445,5 @@
     width: 100%;
     margin: auto;
   }
+
 </style>

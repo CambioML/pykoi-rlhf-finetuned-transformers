@@ -48,6 +48,8 @@ class ModelAnswer(BaseModel):
 class ComparatorInsertRequest(BaseModel):
     data: List[ModelAnswer]
 
+class RetrievalNewMessage(BaseModel):
+    prompt: str
 
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
@@ -472,6 +474,31 @@ class Application:
                 return {"log": "Indexing complete", "status": "200"}
             except Exception as ex:
                 return {"log": f"Indexing failed: {ex}", "status": "500"}
+
+        @app.post("/retrieval/new_message")
+        async def inference(
+            request_body: RetrievalNewMessage,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                print("[/retrieval]: model inference.....", request_body.prompt)
+                output = component["component"].retrieval_model.run_with_return_source_documents({"query": request_body.prompt})
+                id = component["component"].database.insert_question_answer(
+                    request_body.prompt, output["result"]
+                )
+                print('output', output, output["result"])
+                return {
+                    "id": id,
+                    "log": "Inference complete",
+                    "status": "200",
+                    "question": request_body.prompt,
+                    "answer": output["result"],
+                    "source": output["source_documents"][0].metadata.get('file_name', 'No file name found'),
+                    "source_content": output["source_documents"][0].page_content,
+                }
+
+            except Exception as ex:
+                return {"log": f"Inference failed: {ex}", "status": "500"}
 
         @app.get("/retrieval/{message}")
         async def inference(
