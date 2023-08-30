@@ -152,7 +152,7 @@
       button. If the repsonse is not satisfactory, click on the
       <span class="inline-button red">👎</span> button.
     </p>
-    <button>Download Data</button>
+    <!-- <button>Download Data</button> -->
   </div>
   <div class="ranked-chat">
     <section class="chatbox">
@@ -168,7 +168,6 @@
               </div>
               <div class="message-content">
                 <div class="question">
-                  <Dropdown letters={chatLetters} />
                   <h5 class="bold">Question:</h5>
                   <p>{message.question}</p>
                 </div>
@@ -190,6 +189,7 @@
                     {/if}
                   </div>
                   <div class="source">
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
                       class="source_tab"
                       on:click={() =>
@@ -215,24 +215,34 @@
         {/each}
       </div>
     </section>
+
     <div class="chat-input-holder">
-      <form on:submit={askModel} class="chat-input-form">
-        <input
-          bind:value={messageplaceholder}
-          class="chat-input-textarea"
-          placeholder="Type Question Here"
-        />
-        <button
-          class="btnyousend {messageplaceholder === '' ? '' : 'active'}"
-          type="submit">{chatLoading ? dots : "Send"}</button
-        >
-      </form>
+      <div class="chat-and-question">
+        <Dropdown />
+
+        <form on:submit={askModel} class="chat-input-form">
+          <input
+            bind:value={messageplaceholder}
+            class="chat-input-textarea"
+            placeholder="Type Question Here"
+          />
+          <button
+            class="btnyousend {messageplaceholder === '' ? '' : 'active'}"
+            type="submit">{chatLoading ? dots : "Send"}</button
+          >
+        </form>
+      </div>
       <p class="message">Note - may produce inaccurate information.</p>
     </div>
   </div>
 </div>
 
 <style>
+  .chat-and-question {
+    display: grid;
+    grid-template-columns: 20% 80%;
+    width: 100%;
+  }
   .small-button {
     margin-left: 10px;
     background: none;
@@ -282,9 +292,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px;
+    padding: 5px;
     width: 100%;
-    max-width: 640px;
+    max-width: 820px;
     margin: auto;
   }
 
