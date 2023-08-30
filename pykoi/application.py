@@ -491,14 +491,20 @@ class Application:
                     request_body.prompt, output["result"]
                 )
                 print('output', output, output["result"])
+                if output["source_documents"] == []:
+                    source = "N/A"
+                    source_content = "N/A"
+                else:
+                    source = output["source_documents"][0].metadata.get('file_name', 'No file name found')
+                    source_content = output["source_documents"][0].page_content
                 return {
                     "id": id,
                     "log": "Inference complete",
                     "status": "200",
                     "question": request_body.prompt,
                     "answer": output["result"],
-                    "source": output["source_documents"][0].metadata.get('file_name', 'No file name found'),
-                    "source_content": output["source_documents"][0].page_content,
+                    "source": source,
+                    "source_content": source_content,
                 }
 
             except Exception as ex:

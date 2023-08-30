@@ -7,7 +7,7 @@ import pykoi
 
 def main(**kargs):
     # enter openai api key here
-    os.environ["OPENAI_API_KEY"] = ""
+    os.environ["OPENAI_API_KEY"] = "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"
     os.environ["DOC_PATH"] = os.path.join(os.getcwd(), "temp/docs")
     os.environ["VECTORDB_PATH"] = os.path.join(os.getcwd(), "temp/vectordb")
     MODEL_SOURCE = "openai"

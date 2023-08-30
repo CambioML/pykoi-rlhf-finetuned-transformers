@@ -47,7 +47,7 @@ class OpenAIModel(AbsLlm):
         """
         try:
             if file_names == []:
-                metadata_filename_filter = {}
+                metadata_filename_filter = {"file_name": ""}
             elif len(file_names) == 1:
                 metadata_filename_filter = {"file_name": file_names[0]}
             else:
