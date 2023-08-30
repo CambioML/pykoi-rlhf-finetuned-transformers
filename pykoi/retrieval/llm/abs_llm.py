@@ -30,12 +30,14 @@ class AbsLlm(ABC):
         """
         return self._retrieve_qa.run(message)
 
-    def run_with_return_source_documents(self, message: str) -> str:
+    def run_with_return_source_documents(self, message: dict) -> dict:
         """
         Runs the language learning model, return source documents
+
         Args:
-            message (str): The message to run the model on.
+            message (dict): The message dict to run the model on.
+
         Returns:
-            str: The response from the model.
+            dict: The response dict from the model.
         """
         return self._retrieve_qa(message)

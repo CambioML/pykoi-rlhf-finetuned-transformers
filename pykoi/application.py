@@ -48,8 +48,11 @@ class ModelAnswer(BaseModel):
 class ComparatorInsertRequest(BaseModel):
     data: List[ModelAnswer]
 
+
 class RetrievalNewMessage(BaseModel):
     prompt: str
+    file_names: List[str]
+
 
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
@@ -482,6 +485,7 @@ class Application:
         ):
             try:
                 print("[/retrieval]: model inference.....", request_body.prompt)
+                component["component"].retrieval_model.re_init(request_body.file_names)
                 output = component["component"].retrieval_model.run_with_return_source_documents({"query": request_body.prompt})
                 id = component["component"].database.insert_question_answer(
                     request_body.prompt, output["result"]
