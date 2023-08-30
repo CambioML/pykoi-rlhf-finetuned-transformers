@@ -164,7 +164,8 @@
     String.fromCharCode(65 + i)
   );
   function getRAGSources(message) {
-    const ragSources = (message.rag_sources.length === 0) ? $uploadedFiles.map(file => file.name): message.rag_sources;
+    if (message.rag_sources.length === 0) return "No RAG Sources";
+    const ragSources =  message.rag_sources;
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
   }
