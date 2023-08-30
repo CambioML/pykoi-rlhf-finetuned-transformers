@@ -164,7 +164,7 @@
     String.fromCharCode(65 + i)
   );
   function getRAGSources(message) {
-    if (message.rag_sources.length === 0) return "No RAG Sources";
+    if (message.rag_sources.length === 0) return "No Sources";
     const ragSources =  message.rag_sources;
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
@@ -200,7 +200,7 @@
                   <p>{message.question}</p>
                   <div class="rag-sources">
                     <p class="bold" use:tooltip={getRAGSources(message)}>
-                      ℹ️ RAG Sources
+                      ℹ️ Retrieval Sources
                     </p>
                   </div>
                 </div>
@@ -511,7 +511,7 @@
     position: absolute;
     bottom: 100%;
     right: 0.78rem;
-    transform: translate(calc(100% - 80px), 0);
+    transform: translate(calc(100% - 120px), 0);
     padding: 0.2rem 0.35rem;
     background: hsl(0, 0%, 20%);
     color: hsl(0, 0%, 98%);
@@ -525,7 +525,7 @@
     content: "";
     position: absolute;
     top: 100%;
-    left: 80px;
+    left: 10px;
     width: 0.6em;
     height: 0.25em;
     background: inherit;
