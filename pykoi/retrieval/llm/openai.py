@@ -5,9 +5,12 @@ from typing import List
 
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
+from dotenv import load_dotenv
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
+
+load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MIN_DOCS = 2

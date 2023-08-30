@@ -3,13 +3,10 @@
 import os
 import argparse
 import pykoi
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 def main(**kargs):
     # enter openai api key here
+    # os.environ["OPENAI_API_KEY"] = "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"
     os.environ["DOC_PATH"] = os.path.join(os.getcwd(), "temp/docs")
     os.environ["VECTORDB_PATH"] = os.path.join(os.getcwd(), "temp/vectordb")
     MODEL_SOURCE = "openai"
