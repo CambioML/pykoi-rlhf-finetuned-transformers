@@ -3,6 +3,8 @@
   import { onMount } from "svelte";
   import { select } from "d3-selection";
   import { slide } from "svelte/transition";
+  import { writable } from "svelte/store";
+  import Dropdown from "./Components/Dropdown.svelte";
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -28,7 +30,6 @@
     }));
     show_content = new Array(formattedRows.length).fill(false);
     $chatLog = [...formattedRows];
-
   }
 
   const askModel = async (event) => {
@@ -136,6 +137,10 @@
       .style("border", "3px solid var(--black)")
       .style("opacity", 1);
   }
+
+  let chatLetters = [...Array(10).keys()].map((i) =>
+    String.fromCharCode(65 + i)
+  );
 </script>
 
 <div class="ranked-feedback-container">
@@ -163,6 +168,7 @@
               </div>
               <div class="message-content">
                 <div class="question">
+                  <Dropdown letters={chatLetters} />
                   <h5 class="bold">Question:</h5>
                   <p>{message.question}</p>
                 </div>
@@ -186,7 +192,8 @@
                   <div class="source">
                     <div
                       class="source_tab"
-                      on:click={() => (show_content[index] = !show_content[index])}
+                      on:click={() =>
+                        (show_content[index] = !show_content[index])}
                     >
                       <p class="bold">📖 Source: {message.source}</p>
                       {#if show_content[index]}
@@ -195,11 +202,11 @@
                         <p>&#8964;</p>
                       {/if}
                     </div>
-                      {#if show_content[index]}
+                    {#if show_content[index]}
                       <div class="source_content" transition:slide>
                         <p class="bold">{message.source_content}</p>
                       </div>
-                      {/if}
+                    {/if}
                   </div>
                 </div>
               </div>
@@ -445,5 +452,4 @@
     width: 100%;
     margin: auto;
   }
-
 </style>
