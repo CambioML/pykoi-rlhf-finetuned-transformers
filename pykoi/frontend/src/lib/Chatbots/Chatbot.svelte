@@ -5,6 +5,7 @@
   import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import Dropdown from "./Components/Dropdown.svelte";
+  import { tooltip } from '../../utils.js'
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -27,6 +28,7 @@
       question: row[1],
       answer: row[2],
       vote_status: row[3],
+      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
     }));
     show_content = new Array(formattedRows.length).fill(false);
     $chatLog = [...formattedRows];
@@ -41,6 +43,7 @@
       id: $chatLog.length + 1,
       question: mymessage,
       answer: "Loading...",
+      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
       vote_status: "na",
       source: "Loading...",
       source_content: "Loading...",
@@ -48,7 +51,7 @@
     $chatLog = [...$chatLog, currentEntry];
 
     const response = is_retrieval
-      ? // await fetch(`/retrieval/${mymessage}`)
+      ?
         await fetch(`/retrieval/new_message`, {
           method: "POST",
           headers: {
@@ -141,6 +144,13 @@
   let chatLetters = [...Array(10).keys()].map((i) =>
     String.fromCharCode(65 + i)
   );
+  function getRAGSources(message) {
+    if (message.rag_sources.length === 0) return "All";
+    const ragSources = message.rag_sources;
+    const ragSourcesString = ragSources.join(", ");
+    return ragSourcesString;
+  }
+
 </script>
 
 <div class="ranked-feedback-container">
@@ -170,6 +180,10 @@
                 <div class="question">
                   <h5 class="bold">Question:</h5>
                   <p>{message.question}</p>
+                  <div class="rag-sources">
+                    <p class="bold" use:tooltip={getRAGSources(message)}>ℹ️ RAG Sources
+                    </p>
+                  </div>
                 </div>
                 <div class="answers">
                   <div class="answer">
@@ -462,4 +476,42 @@
     width: 100%;
     margin: auto;
   }
+
+  .rag-sources {
+    display: flex;
+  }
+
+  :global(.tooltip) {
+		white-space: nowrap;
+		position: relative;
+		padding-top: 0.35rem;
+		cursor: zoom-in;
+	}
+
+	:global(#tooltip) {
+		position: absolute;
+		bottom: 100%;
+		right: 0.78rem;
+		transform: translate(50%, 0);
+		padding: 0.2rem 0.35rem;
+		background: hsl(0, 0%, 20%);
+		color: hsl(0, 0%, 98%);
+		font-size: 0.95em;
+		border-radius: 0.25rem;
+		filter: drop-shadow(0 1px 2px hsla(0, 0%, 0%, 0.2));
+		width: max-content;
+	}
+
+	:global(.tooltip #tooltip::before) {
+		content: '';
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0.6em;
+		height: 0.25em;
+		background: inherit;
+		clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+	}
+
 </style>
