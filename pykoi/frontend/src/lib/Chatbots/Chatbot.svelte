@@ -1,11 +1,12 @@
 <script>
-  import { chatLog } from "../../store";
+  import { chatLog, checkedDocs } from "../../store";
   import { onMount } from "svelte";
   import { select } from "d3-selection";
   import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import Dropdown from "./Components/Dropdown.svelte";
   import { tooltip } from "../../utils.js";
+
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -56,11 +57,12 @@
     mymessage = messageplaceholder;
     messageplaceholder = "";
     chatLoading = true;
+    const file_names = [...$checkedDocs];
     let currentEntry = {
       id: $chatLog.length + 1,
       question: mymessage,
       answer: "Loading...",
-      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
+      rag_sources: file_names,
       vote_status: "na",
       source: "Loading...",
       source_content: "Loading...",
@@ -75,6 +77,7 @@
           },
           body: JSON.stringify({
             prompt: mymessage,
+            file_names: file_names,
           }),
         })
       : await fetch(`/chat/${mymessage}`, {
@@ -161,8 +164,7 @@
     String.fromCharCode(65 + i)
   );
   function getRAGSources(message) {
-    if (message.rag_sources.length === 0) return "All";
-    const ragSources = message.rag_sources;
+    const ragSources = (message.rag_sources.length === 0) ? $uploadedFiles.map(file => file.name): message.rag_sources;
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
   }
@@ -508,7 +510,7 @@
     position: absolute;
     bottom: 100%;
     right: 0.78rem;
-    transform: translate(50%, 0);
+    transform: translate(calc(100% - 80px), 0);
     padding: 0.2rem 0.35rem;
     background: hsl(0, 0%, 20%);
     color: hsl(0, 0%, 98%);
@@ -522,8 +524,7 @@
     content: "";
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 80px;
     width: 0.6em;
     height: 0.25em;
     background: inherit;

@@ -1,13 +1,13 @@
 <script>
   import { writable } from "svelte/store";
+  import { checkedDocs } from "../../../store";
 
   export let documents = [];
+
 
   let expanded = false;
   let checkboxes; // This will hold our dropdown reference
 
-  // Create a writable store for checkedDocs
-  export const checkedDocs = writable(new Set());
 
   function toggleCheckboxes() {
     expanded = !expanded;
