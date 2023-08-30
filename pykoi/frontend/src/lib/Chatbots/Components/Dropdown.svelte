@@ -1,12 +1,28 @@
 <script>
+  import { writable } from "svelte/store";
+
   export let documents = [];
 
   let expanded = false;
   let checkboxes; // This will hold our dropdown reference
 
+  // Create a writable store for checkedDocs
+  export const checkedDocs = writable(new Set());
+
   function toggleCheckboxes() {
     expanded = !expanded;
   }
+
+  function handleCheckboxChange(docName, event) {
+    if (event.target.checked) {
+      $checkedDocs.add(docName);
+    } else {
+      $checkedDocs.delete(docName);
+    }
+    checkedDocs.set(new Set($checkedDocs)); // Trigger an update to the store
+  }
+
+  $: console.log($checkedDocs);
 </script>
 
 <form>
@@ -25,7 +41,13 @@
     >
       {#each documents as doc, index}
         <label for={doc.id}>
-          <input type="checkbox" id={doc.id} />{doc.name}
+          <!-- Use a checked attribute and a change handler instead of two-way binding -->
+          <input
+            type="checkbox"
+            id={doc.id}
+            checked={$checkedDocs.has(doc.name)}
+            on:change={(event) => handleCheckboxChange(doc.name, event)}
+          />{doc.name}
         </label>
       {/each}
     </div>
