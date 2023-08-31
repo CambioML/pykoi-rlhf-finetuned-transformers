@@ -3,12 +3,12 @@
     export let source = "";
     export let source_content = "";
     export let i = 0;
-    let show_content = false;
+    let show_content = i === 0;
 </script>
 
 <div class="source">
-    <div class="source_tab" on:click={() => (show_content = !show_content)}>
-        <p class="bold">📖 Source {i + 1}: {source}</p>
+    <div class="source_tab" on:click={() => (show_content = !show_content)} transition:slide|global>
+        <p class="bold">{i + 1}: {source}</p>
         {#if show_content}
             <p>&#8963;</p>
         {:else}
@@ -25,11 +25,11 @@
 <style>
     .source {
         text-align: left;
+        background-color: var(--lightGrey);
         border: 1px solid var(--grey);
         border-top: none;
         padding: 0px 5px;
         margin: 0px;
-        background-color: var(--lightGrey);
         color: var(--darkGrey);
         box-sizing: border-box;
     }
@@ -46,18 +46,15 @@
         border: 1pt solid var(--grey);
         padding: 5px;
         margin-bottom: 5px;
+        background-color: white;
+        color: var(--darkGrey);
     }
-    .bold {
-        font-weight: bold;
-        font-size: var(--smallText);
-        margin: 0;
-        padding: 0;
-    }
+
     p {
         margin: 0;
         padding: 0;
     }
-    div.source:nth-of-type(1) {
+    .source:nth-of-type(2) {
         border-top: 1px solid var(--grey);
     }
 </style>

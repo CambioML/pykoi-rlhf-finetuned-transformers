@@ -6,6 +6,7 @@
   import Dropdown from "./Components/Dropdown.svelte";
   import SourceRow from "./Components/SourceRow.svelte";
   import { tooltip } from "../../utils.js";
+    import SourceContainer from "./Components/SourceContainer.svelte";
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -215,7 +216,11 @@
                       </div>
                     {/if}
                   </div>
-                  <div class="sources">
+                  <SourceContainer sources={message.source} source_content={message.source_content}/>
+                  <!-- <div class:sources={message.source.length > 1}>
+                    {#if message.source.length > 1}
+                      <h5 class="bold">Sources:</h5>
+                    {/if}
                     {#each message.source as source, i}
                     <SourceRow
                     {source}
@@ -223,7 +228,7 @@
                     {i}
                     />
                     {/each}
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -387,7 +392,7 @@
     border-bottom: var(--line);
   }
 
-  .bold {
+  :global(.bold) {
     font-weight: bold;
     font-size: var(--smallText);
     margin: 0;
