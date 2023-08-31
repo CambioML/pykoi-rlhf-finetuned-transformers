@@ -2,11 +2,10 @@
   import { chatLog, checkedDocs } from "../../store";
   import { onMount } from "svelte";
   import { select } from "d3-selection";
-  import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import Dropdown from "./Components/Dropdown.svelte";
+  import SourceRow from "./Components/SourceRow.svelte";
   import { tooltip } from "../../utils.js";
-
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -16,7 +15,6 @@
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
-  let show_content = [];
 
   onMount(() => {
     getDataFromDB();
@@ -24,7 +22,6 @@
   });
 
   async function loadRetrievalFiles() {
-    // /retrieval/file/get
     const response = await fetch("/retrieval/file/get");
     const data = await response.json();
     console.log("data", data["files"]);
@@ -47,8 +44,9 @@
       answer: row[2],
       vote_status: row[3],
       rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
+      source: ["Not loaded"],
+      source_content: ["Not loaded"],
     }));
-    show_content = new Array(formattedRows.length).fill(false);
     $chatLog = [...formattedRows];
   }
 
@@ -64,8 +62,8 @@
       answer: "Loading...",
       rag_sources: file_names,
       vote_status: "na",
-      source: "Loading...",
-      source_content: "Loading...",
+      source: ["Loading..."],
+      source_content: ["Loading..."],
     };
     $chatLog = [...$chatLog, currentEntry];
 
@@ -97,7 +95,6 @@
       currentEntry["source"] = data["source"];
       currentEntry["source_content"] = data["source_content"];
       // $chatLog[$chatLog.length - 1] = currentEntry;
-      show_content.push(false);
       chatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
@@ -160,12 +157,9 @@
       .style("opacity", 1);
   }
 
-  let chatLetters = [...Array(10).keys()].map((i) =>
-    String.fromCharCode(65 + i)
-  );
   function getRAGSources(message) {
     if (message.rag_sources.length === 0) return "No Sources";
-    const ragSources =  message.rag_sources;
+    const ragSources = message.rag_sources;
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
   }
@@ -221,25 +215,14 @@
                       </div>
                     {/if}
                   </div>
-                  <div class="source">
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <div
-                      class="source_tab"
-                      on:click={() =>
-                        (show_content[index] = !show_content[index])}
-                    >
-                      <p class="bold">📖 Source: {message.source}</p>
-                      {#if show_content[index]}
-                        <p>&#8963;</p>
-                      {:else}
-                        <p>&#8964;</p>
-                      {/if}
-                    </div>
-                    {#if show_content[index]}
-                      <div class="source_content" transition:slide>
-                        <p class="bold">{message.source_content}</p>
-                      </div>
-                    {/if}
+                  <div class="sources">
+                    {#each message.source as source, i}
+                    <SourceRow
+                    {source}
+                    source_content={message.source_content[i]}
+                    {i}
+                    />
+                    {/each}
                   </div>
                 </div>
               </div>
@@ -464,28 +447,6 @@
     text-align: left;
     padding: 10px;
     border: 1px solid var(--black);
-  }
-
-  .message-content .source {
-    text-align: left;
-    border: 1px solid var(--grey);
-    padding: 5px;
-    background-color: var(--lightGrey);
-    color: var(--darkGrey);
-    box-sizing: border-box;
-  }
-
-  .source_tab {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .source_content {
-    background-color: white;
-    border: 1pt solid var(--grey);
-    padding: 5px;
   }
 
   .message-content .answers {
