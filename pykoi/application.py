@@ -496,7 +496,7 @@ class Application:
                     source_content = "N/A"
                 else:
                     source = output["source_documents"][0].metadata.get('file_name', 'No file name found')
-                    source_content = output["source_documents"][0].page_content
+                    source_content = "1. " + output["source_documents"][0].page_content + "\n2. " + output["source_documents"][1].page_content
                 return {
                     "id": id,
                     "log": "Inference complete",
