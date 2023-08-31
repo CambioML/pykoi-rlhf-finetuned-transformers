@@ -26,7 +26,10 @@ class OpenAIModel(AbsLlm):
         Initializes the OpenAIModel class.
         """
         try:
-            self._llm = OpenAI(temperature=0, max_tokens=500)
+            self._llm = OpenAI(
+                # model_name="gpt-4",
+                temperature=0, 
+                max_tokens=500)
 
             self._vector_db = vector_db.vector_db
 
