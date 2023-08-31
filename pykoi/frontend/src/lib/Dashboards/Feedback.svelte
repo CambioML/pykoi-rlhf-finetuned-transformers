@@ -8,7 +8,7 @@
   import MetricCardPercentage from "./DashboardFeedback/MetricCardPercentage.svelte";
 
   import { onMount } from "svelte";
-  import { chatLog } from "../../store";
+  import { chatLogFeedback } from "../../store";
 
   onMount(() => {
     getDataFromDB();
@@ -25,7 +25,7 @@
       answer: row[2],
       vote_status: row[3],
     }));
-    $chatLog = [...formattedRows];
+    $chatLogFeedback = [...formattedRows];
   }
 </script>
 
