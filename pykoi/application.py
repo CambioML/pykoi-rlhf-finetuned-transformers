@@ -492,11 +492,14 @@ class Application:
                 )
                 print('output', output, output["result"])
                 if output["source_documents"] == []:
-                    source = "N/A"
-                    source_content = "N/A"
+                    source = ["N/A"]
+                    source_content = ["N/A"]
                 else:
-                    source = output["source_documents"][0].metadata.get('file_name', 'No file name found')
-                    source_content = "1. " + output["source_documents"][0].page_content + "\n2. " + output["source_documents"][1].page_content
+                    source = []
+                    source_content = []
+                    for source_document in output["source_documents"]:
+                        source.append(source_document.metadata.get('file_name', 'No file name found'))
+                        source_content.append(source_document.page_content)
                 return {
                     "id": id,
                     "log": "Inference complete",
