@@ -1,6 +1,8 @@
 """reward model finetuning."""
 import os
+import time
 
+from datetime import datetime
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -25,6 +27,11 @@ from pykoi.chat.db.constants import (
     RANKING_CSV_HEADER_UP_RANKING_ANSWER,
 )
 from pykoi.chat.db.ranking_database import RankingDatabase
+from pykoi.telemetry.telemetry import Telemetry
+from pykoi.telemetry.events import (
+    RWStartEvent,
+    RWStopEvent,
+)
 
 
 @dataclass
@@ -63,7 +70,10 @@ class RewardDataCollatorWithPadding:
 
 
 class RewardFinetuning(Trainer):
-    def __init__(self, rlhf_config: RLHFConfig):
+    def __init__(self,
+                 rlhf_config: RLHFConfig,
+                 enable_telemetry: bool = True) -> None:
+        self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
         self.args = TrainingArguments(
             output_dir=rlhf_config.output_dir,
@@ -304,5 +314,16 @@ class RewardFinetuning(Trainer):
             output_path (:obj:`str`, `optional`): The output path to save the model. If not provided, the model will be
                 saved to the default output path.
         """
+        start_event = RWStartEvent(
+            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
+        )        
+        self._telemetry.capture(start_event)
         self.train()
         self.save(output_path)
+        self._telemetry.capture(
+            RWStopEvent(
+                end_time=time.time(),
+                date_time=datetime.utcfromtimestamp(time.time()),
+                duration=time.time() - start_event.start_time,
+            )
+        )

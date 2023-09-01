@@ -1,7 +1,7 @@
 """
 accelerate config
 
-LOCAL_DIR=/home/ubuntu/pykoi # change this to your local path
+LOCAL_DIR=/home/ubuntu/pykoi/pykoi # change this to your local path
 
 export PYTHONPATH=$PYTHONPATH:${LOCAL_DIR}
 
