@@ -1,7 +1,10 @@
 
 # 🎏 pykoi: Active learning in one unified interface
 
-[pykoi](https://www.cambioml.com/pykoi/) is an open-source python library for LLMs providing a unified interface for data & feedback collection, RLHF, and model comparisons.
+[pykoi](https://www.cambioml.com/pykoi/) is an open-source python library for LLMs providing a unified interface for data & feedback collection, RLHF finetuning, and model comparisons.
+
+[![Watch the video](https://img.youtube.com/vi/Pm0fHmg2IFs/maxresdefault.jpg)](https://www.youtube.com/watch?v=Pm0fHmg2IFs)
+
 
 ## Installation
 To get started with `pykoi`, you can choose to one of following compute options: CPU (e.g. your laptop) or GPU (e.g. EC2).
