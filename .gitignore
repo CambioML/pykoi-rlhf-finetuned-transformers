@@ -169,7 +169,7 @@ cython_debug/
 
 # db
 *.db
-a
+
 # data
 *.csv
 rlhf_tests
