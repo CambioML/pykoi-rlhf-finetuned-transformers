@@ -169,7 +169,7 @@ cython_debug/
 
 # db
 *.db
-
+a
 # data
 *.csv
 rlhf_tests
@@ -178,6 +178,7 @@ example/flex/docs
 example/flex/flex.ipynb
 example/flex/flex_sample/
 example/flex/vectordb/
+
 # mac
 .DS_Store
 

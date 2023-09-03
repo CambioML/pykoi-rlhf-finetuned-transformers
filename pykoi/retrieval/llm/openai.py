@@ -27,7 +27,7 @@ class OpenAIModel(AbsLlm):
         """
         try:
             self._llm = OpenAI(
-                # model_name="gpt-4",
+                model_name="gpt-4",
                 temperature=0, 
                 max_tokens=500)
 
