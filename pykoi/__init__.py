@@ -10,6 +10,7 @@ from pykoi.component.chatbot_comparator import Compare
 from pykoi.component.retrieval_qa import RetrievalQA
 from pykoi.component.nvml import Nvml
 from pykoi.retrieval.llm.retrieval_factory import RetrievalFactory
+from pykoi.retrieval.llm.embedding_factory import EmbeddingFactory
 from pykoi.retrieval.vectordb.vectordb_factory import VectorDbFactory
 from pykoi.rlhf.supervised_finetuning import SupervisedFinetuning
 from pykoi.rlhf.rw_finetuning import RewardFinetuning

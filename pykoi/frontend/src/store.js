@@ -16,3 +16,6 @@ const questions = ["who", "what", "how", "why", "where", "does", "can", "n/a"];
 export const questionDistribution = tweened(
   questions.map((question) => ({ question, count: 0 }))
 );
+
+//Chatbot
+export const checkedDocs = writable(new Set());
