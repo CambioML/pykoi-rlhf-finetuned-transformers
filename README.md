@@ -4,7 +4,7 @@
 [pykoi](https://www.cambioml.com/pykoi/) is an open-source python library for LLMs providing a unified interface for data & feedback collection, RLHF finetuning, and model comparisons.
 
 Click and watch the video demo below:
-[![Watch the video](https://img.youtube.com/vi/Pm0fHmg2IFs/maxresdefault.jpg)](https://www.youtube.com/watch?v=Pm0fHmg2IFs)
+![Watch the video](example/image/pykoi_demo_rlaif_data_collection.gif)
 
 
 ## Installation
@@ -60,6 +60,9 @@ Are you concerned about storing your chat history with chatbots from OpenAI, Ama
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_gpu.ipynb)
 - Alternatively, read our [blog](https://www.cambioml.com/docs/data_collection_feedback.html) for more information!
 
+![Watch the video](example/image/pykoi_demo_rlaif_data_collection.gif)
+
+
 ### Model comparison
 
 Comparing models is a difficult task. `pykoi` makes it easy by allowing one to directly compare the performance of multiple models to each other, with just 1 line of code. If you have multiple language models that you’d like to compare to each other on a set of prompts or via an interactive session, you can use `pk.Compare`. Check out any of the demo below: 
@@ -68,6 +71,8 @@ Comparing models is a difficult task. `pykoi` makes it easy by allowing one to d
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_model_comparator_hf.ipynb)
 - Alternatively, read our [blog](https://www.cambioml.com/docs/model_comparison.html) for more information!
  
+ ![Watch the video](example/image/pykoi_demo_model_comparison.gif)
+
 ### RLHF
 
 Reinforcement Learning with Human Feedback (RLHF) is a unique training paradigm that blends reinforcement learning with human-in-the-loop training. The central idea is to use human evaluative feedback to refine a model's decision-making ability and guide the learning process towards desired outcomes. Researchers from [Deepmind](https://www.deepmind.com/blog/learning-through-human-feedback), [OpenAI](https://openai.com/research/learning-from-human-preferences) and [Meta Llama2](https://arxiv.org/pdf/2307.09288.pdf) have all demonstrated that RLHF is a game changer for large language models (LLMs) training.
