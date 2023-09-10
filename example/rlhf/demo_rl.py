@@ -13,11 +13,11 @@ import pykoi
 
 # use huggingface sft and reward model
 config = pykoi.RLHFConfig(
-    base_model_path="elinas/llama-7b-hf-transformers-4.29",  # "elinas/llama-7b-hf-transformers-4.29",
+    base_model_path="models/rlhf_step1_sft",    #"elinas/llama-7b-hf-transformers-4.29", 
     dataset_type="huggingface", 
     dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
     dataset_subset_rl="data",
-    reward_model_path="cambioml/rlhf-reward-model",
+    reward_model_path="models/rlhf_step2_rw/", #"cambioml/rlhf_reward_model",
     save_freq=1,
     ppo_batch_size=32,
     ppo_epochs=4,
