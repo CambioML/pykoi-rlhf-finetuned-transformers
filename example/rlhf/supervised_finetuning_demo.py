@@ -23,5 +23,6 @@ print("My local database has {} samples in total".format(my_data_pd.shape[0]))
 
 # run supervised finetuning
 config = pykoi.RLHFConfig(base_model_path="elinas/llama-7b-hf-transformers-4.29", dataset_type="local_db")
+config.base_model_path = "databricks/dolly-v2-3b"
 rlhf_step1_sft = pykoi.SupervisedFinetuning(config)
 rlhf_step1_sft.train_and_save("./models/rlhf_step1_sft")

@@ -24,5 +24,6 @@ print("My local database has {} samples in total".format(my_data_pd.shape[0]))
 # run reward model finetuning
 # config = pykoi.RLHFConfig(dataset_type="local_db")
 config = pykoi.RLHFConfig()
+config.base_model_path = "databricks/dolly-v2-3b"
 rlhf_step2_rft = pykoi.RewardFinetuning(config)
 rlhf_step2_rft.train_and_save("./models/rlhf_step2_rw")
