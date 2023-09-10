@@ -1,4 +1,7 @@
-"""Demo for the reward fine tuning."""
+"""Demo for the reward fine tuning.
+
+python -m example.rlhf.demo_rw_finetuning
+"""
 
 import pykoi
 

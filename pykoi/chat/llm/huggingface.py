@@ -32,21 +32,22 @@ class HuggingfaceModel(AbsLlm):
             max_length (int): The maximum length for the model. Default is 100.
             device_map (str): The device map for the model. Default is "auto".
         """
-        # running on cpu can be slow!!!
-        print("[HuggingfaceModel] loading model...")
-        self._model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path,
-            trust_remote_code=trust_remote_code,
-            load_in_8bit=load_in_8bit,
-            device_map=device_map,
-        )
-        print("[HuggingfaceModel] loading tokenizer...")
-        self._tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path,
-            trust_remote_code=trust_remote_code,
-            load_in_8bit=load_in_8bit,
-            device_map=device_map,
-        )
+        if pretrained_model_name_or_path != "":
+            # running on cpu can be slow!!!
+            print("[HuggingfaceModel] loading model...")
+            self._model = AutoModelForCausalLM.from_pretrained(
+                pretrained_model_name_or_path,
+                trust_remote_code=trust_remote_code,
+                load_in_8bit=load_in_8bit,
+                device_map=device_map,
+            )
+            print("[HuggingfaceModel] loading tokenizer...")
+            self._tokenizer = AutoTokenizer.from_pretrained(
+                pretrained_model_name_or_path,
+                trust_remote_code=trust_remote_code,
+                load_in_8bit=load_in_8bit,
+                device_map=device_map,
+            )
         self._max_length = max_length
         self._pretrained_model_name_or_path = pretrained_model_name_or_path
         self._name = name
@@ -106,8 +107,33 @@ class HuggingfaceModel(AbsLlm):
             ]
 
             response = [
-                "\n".join(resp.split("\n")[1:]) 
-                for resp in response if "\n" in resp
+                "\n".join(resp.split("\n")[1:]) for resp in response if "\n" in resp
             ]
 
         return response
+
+    @classmethod
+    def create(cls, model, tokenizer, name=None, max_length=100):
+        """
+        Initialize the Huggingface model with given model and tokenizer.
+
+        Args:
+            model: Pre-loaded model instance from Huggingface.
+            tokenizer: Pre-loaded tokenizer instance from Huggingface.
+            name (str): The name of the model
+            max_length (int): The maximum length for the model. Default is 100.
+
+        Returns:
+            An instance of HuggingfaceModel.
+        """
+        instance = cls(
+            pretrained_model_name_or_path="",  # This won't be used since we are directly assigning the model & tokenizer
+            name=name,
+            trust_remote_code=True,  # Setting defaults, but these won't be used
+            load_in_8bit=True,
+            max_length=max_length,
+            device_map="auto",
+        )
+        instance._model = model
+        instance._tokenizer = tokenizer
+        return instance

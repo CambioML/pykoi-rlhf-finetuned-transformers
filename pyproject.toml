@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pykoi"
-version = "0.0.5"
+version = "0.0.6"
 description = ""
 authors = ["CambioML <wanwanaiai45@gmail.com>"]
 license = "Apache"
@@ -37,6 +37,8 @@ pyepsilla = ">=0.1.1"
 torch = "2.0.1"
 posthog = "3.0.1"
 pynvml = "11.5.0"
+sentence-transformers = "2.2.2"
+python-dotenv = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]

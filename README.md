@@ -1,7 +1,11 @@
 
 # 🎏 pykoi: Active learning in one unified interface
 
-[pykoi](https://www.cambioml.com/pykoi/) is an open-source python library for LLMs providing a unified interface for data & feedback collection, RLHF, and model comparisons.
+[pykoi](https://www.cambioml.com/pykoi/) is an open-source python library for LLMs providing a unified interface for data & feedback collection, RLHF finetuning, and model comparisons.
+
+Click and watch the video demo below:
+![Watch the video](example/image/pykoi_demo_rlaif_data_collection.gif)
+
 
 ## Installation
 To get started with `pykoi`, you can choose to one of following compute options: CPU (e.g. your laptop) or GPU (e.g. EC2).
@@ -12,21 +16,20 @@ Installation on a CPU is simple if you have conda. If not, install [conda](https
 First, create a conda environment on your terminal using:
 ```
 conda create -n pykoi python=3.10 -y
-source activate pykoi
+conda activate pykoi
 ```
 
 Then install `pykoi` and the compatible torch version.
 ```
 pip3 install pykoi
-pip3 install torch
 ```
 
 ### Option 2:  GPU (e.g. EC2)
 
 If you are on EC2, you can launch a GPU instance with the following config:
 - EC2 `g4dn.xlarge` (if you want to run a pretrained model with 7B parameters)
-- Deep Learning Base GPU AMI
-    <img src="example/image/readme_ec2_ami.png" alt="Alt text" width="50%" height="50%"/>
+- Deep Learning AMI PyTorch GPU 2.0.1 (Ubuntu 20.04)
+    <img src="example/image/readme_ec2_ami.jpg" alt="Alt text" width="50%" height="50%"/>
 - EBS: at least 100G
     <img src="example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 
@@ -57,6 +60,9 @@ Are you concerned about storing your chat history with chatbots from OpenAI, Ama
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_gpu.ipynb)
 - Alternatively, read our [blog](https://www.cambioml.com/docs/data_collection_feedback.html) for more information!
 
+![Watch the video](example/image/pykoi_demo_rlaif_data_collection.gif)
+
+
 ### Model comparison
 
 Comparing models is a difficult task. `pykoi` makes it easy by allowing one to directly compare the performance of multiple models to each other, with just 1 line of code. If you have multiple language models that you’d like to compare to each other on a set of prompts or via an interactive session, you can use `pk.Compare`. Check out any of the demo below: 
@@ -65,6 +71,8 @@ Comparing models is a difficult task. `pykoi` makes it easy by allowing one to d
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_model_comparator_hf.ipynb)
 - Alternatively, read our [blog](https://www.cambioml.com/docs/model_comparison.html) for more information!
  
+ ![Watch the video](example/image/pykoi_demo_model_comparison.gif)
+
 ### RLHF
 
 Reinforcement Learning with Human Feedback (RLHF) is a unique training paradigm that blends reinforcement learning with human-in-the-loop training. The central idea is to use human evaluative feedback to refine a model's decision-making ability and guide the learning process towards desired outcomes. Researchers from [Deepmind](https://www.deepmind.com/blog/learning-through-human-feedback), [OpenAI](https://openai.com/research/learning-from-human-preferences) and [Meta Llama2](https://arxiv.org/pdf/2307.09288.pdf) have all demonstrated that RLHF is a game changer for large language models (LLMs) training.
@@ -87,7 +95,7 @@ poetry install --no-root
 ### Frontend Dev Setup
 Frontend:
 ```
-cd frontend
-npm install vite
+cd pykoi/pykoi/frontend
+npm install
 npm run build
 ```

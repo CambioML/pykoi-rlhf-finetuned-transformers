@@ -1,4 +1,7 @@
-"""Demo for the supervised fine tuning."""
+"""Demo for the supervised fine tuning.
+
+python -m example.rlhf.supervised_finetuning_demo
+"""
 
 import pykoi
 

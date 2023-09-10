@@ -1,5 +1,13 @@
-## running command:
-## accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/demo_rl.py
+"""
+accelerate config
+
+LOCAL_DIR=/home/ubuntu/pykoi/pykoi # change this to your local path
+
+export PYTHONPATH=$PYTHONPATH:${LOCAL_DIR}
+
+accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 ${LOCAL_DIR}/example/rlhf/demo_rl.py
+"""
+# accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/demo_rl.py
 
 import pykoi
 

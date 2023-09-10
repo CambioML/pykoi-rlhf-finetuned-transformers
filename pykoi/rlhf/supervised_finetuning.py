@@ -2,7 +2,9 @@
 import os
 from typing import Optional
 import torch
+import time
 
+from datetime import datetime
 from datasets import Dataset, load_dataset
 from peft import PeftConfig, PeftModel
 from transformers import (
@@ -22,6 +24,11 @@ from pykoi.chat.db.constants import (
 )
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
+from pykoi.telemetry.telemetry import Telemetry
+from pykoi.telemetry.events import (
+    SFTStartEvent,
+    SFTStopEvent,
+)
 
 
 class SupervisedFinetuning:
@@ -39,13 +46,17 @@ class SupervisedFinetuning:
         trainer (SFTTrainer): The trainer object used for training the model.
     """
 
-    def __init__(self, rlhf_config: RLHFConfig):
+    def __init__(self,
+                 rlhf_config: RLHFConfig,
+                 enable_telemetry: bool = True) -> None:
         """
         Initializes the SFTTrainer object.
 
         Args:
             rlhf_config (RLHFConfig): The RLHF configuration object.
+            enbale_telemetry (bool): Whether to enable telemetry or not.
         """
+        self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
         self.tokenizer = AutoTokenizer.from_pretrained(
             rlhf_config.base_model_path
@@ -145,8 +156,19 @@ class SupervisedFinetuning:
         self.trainer.save_model(output_path)
 
     def train_and_save(self, output_path=None):
+        start_event = SFTStartEvent(
+            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
+        )        
+        self._telemetry.capture(start_event)
         self.trainer.train()
         self.save(output_path)
+        self._telemetry.capture(
+            SFTStopEvent(
+                end_time=time.time(),
+                date_time=datetime.utcfromtimestamp(time.time()),
+                duration=time.time() - start_event.start_time,
+            )
+        )
 
     def prepare_sample_text(self, example):
         """Prepare the text from a sample of the dataset."""

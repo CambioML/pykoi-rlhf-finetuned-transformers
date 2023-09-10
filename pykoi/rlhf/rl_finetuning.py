@@ -1,4 +1,6 @@
 """rl finetuning."""
+import time
+from datetime import datetime
 from pykoi.rlhf.config import RLHFConfig
 from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
@@ -28,16 +30,24 @@ from trl.core import LengthSampler
 from huggingface_hub import hf_hub_download
 from transformers import AutoModelForCausalLM
 from peft import PeftModel, PeftConfig, AutoPeftModelForCausalLM
+from pykoi.telemetry.telemetry import Telemetry
+from pykoi.telemetry.events import (
+    RLStartEvent,
+    RLStopEvent,
+)
 
 
 class RLFinetuning(Trainer):
-    def __init__(self, rlhf_config: RLHFConfig):
+    def __init__(self,
+                 rlhf_config: RLHFConfig,
+                 enable_telemetry: bool = True) -> None:
         """
         RLFinetuning class for finetuning a language model using reinforcement learning.
 
         Args:
             rlhf_config (RLHFConfig): Configuration object for RLHF.
         """
+        self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
         self.accelerator = Accelerator()
         self.num_proc = (
@@ -474,5 +484,16 @@ class RLFinetuning(Trainer):
         Args:
             output_path (str, optional): The path to save the model to. Default to None.
         """
+        start_event = RLStartEvent(
+            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
+        )        
+        self._telemetry.capture(start_event)
         self.train(save_checkpoints_path=output_path)
         self.save(output_path)
+        self._telemetry.capture(
+            RLStopEvent(
+                end_time=time.time(),
+                date_time=datetime.utcfromtimestamp(time.time()),
+                duration=time.time() - start_event.start_time,
+            )
+        )
