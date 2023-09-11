@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM python:3.10
 LABEL maintainer="Pykio Team"
 LABEL repository="Pykoi"
 
@@ -12,11 +12,7 @@ RUN apt update && \
                    curl \
                    ca-certificates \
                    libsndfile1-dev \
-                   python3.8 \
-                   python3-pip \
-                   libgl1 \
-                   python3.8-venv && \
-    rm -rf /var/lib/apt/lists
+                   libgl1
 
 # make sure to use venv
 RUN python3 -m venv /opt/venv
