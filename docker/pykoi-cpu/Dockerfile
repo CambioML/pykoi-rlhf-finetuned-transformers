@@ -24,3 +24,4 @@ RUN python -m pip install --no-cache-dir --upgrade pip && \
     pykoi
 
 CMD ["/bin/bash"]
+

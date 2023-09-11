@@ -26,7 +26,6 @@ dashboard = pykoi.Dashboard(database=database)
 # Create the application
 # app = pykoi.Application(debug=False, share=True)
 app = pykoi.Application(
-    host='0.0.0.0',
     debug=False, 
     share=True)
 app.add_component(chatbot)

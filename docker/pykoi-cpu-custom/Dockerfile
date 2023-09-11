@@ -1,4 +1,4 @@
-FROM weialexchen/pykoi-cpu:base
+FROM pykoi/pykoi-cpu:base
 
 # set the working directory in the container
 WORKDIR /app
