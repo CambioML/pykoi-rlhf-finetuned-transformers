@@ -5,7 +5,7 @@ import pykoi
 # Creating an OpenAI model (requires an OpenAI API key) #
 ##########################################################
 # enter openai api key here
-api_key = "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"
+api_key = ""
 
 # Creating an OpenAI model
 model = pykoi.ModelFactory.create_model(
