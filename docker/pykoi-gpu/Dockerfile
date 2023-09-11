@@ -41,6 +41,7 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip && \
         transformers \
         omegaconf \
         pytorch-lightning \
-        xformers
+        xformers \
+        pykoi
 
 CMD ["/bin/bash"]
