@@ -25,19 +25,7 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip && \
         torchvision \
         torchaudio && \
     python3 -m pip install --no-cache-dir \
-        accelerate \
-        datasets \
-        hf-doc-builder \
-        huggingface-hub \
-        Jinja2 \
-        librosa \
-        numpy \
-        scipy \
-        tensorboard \
-        transformers \
-        omegaconf \
-        pytorch-lightning \
-        xformers \
         pykoi
 
 CMD ["/bin/bash"]
+
