@@ -5,7 +5,7 @@ import pykoi
 # Creating an OpenAI model (requires an OpenAI API key) #
 ##########################################################
 # enter openai api key here
-api_key = ""
+api_key = "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"
 
 # Creating an OpenAI model
 model = pykoi.ModelFactory.create_model(
@@ -25,7 +25,9 @@ dashboard = pykoi.Dashboard(database=database)
 ###########################################################
 # Create the application
 # app = pykoi.Application(debug=False, share=True)
-app = pykoi.Application(debug=False, share=False)
+app = pykoi.Application(
+    debug=False, 
+    share=True)
 app.add_component(chatbot)
 app.add_component(dashboard)
 app.run()
