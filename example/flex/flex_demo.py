@@ -2,11 +2,15 @@
 
 import os
 import argparse
+from dotenv import load_dotenv
 from pykoi import Application
 from pykoi.chat import QuestionAnswerDatabase
 from pykoi.retrieval import RetrievalFactory
 from pykoi.retrieval import VectorDbFactory
 from pykoi.component import Chatbot, Dashboard, RetrievalQA
+
+
+load_dotenv()
 
 
 def main(**kargs):

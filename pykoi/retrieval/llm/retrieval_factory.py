@@ -2,8 +2,6 @@
 from typing import Union
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
-from pykoi.retrieval.llm.openai import OpenAIModel
-from pykoi.retrieval.llm.huggingface import HuggingFaceModel
 from pykoi.retrieval.llm.constants import ModelSource
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 
@@ -29,8 +27,10 @@ class RetrievalFactory:
         try:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
+                from pykoi.retrieval.llm.openai import OpenAIModel
                 return OpenAIModel(vector_db)
             if model_source == ModelSource.HUGGINGFACE:
+                from pykoi.retrieval.llm.huggingface import HuggingFaceModel
                 return HuggingFaceModel(vector_db, **kwargs)
         except Exception as ex:
             raise Exception(f"Unknown model: {model_source}") from ex
