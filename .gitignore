@@ -191,3 +191,6 @@ models/
 
 # retrieval
 temp/
+
+# poetry
+poetry.lock
