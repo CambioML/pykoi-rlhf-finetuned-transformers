@@ -3,7 +3,9 @@
 python -m example.rlhf.supervised_finetuning_demo
 """
 
-import pykoi
+from pykoi.chat import QuestionAnswerDatabase
+from pykoi.rlhf import RLHFConfig
+from pykoi.rlhf import SupervisedFinetuning
 
 from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
@@ -12,7 +14,7 @@ from pykoi.chat.db.constants import (
     QA_CSV_HEADER_VOTE_STATUS)
 
 # get data from local database
-qa_database = pykoi.QuestionAnswerDatabase()
+qa_database = QuestionAnswerDatabase()
 my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
 my_data_pd = my_data_pd[[
     QA_CSV_HEADER_ID,
@@ -25,6 +27,6 @@ print(my_data_pd)
 print("My local database has {} samples in total".format(my_data_pd.shape[0]))
 
 # run supervised finetuning
-config = pykoi.RLHFConfig(base_model_path="databricks/dolly-v2-3b", dataset_type="local_db")
-rlhf_step1_sft = pykoi.SupervisedFinetuning(config)
+config = RLHFConfig(base_model_path="databricks/dolly-v2-3b", dataset_type="local_db")
+rlhf_step1_sft = SupervisedFinetuning(config)
 rlhf_step1_sft.train_and_save("./models/rlhf_step1_sft")
