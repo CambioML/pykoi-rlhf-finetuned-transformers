@@ -2,7 +2,11 @@
 
 import os
 import argparse
-import pykoi
+from pykoi import Application
+from pykoi.chat import QuestionAnswerDatabase
+from pykoi.retrieval import RetrievalFactory
+from pykoi.retrieval import VectorDbFactory
+from pykoi.component import Chatbot, Dashboard, RetrievalQA
 
 
 def main(**kargs):
@@ -16,25 +20,25 @@ def main(**kargs):
     # Creating a retrieval QA component #
     #####################################
     # vector database
-    vector_db = pykoi.VectorDbFactory.create(
+    vector_db = VectorDbFactory.create(
         model_source=MODEL_SOURCE, vector_db_name=kargs.get("vectordb"), **kargs
     )
 
     # retrieval model with vector database
-    retrieval_model = pykoi.RetrievalFactory.create(
+    retrieval_model = RetrievalFactory.create(
         model_source=MODEL_SOURCE, vector_db=vector_db
     )
 
     # retrieval, chatbot, and dashboard pykoi components
-    retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
-    chatbot = pykoi.Chatbot(None, feedback="vote", is_retrieval=True)
-    dashboard = pykoi.Dashboard(pykoi.QuestionAnswerDatabase())
+    retriever = RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
+    chatbot = Chatbot(None, feedback="vote", is_retrieval=True)
+    dashboard = Dashboard(QuestionAnswerDatabase())
 
     ############################################################
     # Starting the application and retrieval qa as a component #
     ############################################################
     # Create the application
-    app = pykoi.Application(debug=False, share=False)
+    app = Application(debug=False, share=False)
     app.add_component(retriever)
     app.add_component(chatbot)
     app.add_component(dashboard)

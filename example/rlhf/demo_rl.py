@@ -9,10 +9,12 @@ accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 ${L
 """
 # accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/demo_rl.py
 
-import pykoi
+from pykoi.rlhf import RLHFConfig
+from pykoi.rlhf import RLFinetuning
+
 
 # use huggingface sft and reward model
-config = pykoi.RLHFConfig(
+config = RLHFConfig(
     base_model_path="models/rlhf_step1_sft",    #"elinas/llama-7b-hf-transformers-4.29", 
     dataset_type="huggingface", 
     dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
@@ -25,5 +27,5 @@ config = pykoi.RLHFConfig(
     output_dir="./models/rlhf_step3_rl",
 )
 
-rlhf_step3_rl = pykoi.RLFinetuning(config)
+rlhf_step3_rl = RLFinetuning(config)
 rlhf_step3_rl.train_and_save("./models/rlhf_step3_rl")

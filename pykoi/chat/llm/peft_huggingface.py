@@ -67,7 +67,7 @@ class PeftHuggingfacemodel(AbsLlm):
         self._base_model_path = base_model_path
         self._lora_model_path = lora_model_path
         self._name = name
-        self._model.to("cuda")
+        self._model.to("cuda:0")
         self._model.eval()
         super().__init__()
 

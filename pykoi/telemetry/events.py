@@ -4,8 +4,15 @@ import os
 from dataclasses import asdict, dataclass
 from typing import ClassVar, Dict, Any
 import platform
-import torch
 import requests
+import pynvml
+
+
+try:
+    pynvml.nvmlInit()
+    HAS_GPU = True
+except pynvml.NVMLError:
+    HAS_GPU = False
 
 
 def identify_cloud_provider():
@@ -92,7 +99,7 @@ class AppStartEvent(TelemetryEvent):
     name: ClassVar[str] = "app_start"
     start_time: float
     date_time: str
-    gpu: bool = torch.cuda.is_available()
+    gpu: bool = HAS_GPU
     cloud_provider: str = identify_cloud_provider()
     system: str = platform.system()
     release: str = platform.release()
@@ -132,7 +139,7 @@ class SFTStartEvent(TelemetryEvent):
     name: ClassVar[str] = "sft_start"
     start_time: float
     date_time: str
-    gpu: bool = torch.cuda.is_available()
+    gpu: bool = HAS_GPU
     cloud_provider: str = identify_cloud_provider()
     system: str = platform.system()
     release: str = platform.release()
@@ -172,7 +179,7 @@ class RWStartEvent(TelemetryEvent):
     name: ClassVar[str] = "rw_start"
     start_time: float
     date_time: str
-    gpu: bool = torch.cuda.is_available()
+    gpu: bool = HAS_GPU
     cloud_provider: str = identify_cloud_provider()
     system: str = platform.system()
     release: str = platform.release()
@@ -212,7 +219,7 @@ class RLStartEvent(TelemetryEvent):
     name: ClassVar[str] = "rl_start"
     start_time: float
     date_time: str
-    gpu: bool = torch.cuda.is_available()
+    gpu: bool = HAS_GPU
     cloud_provider: str = identify_cloud_provider()
     system: str = platform.system()
     release: str = platform.release()

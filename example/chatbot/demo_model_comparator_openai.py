@@ -1,6 +1,7 @@
 """Demo for the chatbot application using multiple model endpoint."""
-import pykoi
-
+from pykoi import Application
+from pykoi.chat import ModelFactory
+from pykoi.component import Compare
 
 ##########################################################
 # Creating an OpenAI model (requires an OpenAI API key) #
@@ -9,13 +10,13 @@ import pykoi
 api_key = ""
 
 # Creating an OpenAI model
-openai_model_1 = pykoi.ModelFactory.create_model(
+openai_model_1 = ModelFactory.create_model(
     model_source="openai", name="openai_babbage", api_key=api_key, engine="babbage"
 )
-openai_model_2 = pykoi.ModelFactory.create_model(
+openai_model_2 = ModelFactory.create_model(
     model_source="openai", name="openai_curie", api_key=api_key, engine="curie"
 )
-openai_model_3 = pykoi.ModelFactory.create_model(
+openai_model_3 = ModelFactory.create_model(
     model_source="openai", name="openai_davinci", api_key=api_key, engine="davinci"
 )
 
@@ -41,12 +42,12 @@ openai_model_3 = pykoi.ModelFactory.create_model(
 # Creating a chatbot comparator #
 #################################
 # pass in a list of models to compare
-chatbot_comparator = pykoi.Compare(models=[openai_model_1, openai_model_2])
+chatbot_comparator = Compare(models=[openai_model_1, openai_model_2])
 chatbot_comparator.add(openai_model_3)
 # or add models later
 # chatbot_comparator.add(huggingface_model)
 # chatbot_comparator.add(peft_huggingface_model)
 
-app = pykoi.Application(debug=False, share=True, username="rachel", password="rachel")
+app = Application(debug=False, share=False)
 app.add_component(chatbot_comparator)
 app.run()

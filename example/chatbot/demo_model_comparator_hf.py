@@ -1,10 +1,13 @@
 """Demo for the chatbot application using multiple model endpoint."""
-import pykoi
+from pykoi import Application
+from pykoi.chat import ModelFactory
+from pykoi.component import Compare
+
 
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-rw-1b (EC2 g4.2xlarge with 100GB space) #
 ###################################################################################
-huggingface_model_1 = pykoi.ModelFactory.create_model(
+huggingface_model_1 = ModelFactory.create_model(
     model_source="huggingface",
     pretrained_model_name_or_path="tiiuae/falcon-rw-1b",
 )
@@ -12,7 +15,7 @@ huggingface_model_1 = pykoi.ModelFactory.create_model(
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g4.2xlarge with 100GB space) #
 ###################################################################################
-huggingface_model_2 = pykoi.ModelFactory.create_model(
+huggingface_model_2 = ModelFactory.create_model(
     model_source="huggingface",
     pretrained_model_name_or_path="tiiuae/falcon-7b",
 )
@@ -20,7 +23,7 @@ huggingface_model_2 = pykoi.ModelFactory.create_model(
 ###################################################################################
 # Creating a Huggingface model databricks/dolly-v2-3b (EC2 g4.2xlarge with 100GB space) #
 ###################################################################################
-huggingface_model_3 = pykoi.ModelFactory.create_model(
+huggingface_model_3 = ModelFactory.create_model(
     model_source="huggingface",
     pretrained_model_name_or_path="databricks/dolly-v2-3b",
 )
@@ -39,10 +42,10 @@ huggingface_model_3 = pykoi.ModelFactory.create_model(
 # Creating a chatbot comparator #
 #################################
 # pass in a list of models to compare
-chatbot_comparator = pykoi.Compare(models=[huggingface_model_1, huggingface_model_2])
+chatbot_comparator = Compare(models=[huggingface_model_1, huggingface_model_2])
 # or add models later
 chatbot_comparator.add(huggingface_model_3)
 
-app = pykoi.Application(debug=False, share=True, username="rachel", password="rachel")
+app = Application(debug=False, share=True, username="rachel", password="rachel")
 app.add_component(chatbot_comparator)
 app.run()
