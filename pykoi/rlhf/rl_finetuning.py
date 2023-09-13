@@ -79,12 +79,6 @@ class RLFinetuning(Trainer):
             rlhf_config.reward_model_path
         )
         self.reward_dataset = self.create_dataset(self.reward_tokenizer)
-        # self.reward_model = AutoModelForSequenceClassification.from_pretrained(
-        #     rlhf_config.reward_model_path,
-        #     num_labels=1,
-        #     load_in_8bit=True,
-        #     device_map={"": Accelerator().local_process_index},
-        # )
 
         reward_model_path = rlhf_config.reward_model_path
 
