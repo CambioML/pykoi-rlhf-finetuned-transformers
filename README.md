@@ -2,6 +2,7 @@
 # 🎏 pykoi: RLHF/RLAIF in one unified interface
 <p align="center">
   <a href="/LICENSE"><img alt="License Apache-2.0" src="https://img.shields.io/github/license/cambioml/pykoi?style=flat-square"></a>
+  <a href="https://pypi.org/project/pykoi"><img src="https://img.shields.io/pypi/v/pykoi.svg" alt="pypi_status" /></a>
   <a href='http://makeapullrequest.com'><img alt='PRs Welcome' src='https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square'/></a>
 </p>
 
