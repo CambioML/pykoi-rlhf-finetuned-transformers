@@ -11,9 +11,9 @@
 
 `pykoi` let you easily get real-time user feedback and continuously improve your models. Here are some common applications:
 
-### Sharable Chatbot UI with Database
+### Sharable UI
 
-Do you want to store your chat history with LLMs from OpenAI, Amazon Bedrock(:woman_technologist: building now :man_technologist:), or Huggingface? With just three lines of code, pykoi lets you to store them locally, ensuring 100% privacy. This includes launching a chatbot UI, automatically saving your chat history, and visualizing it on a dashboard. Explore the demos below:
+Do you want to store your chat history with LLMs from OpenAI, Amazon Bedrock(:woman_technologist: building now :man_technologist:), or Huggingface? With just three lines of code, pykoi lets you to store them locally, ensuring 100% privacy. This includes launching a chatbot UI, automatically saving your chat history in your compute instance (cpu or gpu), and visualizing it on a dashboard. Explore the demos below:
 
 - If you're using a CPU instance, check out [demo_launch_app_cpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_cpu_openai.ipynb)
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_gpu_huggingface.ipynb)
