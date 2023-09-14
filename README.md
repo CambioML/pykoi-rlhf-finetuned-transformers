@@ -9,7 +9,7 @@
 
 ### Sharable Chatbot UI with Database
 
-Are you concerned about storing your chat history with chatbots from OpenAI, Amazon Bedrock(:woman_technologist: building now :man_technologist:), or Huggingface? With just three lines of code, we enable you to store it locally, ensuring 100% privacy. This includes launching a chatbot UI, automatically saving your chat history, and visualizing it on a dashboard. Explore the demos below:
+Do you want to store your chat history with LLMs from OpenAI, Amazon Bedrock(:woman_technologist: building now :man_technologist:), or Huggingface? With just three lines of code, pykoi lets you to store them locally, ensuring 100% privacy. This includes launching a chatbot UI, automatically saving your chat history, and visualizing it on a dashboard. Explore the demos below:
 
 - If you're using a CPU instance, check out [demo_launch_app_cpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_cpu_openai.ipynb)
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_launch_app_gpu_huggingface.ipynb)
@@ -20,7 +20,7 @@ Are you concerned about storing your chat history with chatbots from OpenAI, Ama
 
 ### Model comparison
 
-Comparing models is a difficult task. `pykoi` makes it easy by allowing one to directly compare the performance of multiple models to each other, with just 1 line of code. If you have multiple language models that you’d like to compare to each other on a set of prompts or via an interactive session, you can use `pk.Compare`. Check out any of the demo below: 
+Comparing models is a difficult task. `pykoi` makes it easy by allowing one to directly compare the performance of multiple models to each other, with just a few lines of code. If you have multiple language models that you’d like to compare to each other on a set of prompts or via an interactive session, you can use `pk.Compare`. Check out any of the demo below: 
 
 - If you're using a CPU instance, check out [demo_launch_app_cpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_model_comparator_openai.ipynb)
 - If you're using a GPU instance, check out [demo_launch_app_gpu.ipynb](https://nbviewer.org/github/CambioML/pykoi/blob/main/example/chatbot/demo_model_comparator_gpu_huggingface.ipynb)
@@ -47,9 +47,10 @@ conda create -n pykoi python=3.10 -y
 conda activate pykoi
 ```
 
-Then install `pykoi` and the compatible torch version.
+Then install `pykoi` and the compatible [pytorch based on your os](https://pytorch.org/get-started)
 ```
 pip3 install pykoi
+pip3 install torch 
 ```
 
 ### Option 2: GPU (e.g. EC2 or SageMaker)
