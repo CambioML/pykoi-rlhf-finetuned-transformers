@@ -5,6 +5,7 @@ from typing import Callable, List, Optional, Union
 from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
 from pykoi.component.constants import FeedbackType
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.rag_database import RAGDatabase
 from pykoi.chat.db.ranking_database import RankingDatabase
 from pykoi.chat.llm.abs_llm import AbsLlm
 
@@ -129,7 +130,7 @@ class Dashboard(Component):
         database (str): The database to use for the dashboard.
     """
 
-    def __init__(self, database: QuestionAnswerDatabase, **kwargs):
+    def __init__(self, database: any, **kwargs):
         """
         Initialize a new instance of Dashboard.
 

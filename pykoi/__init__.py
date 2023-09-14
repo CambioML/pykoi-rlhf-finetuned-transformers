@@ -2,6 +2,7 @@ from pykoi import chat
 
 from pykoi.application import Application
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
+from pykoi.chat.db.rag_database import RAGDatabase
 from pykoi.chat.db.ranking_database import RankingDatabase
 from pykoi.chat.llm.abs_llm import AbsLlm
 from pykoi.chat.llm.model_factory import ModelFactory

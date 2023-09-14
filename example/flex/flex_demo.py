@@ -23,9 +23,9 @@ def main(**kargs):
     )
 
     # retrieval, chatbot, and dashboard pykoi components
-    retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db)
-    chatbot = pykoi.Chatbot(None, feedback="vote", is_retrieval=True)
-    dashboard = pykoi.Dashboard(pykoi.QuestionAnswerDatabase())
+    retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db, feedback="rag")
+    chatbot = pykoi.Chatbot(None, feedback="rag", is_retrieval=True)
+    dashboard = pykoi.Dashboard(pykoi.RAGDatabase(), feedback="rag")
 
     ############################################################
     # Starting the application and retrieval qa as a component #
