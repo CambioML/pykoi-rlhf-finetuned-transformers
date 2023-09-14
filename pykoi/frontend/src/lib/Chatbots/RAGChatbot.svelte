@@ -1,11 +1,14 @@
 <script>
-  import { chatLog } from "../../store";
+  import { chatLog, checkedDocs } from "../../store";
   import { onMount } from "svelte";
   import { select } from "d3-selection";
-  import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import Dropdown from "./Components/Dropdown.svelte";
   import { tooltip } from "../../utils.js";
+  import SourceContainer from "./Components/SourceContainer.svelte";
+  import Tabs from "../UIComponents/Tabs.svelte";
+  import ModifiedAnswer from "./Components/ModifiedAnswer.svelte";
+  import Answer from "./Components/Answer.svelte";
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -15,7 +18,20 @@
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
-  let show_content = [];
+  let editting_response = true;
+
+  let items = [
+    {
+      label: "Answer",
+      value: 1,
+      component: Answer,
+    },
+    {
+      label: "Modified Answer",
+      value: 2,
+      component: ModifiedAnswer,
+    },
+  ];
 
   onMount(() => {
     getDataFromDB();
@@ -23,7 +39,6 @@
   });
 
   async function loadRetrievalFiles() {
-    // /retrieval/file/get
     const response = await fetch("/retrieval/file/get");
     const data = await response.json();
     console.log("data", data["files"]);
@@ -37,17 +52,20 @@
   }
 
   async function getDataFromDB() {
-    const response = await fetch("/chat/qa_table/retrieve");
+    const response = await fetch("/chat/rag_table/retrieve");
     const data = await response.json();
     const dbRows = data["rows"];
+    console.log("Got data from db", dbRows);
     const formattedRows = dbRows.map((row) => ({
       id: row[0],
       question: row[1],
       answer: row[2],
-      vote_status: row[3],
-      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
+      edited_answer: row[3],
+      vote_status: row[4],
+      rag_sources: row[5],
+      source: row[6],
+      source_content: row[7],
     }));
-    show_content = new Array(formattedRows.length).fill(false);
     $chatLog = [...formattedRows];
   }
 
@@ -56,14 +74,15 @@
     mymessage = messageplaceholder;
     messageplaceholder = "";
     chatLoading = true;
+    const file_names = [...$checkedDocs];
     let currentEntry = {
       id: $chatLog.length + 1,
       question: mymessage,
       answer: "Loading...",
-      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
+      rag_sources: file_names,
       vote_status: "na",
-      source: "Loading...",
-      source_content: "Loading...",
+      source: ["Loading..."],
+      source_content: ["Loading..."],
     };
     $chatLog = [...$chatLog, currentEntry];
 
@@ -75,6 +94,7 @@
           },
           body: JSON.stringify({
             prompt: mymessage,
+            file_names: file_names,
           }),
         })
       : await fetch(`/chat/${mymessage}`, {
@@ -94,7 +114,6 @@
       currentEntry["source"] = data["source"];
       currentEntry["source_content"] = data["source_content"];
       // $chatLog[$chatLog.length - 1] = currentEntry;
-      show_content.push(false);
       chatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
@@ -121,47 +140,8 @@
 
   $: dots = ".".repeat(dotState).padEnd(3);
 
-  async function insertVote(feedbackUpdate) {
-    const response = await fetch("/chat/qa_table/update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(feedbackUpdate),
-    });
-
-    if (response.ok) {
-      console.log("response", response);
-    } else {
-      const err = await response.text();
-      alert(err);
-    }
-  }
-
-  function logVote(event, vote, index) {
-    const messageLog = $chatLog[index];
-    messageLog.vote = vote;
-    const feedbackUpdate = {
-      id: index + 1, // increment bc sqlite 1-indexed
-      vote_status: vote,
-    };
-
-    insertVote(feedbackUpdate);
-
-    select(event.currentTarget.parentNode)
-      .selectAll("button")
-      .style("border", "3px solid transparent")
-      .style("opacity", 0.65);
-    select(event.currentTarget)
-      .style("border", "3px solid var(--black)")
-      .style("opacity", 1);
-  }
-
-  let chatLetters = [...Array(10).keys()].map((i) =>
-    String.fromCharCode(65 + i)
-  );
   function getRAGSources(message) {
-    if (message.rag_sources.length === 0) return "All";
+    if (message.rag_sources.length === 0) return "No Sources";
     const ragSources = message.rag_sources;
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
@@ -174,7 +154,7 @@
     <p>
       Ask a question to receive an answer from the chatbot. If the response is
       satisfactory, click on the <span class="inline-button green">👍</span>
-      button. If the repsonse is not satisfactory, click on the
+      button. If the response is not satisfactory, click on the
       <span class="inline-button red">👎</span> button.
     </p>
     <!-- <button>Download Data</button> -->
@@ -197,48 +177,19 @@
                   <p>{message.question}</p>
                   <div class="rag-sources">
                     <p class="bold" use:tooltip={getRAGSources(message)}>
-                      ℹ️ RAG Sources
+                      ℹ️ Retrieval Sources
                     </p>
                   </div>
                 </div>
                 <div class="answers">
                   <div class="answer">
-                    <h5 class="bold">Response:</h5>
-                    <p>{message.answer}</p>
-                    {#if feedback}
-                      <div class="feedback-buttons">
-                        <button
-                          on:click={(event) => logVote(event, "up", index)}
-                          class="small-button thumbs-up">👍</button
-                        >
-                        <button
-                          on:click={(event) => logVote(event, "down", index)}
-                          class="small-button thumbs-down">👎</button
-                        >
-                      </div>
-                    {/if}
-                  </div>
-                  <div class="source">
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <div
-                      class="source_tab"
-                      on:click={() =>
-                        (show_content[index] = !show_content[index])}
-                    >
-                      <p class="bold">📖 Source: {message.source}</p>
-                      {#if show_content[index]}
-                        <p>&#8963;</p>
-                      {:else}
-                        <p>&#8964;</p>
-                      {/if}
-                    </div>
-                    {#if show_content[index]}
-                      <div class="source_content" transition:slide>
-                        <p class="bold">{message.source_content}</p>
-                      </div>
-                    {/if}
+                    <Tabs {items} tabProps={{ message, feedback, index }} />
                   </div>
                 </div>
+                <SourceContainer
+                  sources={message.source}
+                  source_content={message.source_content}
+                />
               </div>
             </div>
           </div>
@@ -273,7 +224,7 @@
     grid-template-columns: 20% 80%;
     width: 100%;
   }
-  .small-button {
+  /* .small-button {
     margin-left: 10px;
     background: none;
     border: 3px solid transparent;
@@ -303,7 +254,7 @@
   .thumbs-down:hover,
   .thumbs-down::selection {
     background: var(--red);
-  }
+  } */
   .ranked-chat {
     height: 100vh;
     display: grid;
@@ -401,7 +352,7 @@
     border-bottom: var(--line);
   }
 
-  .bold {
+  :global(.bold) {
     font-weight: bold;
     font-size: var(--smallText);
     margin: 0;
@@ -463,28 +414,6 @@
     border: 1px solid var(--black);
   }
 
-  .message-content .source {
-    text-align: left;
-    border: 1px solid var(--grey);
-    padding: 5px;
-    background-color: var(--lightGrey);
-    color: var(--darkGrey);
-    box-sizing: border-box;
-  }
-
-  .source_tab {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .source_content {
-    background-color: white;
-    border: 1pt solid var(--grey);
-    padding: 5px;
-  }
-
   .message-content .answers {
     display: grid;
     grid-template-columns: 100%;
@@ -508,7 +437,7 @@
     position: absolute;
     bottom: 100%;
     right: 0.78rem;
-    transform: translate(50%, 0);
+    transform: translate(calc(100% - 120px), 0);
     padding: 0.2rem 0.35rem;
     background: hsl(0, 0%, 20%);
     color: hsl(0, 0%, 98%);
@@ -522,8 +451,7 @@
     content: "";
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10px;
     width: 0.6em;
     height: 0.25em;
     background: inherit;

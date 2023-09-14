@@ -8,6 +8,7 @@
   import QuestionRating from "./lib/Annotations/QuestionRating.svelte";
   import RankedChatbot from "./lib/Chatbots/RankedChatbot.svelte";
   import RAG from "./lib/RAG/RAG.svelte";
+    import FeedbackWrapper from "./lib/Dashboards/FeedbackWrapper.svelte";
 
   const components = writable([]);
   const selectedPage = writable(null);
@@ -15,7 +16,7 @@
   const componentMap = {
     Chatbot: Chat,
     Dropdown: Dropdown,
-    Feedback: Feedback,
+    Feedback: FeedbackWrapper,
     Compare: ComparisonChat,
     RetrievalQA: RAG,
   };
