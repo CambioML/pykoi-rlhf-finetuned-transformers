@@ -7,7 +7,7 @@
 
 [pykoi](https://www.cambioml.com/pykoi/) is an open-source python library for improving LLMs with RLHF. We provide a unified interface including RLHF/RLAIF data and feedback collection, finetuning with reinforcement learning and reward modeling, and LLM comparisons. 
 
-## How do I use `pykoi`?
+## Features
 
 `pykoi` let you easily get real-time user feedback and continuously improve your models. Here are some common applications:
 
