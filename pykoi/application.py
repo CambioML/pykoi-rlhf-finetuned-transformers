@@ -3,6 +3,10 @@ import os
 import socket
 import threading
 import time
+import subprocess
+import re
+import asyncio
+
 
 from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
@@ -488,17 +492,28 @@ class Application:
             try:
                 print("[/retrieval]: model inference.....", request_body.prompt)
                 component["component"].retrieval_model.re_init(request_body.file_names)
-                output = component["component"].retrieval_model.run_with_return_source_documents({"query": request_body.prompt})
+                output = component[
+                    "component"
+                ].retrieval_model.run_with_return_source_documents(
+                    {"query": request_body.prompt}
+                )
                 id = component["component"].database.insert_question_answer(
                     request_body.prompt, output["result"]
                 )
-                print('output', output, output["result"])
+                print("output", output, output["result"])
                 if output["source_documents"] == []:
                     source = "N/A"
                     source_content = "N/A"
                 else:
-                    source = output["source_documents"][0].metadata.get('file_name', 'No file name found')
-                    source_content = "1. " + output["source_documents"][0].page_content + "\n2. " + output["source_documents"][1].page_content
+                    source = output["source_documents"][0].metadata.get(
+                        "file_name", "No file name found"
+                    )
+                    source_content = (
+                        "1. "
+                        + output["source_documents"][0].page_content
+                        + "\n2. "
+                        + output["source_documents"][1].page_content
+                    )
                 return {
                     "id": id,
                     "log": "Inference complete",
@@ -671,13 +686,38 @@ class Application:
         self._telemetry.capture(start_event)
 
         if self._share:
-            public_url = ngrok.connect(self._host + ":" + str(self._port))
-            print("Public URL:", public_url)
+            import nest_asyncio
+
+            nest_asyncio.apply()
+            command = f"ssh -R 80:{self._host}:{self._port} nokey@localhost.run"
+
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True,
+                text=True,
+            )
+            # Get the public URL without waiting for the process to complete
+            while True:
+                line = process.stdout.readline()
+                if not line:
+                    break
+
+                match = re.search(r"(\bhttp[s]?://[^\s]+)", line)
+                if match:
+                    public_url = match.group(1)
+                    print("Public URL:", public_url)
+                    break
+
+            # The process will continue to run in the background here
             import uvicorn
 
             uvicorn.run(app, host=self._host, port=self._port)
             print("Stopping server...")
-            ngrok.disconnect(public_url)
+
+            # Once done, you may choose to terminate the ssh process
+            process.terminate()
         else:
             import uvicorn
 
@@ -694,6 +734,7 @@ class Application:
         """
         Run the application.
         """
+        print("hey2")
         import nest_asyncio
 
         nest_asyncio.apply()
