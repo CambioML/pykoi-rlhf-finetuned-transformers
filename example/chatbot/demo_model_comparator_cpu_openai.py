@@ -7,7 +7,10 @@ Demo for the chatbot application using multiple OpenAI models.
     to set up the environment. 
 - Run the demo:
     1. Enter your OpenAI API key in the `api_key` below.
-    2. On terminal and `~/pykoi` directory, run `python -m example.chatbot.demo_model_comparator_cpu_openai`
+    2. On terminal and `~/pykoi` directory, run 
+        ```
+        python -m example.chatbot.demo_model_comparator_cpu_openai
+        ```
 """
 
 from pykoi import Application

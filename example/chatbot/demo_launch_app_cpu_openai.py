@@ -7,7 +7,10 @@ Demo for the chatbot application using OpenAI endpoint.
     to set up the environment. 
 - Run the demo:
     1. Enter your OpenAI API key in the `api_key` below.
-    2. On terminal and `~/pykoi` directory, run `python -m example.chatbot.demo_launch_app_cpu_openai`
+    2. On terminal and `~/pykoi` directory, run 
+        ```
+        python -m example.chatbot.demo_launch_app_cpu_openai
+        ```
 """
 
 from pykoi import Application
