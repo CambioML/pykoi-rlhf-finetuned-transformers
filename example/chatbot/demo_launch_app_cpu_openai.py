@@ -2,7 +2,7 @@
 Demo for the chatbot application using OpenAI endpoint.
 
 - Prerequisites:
-    To run this jupyter notebook, you need an `rag` environment. 
+    To run this jupyter notebook, you need a `pykoi` environment with the `rag` option.  
     You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-1-rag-cpu) 
     to set up the environment. 
 - Run the demo:
