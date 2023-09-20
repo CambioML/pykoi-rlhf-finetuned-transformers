@@ -47,7 +47,7 @@ class Compare(Component):
                 "latency",
                 "length_in_tokens",
             ]
-        )  # Added this line
+        )
 
     def add(self, model: AbsLlm):
         """
@@ -118,5 +118,13 @@ class Compare(Component):
         return self.inference_results
 
     def visualize(self):
+        """
+        Visualize the inference results using a bar chart.
+
+        Returns
+        -------
+        object
+            A Barchart visualization with the inference results.
+        """
         records = df_to_js_array(self.inference_results)
         return Barchart()(data=records)

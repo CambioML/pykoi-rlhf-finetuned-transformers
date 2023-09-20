@@ -14,7 +14,6 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pyngrok import ngrok
 from starlette.middleware.cors import CORSMiddleware
-from pykoi.component.base import Dropdown
 from pykoi.interactives.chatbot import Chatbot
 from pykoi.telemetry.telemetry import Telemetry
 from pykoi.telemetry.events import AppStartEvent, AppStopEvent
@@ -169,6 +168,9 @@ class Application:
         Args:
             component (Any): The component to be added.
         """
+        # TODO (Jojo): remove component Dropdown check
+        from pykoi.component.base import Dropdown
+
         if component.data_source:
             self.data_sources[component.id] = component.data_source
             # set data_endpoint if it's a Dropdown component

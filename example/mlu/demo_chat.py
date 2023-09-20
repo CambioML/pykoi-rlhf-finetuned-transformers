@@ -2,8 +2,10 @@
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-import pykoi
-
+from pykoi import Application
+from pykoi.chat import QuestionAnswerDatabase
+from pykoi.chat.llm.huggingface import HuggingfaceModel
+from pykoi.component import Chatbot, Dashboard
 
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #
@@ -25,7 +27,7 @@ hf_tokenizer = AutoTokenizer.from_pretrained(
 )
 
 print("create pykoi model component for UI...")
-model = pykoi.chat.llm.huggingface.HuggingfaceModel.create(
+model = HuggingfaceModel.create(
     model=hf_model,
     tokenizer=hf_tokenizer,
     name="falcon-7b",
@@ -35,15 +37,15 @@ model = pykoi.chat.llm.huggingface.HuggingfaceModel.create(
 #####################################
 # Creating a chatbot with the model #
 #####################################
-database = pykoi.QuestionAnswerDatabase(debug=True)
-chatbot = pykoi.Chatbot(model=model, feedback="vote")
-dashboard = pykoi.Dashboard(database=database)
+database = QuestionAnswerDatabase(debug=True)
+chatbot = Chatbot(model=model, feedback="vote")
+dashboard = Dashboard(database=database)
 
 ###########################################################
 # Starting the application and add chatbot as a component #
 ###########################################################
 # Create the application
-app = pykoi.Application()
+app = Application()
 app.add_component(chatbot)
 app.add_component(dashboard)
 app.run()

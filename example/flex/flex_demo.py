@@ -2,7 +2,16 @@
 
 import os
 import argparse
-import pykoi
+from dotenv import load_dotenv
+from pykoi import Application
+from pykoi.chat import QuestionAnswerDatabase
+from pykoi.retrieval import RetrievalFactory
+from pykoi.retrieval import VectorDbFactory
+from pykoi.component import Chatbot, Dashboard, RetrievalQA
+
+
+load_dotenv()
+
 
 def main(**kargs):
     os.environ["DOC_PATH"] = os.path.join(os.getcwd(), "temp/docs")
@@ -13,12 +22,12 @@ def main(**kargs):
     # Creating a retrieval QA component #
     #####################################
     # vector database
-    vector_db = pykoi.VectorDbFactory.create(
+    vector_db = VectorDbFactory.create(
         model_source=MODEL_SOURCE, vector_db_name=kargs.get("vectordb"), **kargs
     )
 
     # retrieval model with vector database
-    retrieval_model = pykoi.RetrievalFactory.create(
+    retrieval_model = RetrievalFactory.create(
         model_source=MODEL_SOURCE, vector_db=vector_db
     )
 
@@ -31,7 +40,7 @@ def main(**kargs):
     # Starting the application and retrieval qa as a component #
     ############################################################
     # Create the application
-    app = pykoi.Application(debug=False, share=False)
+    app = Application(debug=False, share=False)
     app.add_component(retriever)
     app.add_component(chatbot)
     app.add_component(dashboard)

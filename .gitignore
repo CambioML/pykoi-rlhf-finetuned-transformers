@@ -176,6 +176,8 @@ rlhf_tests
 test_data
 example/flex/docs
 example/flex/flex.ipynb
+example/flex/flex_sample/
+example/flex/vectordb/
 
 # mac
 .DS_Store
@@ -189,3 +191,6 @@ models/
 
 # retrieval
 temp/
+
+# poetry
+poetry.lock

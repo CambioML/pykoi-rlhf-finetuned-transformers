@@ -2,7 +2,9 @@
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-import pykoi
+from pykoi import Application
+from pykoi.chat.llm.huggingface import HuggingfaceModel
+from pykoi.component import Compare
 
 
 ######################################################################################
@@ -71,13 +73,13 @@ models = [hf_model_1, hf_model_2, hf_model_3]
 tokenizers = [hf_tokenizer_1, hf_tokenizer_2, hf_tokenizer_3]
 
 models_list = [
-    pykoi.chat.llm.huggingface.HuggingfaceModel.create(
+    HuggingfaceModel.create(
         model=model, tokenizer=tokenizer, name=name, max_length=100
     )
     for model, tokenizer, name in zip(models, tokenizers, model_name)
 ]
 
-chatbot_comparator = pykoi.Compare(models=models_list)
-app = pykoi.Application()
+chatbot_comparator = Compare(models=models_list)
+app = Application()
 app.add_component(chatbot_comparator)
 app.run()

@@ -5,12 +5,10 @@ from typing import List
 
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
-from dotenv import load_dotenv
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 
-load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MIN_DOCS = 2
@@ -26,7 +24,10 @@ class OpenAIModel(AbsLlm):
         Initializes the OpenAIModel class.
         """
         try:
-            self._llm = OpenAI(temperature=0, max_tokens=500)
+            self._llm = OpenAI(
+                model_name="gpt-4",
+                temperature=0, 
+                max_tokens=500)
 
             self._vector_db = vector_db.vector_db
 
