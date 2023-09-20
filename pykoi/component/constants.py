@@ -7,3 +7,4 @@ class FeedbackType(Enum):
 
     VOTE = "vote"
     RANK = "rank"
+    RAG = "rag"
