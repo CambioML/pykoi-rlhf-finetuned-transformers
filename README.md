@@ -69,7 +69,7 @@ conda create -n pykoi python=3.10 -y && source activate pykoi
 
 Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
-pip3 install "pykoi[huggingface]"
+pip3 install "pykoi[rag, huggingface]"
 
 pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
@@ -110,7 +110,7 @@ Then, based the feature you need to develop, run one or more installation option
   ```
 - Option 2: RAG (GPU) 
   ```
-  poetry install --no-root --extras huggingface
+  poetry install --no-root --extras "rag huggingface"
   ```
 - Option 3: RLHF (GPU) 
   ```
