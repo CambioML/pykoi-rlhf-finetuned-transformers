@@ -358,14 +358,7 @@ class Application:
         ):
             try:
                 rows = component["component"].database.retrieve_all_question_answers()
-                modified_rows = []
-                for row in rows:
-                    row_list = list(row)  # Convert the tuple to a list
-                    row_list[5] = row_list[5].split(QA_LIST_SEPARATOR)
-                    row_list[6] = row_list[6].split(QA_LIST_SEPARATOR)
-                    row_list[7] = row_list[7].split(QA_LIST_SEPARATOR)
-                    modified_rows.append(row_list)  # Append the modified list to the new list
-                return {"rows": modified_rows, "log": "Table retrieved", "status": "200"}
+                return {"rows": rows, "log": "Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 

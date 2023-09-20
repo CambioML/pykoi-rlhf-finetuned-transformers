@@ -4,7 +4,6 @@
   import { select } from "d3-selection";
   import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
-  import Dropdown from "./Components/Dropdown.svelte";
   import { tooltip } from "../../utils.js";
 
   export let feedback = false;
@@ -15,26 +14,10 @@
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
-  let show_content = [];
 
   onMount(() => {
     getDataFromDB();
-    loadRetrievalFiles();
   });
-
-  async function loadRetrievalFiles() {
-    // /retrieval/file/get
-    const response = await fetch("/retrieval/file/get");
-    const data = await response.json();
-    console.log("data", data["files"]);
-    const fileData = data["files"];
-    const fileNames = fileData.map((row, index) => ({
-      id: String(index),
-      name: row.name,
-    }));
-    console.log("files", fileNames);
-    $uploadedFiles = [...fileNames];
-  }
 
   async function getDataFromDB() {
     const response = await fetch("/chat/qa_table/retrieve");
@@ -45,9 +28,7 @@
       question: row[1],
       answer: row[2],
       vote_status: row[3],
-      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
     }));
-    show_content = new Array(formattedRows.length).fill(false);
     $chatLog = [...formattedRows];
   }
 
@@ -60,10 +41,7 @@
       id: $chatLog.length + 1,
       question: mymessage,
       answer: "Loading...",
-      rag_sources: ["doc1.pdf", "doc2.pdf", "doc3.pdf"],
       vote_status: "na",
-      source: "Loading...",
-      source_content: "Loading...",
     };
     $chatLog = [...$chatLog, currentEntry];
 
@@ -91,10 +69,7 @@
       const data = await response.json();
       console.log("response data", data);
       currentEntry["answer"] = data["answer"];
-      currentEntry["source"] = data["source"];
-      currentEntry["source_content"] = data["source_content"];
       // $chatLog[$chatLog.length - 1] = currentEntry;
-      show_content.push(false);
       chatLog.update((state) => {
         state[state.length - 1] = currentEntry;
         return state;
@@ -160,12 +135,6 @@
   let chatLetters = [...Array(10).keys()].map((i) =>
     String.fromCharCode(65 + i)
   );
-  function getRAGSources(message) {
-    if (message.rag_sources.length === 0) return "All";
-    const ragSources = message.rag_sources;
-    const ragSourcesString = ragSources.join(", ");
-    return ragSourcesString;
-  }
 </script>
 
 <div class="ranked-feedback-container">
@@ -195,11 +164,6 @@
                 <div class="question">
                   <h5 class="bold">Question:</h5>
                   <p>{message.question}</p>
-                  <div class="rag-sources">
-                    <p class="bold" use:tooltip={getRAGSources(message)}>
-                      ℹ️ RAG Sources
-                    </p>
-                  </div>
                 </div>
                 <div class="answers">
                   <div class="answer">
@@ -218,26 +182,6 @@
                       </div>
                     {/if}
                   </div>
-                  <div class="source">
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <div
-                      class="source_tab"
-                      on:click={() =>
-                        (show_content[index] = !show_content[index])}
-                    >
-                      <p class="bold">📖 Source: {message.source}</p>
-                      {#if show_content[index]}
-                        <p>&#8963;</p>
-                      {:else}
-                        <p>&#8964;</p>
-                      {/if}
-                    </div>
-                    {#if show_content[index]}
-                      <div class="source_content" transition:slide>
-                        <p class="bold">{message.source_content}</p>
-                      </div>
-                    {/if}
-                  </div>
                 </div>
               </div>
             </div>
@@ -247,21 +191,17 @@
     </section>
 
     <div class="chat-input-holder">
-      <div class="chat-and-question">
-        <Dropdown documents={$uploadedFiles} />
-
-        <form on:submit={askModel} class="chat-input-form">
-          <input
-            bind:value={messageplaceholder}
-            class="chat-input-textarea"
-            placeholder="Type Question Here"
-          />
-          <button
-            class="btnyousend {messageplaceholder === '' ? '' : 'active'}"
-            type="submit">{chatLoading ? dots : "Send"}</button
-          >
-        </form>
-      </div>
+      <form on:submit={askModel} class="chat-input-form">
+        <input
+          bind:value={messageplaceholder}
+          class="chat-input-textarea"
+          placeholder="Type Question Here"
+        />
+        <button
+          class="btnyousend {messageplaceholder === '' ? '' : 'active'}"
+          type="submit">{chatLoading ? dots : "Send"}</button
+        >
+      </form>
       <p class="message">Note - may produce inaccurate information.</p>
     </div>
   </div>
@@ -463,38 +403,12 @@
     border: 1px solid var(--black);
   }
 
-  .message-content .source {
-    text-align: left;
-    border: 1px solid var(--grey);
-    padding: 5px;
-    background-color: var(--lightGrey);
-    color: var(--darkGrey);
-    box-sizing: border-box;
-  }
-
-  .source_tab {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .source_content {
-    background-color: white;
-    border: 1pt solid var(--grey);
-    padding: 5px;
-  }
-
   .message-content .answers {
     display: grid;
     grid-template-columns: 100%;
     gap: 0%;
     width: 100%;
     margin: auto;
-  }
-
-  .rag-sources {
-    display: flex;
   }
 
   :global(.tooltip) {
