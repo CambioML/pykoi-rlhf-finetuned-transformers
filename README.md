@@ -55,7 +55,7 @@ conda activate pykoi  # some OS requires `source activate pykoi`
 
 Then install `pykoi` and the compatible [pytorch based on your os](https://pytorch.org/get-started/locally/)
 ```
-pip3 install pykoi[rag]
+pip3 install "pykoi[rag]"
 pip3 install torch 
 ```
 
@@ -69,7 +69,7 @@ conda create -n pykoi python=3.10 -y && source activate pykoi
 
 Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
-pip3 install pykoi[huggingface]
+pip3 install "pykoi[huggingface]"
 
 pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
@@ -84,7 +84,7 @@ conda create -n pykoi python=3.10 -y && source activate pykoi
 
 Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
-pip3 install pykoi[rlhf]
+pip3 install "pykoi[rlhf]"
 
 pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
