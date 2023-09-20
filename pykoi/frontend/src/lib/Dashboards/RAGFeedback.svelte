@@ -11,11 +11,12 @@
   import { chatLogFeedback } from "../../store";
 
   onMount(() => {
+    console.log("FEEDBACK on mount");
     getDataFromDB();
   });
 
   async function getDataFromDB() {
-    const response = await fetch("/chat/qa_table/retrieve");
+    const response = await fetch("/chat/rag_table/retrieve");
     const data = await response.json();
 
     const dbRows = data["rows"];
@@ -23,7 +24,7 @@
       id: row[0],
       question: row[1],
       answer: row[2],
-      vote_status: row[3],
+      vote_status: row[4],
     }));
     $chatLogFeedback = [...formattedRows];
   }

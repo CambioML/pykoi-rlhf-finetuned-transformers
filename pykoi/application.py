@@ -17,6 +17,7 @@ from starlette.middleware.cors import CORSMiddleware
 from pykoi.interactives.chatbot import Chatbot
 from pykoi.telemetry.telemetry import Telemetry
 from pykoi.telemetry.events import AppStartEvent, AppStopEvent
+from pykoi.chat.db.constants import QA_LIST_SEPARATOR
 
 
 oauth_scheme = HTTPBasic()
@@ -26,6 +27,17 @@ class UpdateQATable(BaseModel):
     id: int
     vote_status: str
 
+class UpdateRAGTable(BaseModel):
+    id: int
+    vote_status: str
+
+class UpdateQATableAnswer(BaseModel):
+    id: int
+    new_answer: str
+
+class UpdateRAGTableAnswer(BaseModel):
+    id: int
+    new_answer: str
 
 class RankingTableUpdate(BaseModel):
     question: str
@@ -209,10 +221,25 @@ class Application:
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
         ):
             try:
+                print("updating QA vote")
                 component["component"].database.update_vote_status(
                     request_body.id, request_body.vote_status
                 )
                 return {"log": "Table updated", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.post("/chat/qa_table/update_answer")
+        async def update_qa_table_response(
+            request_body: UpdateQATableAnswer,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                component["component"].database.update_answer(
+                    request_body.id, request_body.new_answer
+                )
+                print("/chat/qa_table/update_answer", request_body.id, request_body.new_answer)
+                return {"log": "Table response updated", "new_answer": request_body.new_answer, "status": "200"}
             except Exception as ex:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
@@ -268,6 +295,51 @@ class Application:
                 print("retrieve_ranking_table")
                 rows = component["component"].database.retrieve_all_question_answers()
                 return {"rows": rows, "log": "Table retrieved", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table retrieval failed: {ex}", "status": "500"}
+
+        @app.post("/chat/rag_table/update")
+        async def update_rag_table(
+            request_body: UpdateRAGTable,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                print("updating RAG vote")
+                component["component"].database.update_vote_status(
+                    request_body.id, request_body.vote_status
+                )
+                return {"log": "Table updated", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.post("/chat/rag_table/update_answer")
+        async def update_rag_table_response(
+            request_body: UpdateRAGTableAnswer,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                component["component"].database.update_answer(
+                    request_body.id, request_body.new_answer
+                )
+                print("/chat/rag_table/update_answer", request_body.id, request_body.new_answer)
+                return {"log": "Table response updated", "new_answer": request_body.new_answer, "status": "200"}
+            except Exception as ex:
+                return {"log": f"Table update failed: {ex}", "status": "500"}
+
+        @app.get("/chat/rag_table/retrieve")
+        async def retrieve_rag_table(
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
+        ):
+            try:
+                rows = component["component"].database.retrieve_all_question_answers()
+                modified_rows = []
+                for row in rows:
+                    row_list = list(row)  # Convert the tuple to a list
+                    row_list[5] = row_list[5].split(QA_LIST_SEPARATOR)
+                    row_list[6] = row_list[6].split(QA_LIST_SEPARATOR)
+                    row_list[7] = row_list[7].split(QA_LIST_SEPARATOR)
+                    modified_rows.append(row_list)  # Append the modified list to the new list
+                return {"rows": modified_rows, "log": "RAG Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
 
@@ -489,16 +561,19 @@ class Application:
                 print("[/retrieval]: model inference.....", request_body.prompt)
                 component["component"].retrieval_model.re_init(request_body.file_names)
                 output = component["component"].retrieval_model.run_with_return_source_documents({"query": request_body.prompt})
-                id = component["component"].database.insert_question_answer(
-                    request_body.prompt, output["result"]
-                )
                 print('output', output, output["result"])
                 if output["source_documents"] == []:
-                    source = "N/A"
-                    source_content = "N/A"
+                    source = ["N/A"]
+                    source_content = ["N/A"]
                 else:
-                    source = output["source_documents"][0].metadata.get('file_name', 'No file name found')
-                    source_content = "1. " + output["source_documents"][0].page_content + "\n2. " + output["source_documents"][1].page_content
+                    source = []
+                    source_content = []
+                    for source_document in output["source_documents"]:
+                        source.append(source_document.metadata.get('file_name', 'No file name found'))
+                        source_content.append(source_document.page_content)
+                id = component["component"].database.insert_question_answer(
+                    request_body.prompt, output["result"], request_body.file_names, source, source_content
+                )
                 return {
                     "id": id,
                     "log": "Inference complete",

@@ -3,7 +3,7 @@
   import { cubicOut } from "svelte/easing";
   import QACard from "./QACard.svelte";
   import {
-    chatLog,
+    chatLogFeedback,
     feedbackSelection,
     questionDistribution,
   } from "../../../store";
@@ -11,8 +11,8 @@
 
   $: qadata =
     $feedbackSelection === "all"
-      ? $chatLog
-      : $chatLog.filter((d) => d.vote_status === $feedbackSelection);
+      ? $chatLogFeedback
+      : $chatLogFeedback.filter((d) => d.vote_status === $feedbackSelection);
 
   const customSlide = (
     node,
