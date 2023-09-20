@@ -8,6 +8,7 @@ from pykoi.chat import QuestionAnswerDatabase
 from pykoi.retrieval import RetrievalFactory
 from pykoi.retrieval import VectorDbFactory
 from pykoi.component import Chatbot, Dashboard, RetrievalQA
+from pykoi.chat import RAGDatabase
 
 
 load_dotenv()
@@ -32,9 +33,9 @@ def main(**kargs):
     )
 
     # retrieval, chatbot, and dashboard pykoi components
-    retriever = pykoi.RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db, feedback="rag")
-    chatbot = pykoi.Chatbot(None, feedback="rag", is_retrieval=True)
-    dashboard = pykoi.Dashboard(pykoi.RAGDatabase(), feedback="rag")
+    retriever = RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db, feedback="rag")
+    chatbot = Chatbot(None, feedback="rag", is_retrieval=True)
+    dashboard = Dashboard(RAGDatabase(), feedback="rag")
 
     ############################################################
     # Starting the application and retrieval qa as a component #
