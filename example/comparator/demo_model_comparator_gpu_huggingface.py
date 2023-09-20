@@ -8,7 +8,7 @@ Demo for the chatbot application using multiple open source LLMs from Huggingfac
 - Run the demo:
     1. On terminal and `~/pykoi` directory, run
         ```
-        python -m example.chatbot.demo_model_comparator_gpu_huggingface
+        python -m example.comparator.demo_model_comparator_gpu_huggingface
         ```
 """
 from pykoi import Application
