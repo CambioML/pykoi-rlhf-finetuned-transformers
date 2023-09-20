@@ -53,7 +53,7 @@ conda create -n pykoi python=3.10 -y
 conda activate pykoi  # some OS requires `source activate pykoi`
 ```
 
-Then install `pykoi` and the compatible [pytorch based on your os](https://pytorch.org/get-started)
+Then install `pykoi` and the compatible [pytorch based on your os](https://pytorch.org/get-started/locally/)
 ```
 pip3 install pykoi[rag]
 pip3 install torch 
@@ -67,12 +67,11 @@ On your GPU instance terminal, create a conda environment using:
 conda create -n pykoi python=3.10 -y && source activate pykoi
 ```
 
-Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started). You can find your CUDA version via `nvcc -V`.
+Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
 pip3 install pykoi[huggingface]
 
-# install torch based on cuda (e.g. cu118 means cuda 11.8)
-pip3 install torch --index-url https://download.pytorch.org/whl/cu118
+pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
 
 ### Option 3: RLHF (GPU) 
@@ -83,12 +82,11 @@ On your GPU instance terminal, create a conda environment using:
 conda create -n pykoi python=3.10 -y && source activate pykoi
 ```
 
-Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started). You can find your CUDA version via `nvcc -V`.
+Then install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
 pip3 install pykoi[rlhf]
 
-# install torch based on cuda (e.g. cu118 means cuda 11.8)
-pip3 install torch --index-url https://download.pytorch.org/whl/cu118
+pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
 
 Congrats you have finished the installation! 
@@ -119,12 +117,9 @@ Then, based the feature you need to develop, run one or more installation option
   poetry install --no-root --extras rlhf
   ```
 
-Finally, if you are on a GPU, install `pykoi` and [pytorch based on your cuda version](https://pytorch.org/get-started). You can find your CUDA version via `nvcc -V`.
+Finally, if you are on a GPU, install [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
-pip3 install pykoi[huggingface]
-
-# install torch based on cuda (e.g. cu118 means cuda 11.8)
-pip3 install torch --index-url https://download.pytorch.org/whl/cu118
+pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
 
 
