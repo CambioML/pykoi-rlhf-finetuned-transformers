@@ -1,4 +1,16 @@
-"""Demo for the chatbot application using multiple model endpoint."""
+"""
+Demo for the chatbot application using multiple open source LLMs from Huggingface.
+
+- Prerequisites:
+    To run this jupyter notebook, you need a `pykoi` environment with the `huggingface` option. 
+    You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-2-rag-gpu) 
+    to set up the environment. 
+- Run the demo:
+    1. On terminal and `~/pykoi` directory, run
+        ```
+        python -m example.comparator.demo_model_comparator_gpu_huggingface
+        ```
+"""
 from pykoi import Application
 from pykoi.chat import ModelFactory
 from pykoi.component import Compare

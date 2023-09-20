@@ -1,5 +1,5 @@
 """
-Demo for the chatbot application using OpenAI endpoint.
+Demo for launching a chatbot UI (with database) from an OpenAI model.
 
 - Prerequisites:
     To run this jupyter notebook, you need a `pykoi` environment with the `rag` option.  
