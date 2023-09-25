@@ -94,7 +94,9 @@ class RewardFinetuning(Trainer):
             logging_strategy=rlhf_config.logging_strategy,
             logging_steps=rlhf_config.logging_steps,
             # optim=rlhf_config.optim,
-            # lr_scheduler_type=rlhf_config.lr_scheduler_type_rw
+            # lr_scheduler_type=rlhf_config.lr_scheduler_type_rw,
+            adam_epsilon = 1e-7 # Language model is loaded in torch.float16. Adam optimizer adds epsilon to avoid zero denominator.
+                                # NOTE: torch.float 16 will round any number smaller than 6e-8 to 0. Do not change episolon to smaller than 6e-8. 
         )
         self.torch_dtype = torch.bfloat16 if rlhf_config.bf16 else torch.float16
         # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
