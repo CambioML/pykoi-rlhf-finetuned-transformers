@@ -2,26 +2,34 @@
 Demo for the chatbot application using multiple OpenAI models.
 
 - Prerequisites:
-    To run this jupyter notebook, you need a `pykoi` environment with the `rag` option. 
-    You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-1-rag-cpu) 
-    to set up the environment. 
+    To run this jupyter notebook, you need a `pykoi` environment with the `rag` option.
+    You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-1-rag-cpu)
+    to set up the environment.
 - Run the demo:
-    1. Enter your OpenAI API key in the `api_key` below.
-    2. On terminal and `~/pykoi` directory, run 
+    1. Enter your OpenAI API key a .env file in the `~/pykoi` directory with the name OPEN_API_KEY, e.g.
+        ```
+        OPENAI_API_KEY=your_api_key
+        ```
+    2. On terminal and `~/pykoi` directory, run
         ```
         python -m example.comparator.demo_model_comparator_cpu_openai
         ```
 """
 
+import os
+
+from dotenv import load_dotenv
+
 from pykoi import Application
 from pykoi.chat import ModelFactory
 from pykoi.component import Compare
 
+
 ##########################################################
 # Creating an OpenAI model (requires an OpenAI API key) #
 ##########################################################
-# enter openai api key here
-api_key = ""
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
 
 # Creating an OpenAI model
 openai_model_1 = ModelFactory.create_model(
