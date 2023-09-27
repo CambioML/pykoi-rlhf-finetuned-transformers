@@ -194,7 +194,7 @@ class RAGDatabase:
         """
         rows = self.retrieve_all_question_answers()
         rows_to_pd = pd.DataFrame(rows)
-        rows_to_pd.columns = QA_CSV_HEADER
+        rows_to_pd.columns = RAG_CSV_HEADER
         return rows_to_pd
 
     def close_connection(self):
