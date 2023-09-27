@@ -5,6 +5,7 @@ export const state = writable({});
 export const chatLog = writable([]);
 export const rankChatLog = writable([]);
 export const compareChatLog = writable([]);
+export const chatLogFeedback = writable([]);
 
 // feedback (rewrite)
 export const feedbackSelection = writable("all"); // up, down, or NA

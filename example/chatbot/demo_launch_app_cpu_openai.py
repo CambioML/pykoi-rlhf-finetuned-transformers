@@ -1,4 +1,18 @@
-"""Demo for the chatbot application using OpenAI endpoint."""
+"""
+Demo for launching a chatbot UI (with database) from an OpenAI model.
+
+- Prerequisites:
+    To run this jupyter notebook, you need a `pykoi` environment with the `rag` option.
+    You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-1-rag-cpu)
+    to set up the environment.
+- Run the demo:
+    1. Enter your OpenAI API key in the `api_key` below.
+    2. On terminal and `~/pykoi` directory, run
+        ```
+        python -m example.chatbot.demo_launch_app_cpu_openai
+        ```
+"""
+
 from pykoi import Application
 from pykoi.chat import ModelFactory
 from pykoi.chat import QuestionAnswerDatabase
@@ -9,7 +23,7 @@ from pykoi.component import Chatbot, Dashboard
 # Creating an OpenAI model (requires an OpenAI API key) #
 ##########################################################
 # enter openai api key here
-api_key = ""
+api_key = "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"
 
 # Creating an OpenAI model
 model = ModelFactory.create_model(
