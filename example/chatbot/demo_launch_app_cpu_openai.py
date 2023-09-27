@@ -6,11 +6,12 @@ Demo for launching a chatbot UI (with database) from an OpenAI model.
     You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-1-rag-cpu)
     to set up the environment.
 - Run the demo:
-    1. Enter your OpenAI API key a .env file in the `~/pykoi` directory with the name OPEN_API_KEY, e.g.
+    1. Create an `.env` file in the `~/pykoi/` directory.
+    2. Replace `your_api_key` with your OpenAI API key in the `.env` file, e.g.
         ```
         OPENAI_API_KEY=your_api_key
         ```
-    2. On terminal and `~/pykoi` directory, run
+    3. On terminal and `~/pykoi` directory, run
         ```
         python -m example.chatbot.demo_launch_app_cpu_openai
         ```
