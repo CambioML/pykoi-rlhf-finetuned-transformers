@@ -1,6 +1,9 @@
 """Application module."""
+import asyncio
 import os
+import re
 import socket
+import subprocess
 import threading
 import time
 
@@ -746,13 +749,38 @@ class Application:
         self._telemetry.capture(start_event)
 
         if self._share:
-            public_url = ngrok.connect(self._host + ":" + str(self._port))
-            print("Public URL:", public_url)
+            import nest_asyncio
+
+            nest_asyncio.apply()
+            command = f"ssh -o StrictHostKeyChecking=no -R 80:{self._host}:{self._port} nokey@localhost.run"
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True,
+                text=True,
+            )
+            # Get the public URL without waiting for the process to complete
+            while True:
+                line = process.stdout.readline()
+
+                if not line:
+                    break
+                # return url
+                match = re.search(r"(\bhttp[s]?://[^\s]+)", line)
+                if match:
+                    public_url = match.group(1)
+                    print("Public URL:", public_url)
+                    break
+
+            # The process will continue to run in the background here
             import uvicorn
 
             uvicorn.run(app, host=self._host, port=self._port)
             print("Stopping server...")
-            ngrok.disconnect(public_url)
+
+            # Once done, you may choose to terminate the ssh process
+            process.terminate()
         else:
             import uvicorn
 
@@ -769,6 +797,7 @@ class Application:
         """
         Run the application.
         """
+        print("hey2")
         import nest_asyncio
 
         nest_asyncio.apply()
