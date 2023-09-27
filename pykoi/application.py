@@ -1,12 +1,11 @@
 """Application module."""
+import asyncio
 import os
+import re
 import socket
+import subprocess
 import threading
 import time
-import subprocess
-import re
-import asyncio
-
 
 from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
@@ -689,8 +688,7 @@ class Application:
             import nest_asyncio
 
             nest_asyncio.apply()
-            command = f"ssh -R 80:{self._host}:{self._port} nokey@localhost.run"
-
+            command = f"ssh -o StrictHostKeyChecking=no -R 80:{self._host}:{self._port} nokey@localhost.run"
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
@@ -701,6 +699,7 @@ class Application:
             # Get the public URL without waiting for the process to complete
             while True:
                 line = process.stdout.readline()
+
                 if not line:
                     break
 
