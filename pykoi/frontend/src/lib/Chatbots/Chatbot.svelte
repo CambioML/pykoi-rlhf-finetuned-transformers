@@ -2,9 +2,10 @@
   import { chatLog } from "../../store";
   import { onMount } from "svelte";
   import { select } from "d3-selection";
-  import { slide } from "svelte/transition";
   import { writable } from "svelte/store";
-  import { tooltip } from "../../utils.js";
+  import DownloadModal from "./Components/DownloadModal.svelte";
+
+  let showModal = false;
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -132,10 +133,16 @@
       .style("opacity", 1);
   }
 
+  function handleDownloadClick () {
+    showModal = true;
+  }
+
   let chatLetters = [...Array(10).keys()].map((i) =>
     String.fromCharCode(65 + i)
   );
 </script>
+
+<DownloadModal bind:showModal table="qa_table"/>
 
 <div class="ranked-feedback-container">
   <div class="instructions">
@@ -146,7 +153,7 @@
       button. If the repsonse is not satisfactory, click on the
       <span class="inline-button red">👎</span> button.
     </p>
-    <!-- <button>Download Data</button> -->
+    <button on:click={handleDownloadClick}>Download Data</button>
   </div>
   <div class="ranked-chat">
     <section class="chatbox">

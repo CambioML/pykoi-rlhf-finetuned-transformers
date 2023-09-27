@@ -1,7 +1,6 @@
 <script>
   import { chatLog, checkedDocs } from "../../store";
   import { onMount } from "svelte";
-  import { select } from "d3-selection";
   import { writable } from "svelte/store";
   import Dropdown from "./Components/Dropdown.svelte";
   import { tooltip } from "../../utils.js";
@@ -9,6 +8,7 @@
   import Tabs from "../UIComponents/Tabs.svelte";
   import ModifiedAnswer from "./Components/ModifiedAnswer.svelte";
   import Answer from "./Components/Answer.svelte";
+  import DownloadModal from "./Components/DownloadModal.svelte";
 
   export let feedback = false;
   export let is_retrieval = false;
@@ -18,7 +18,7 @@
   let mymessage = "";
   let messageplaceholder = "";
   let chatLoading = false;
-  let editting_response = true;
+  let showModal = false;
 
   let items = [
     {
@@ -146,7 +146,13 @@
     const ragSourcesString = ragSources.join(", ");
     return ragSourcesString;
   }
+
+  function handleDownloadClick() {
+    showModal = true;
+  }
 </script>
+
+<DownloadModal bind:showModal table="rag_table" />
 
 <div class="ranked-feedback-container">
   <div class="instructions">
@@ -157,7 +163,7 @@
       button. If the response is not satisfactory, click on the
       <span class="inline-button red">👎</span> button.
     </p>
-    <!-- <button>Download Data</button> -->
+    <button on:click={handleDownloadClick}>Download Data</button>
   </div>
   <div class="ranked-chat">
     <section class="chatbox">
@@ -224,37 +230,7 @@
     grid-template-columns: 20% 80%;
     width: 100%;
   }
-  /* .small-button {
-    margin-left: 10px;
-    background: none;
-    border: 3px solid transparent;
-    color: inherit;
-    padding: 6px 10px;
-    cursor: pointer;
-    box-shadow: none;
-    font-size: var(--smallText);
-  }
 
-  .feedback-buttons {
-    text-align: center;
-    margin: auto;
-    width: 20%;
-  }
-
-  .small-button:hover {
-    box-shadow: var(--shadow-md);
-  }
-
-  .thumbs-up,
-  .thumbs-up:hover,
-  .thumbs-up::selection {
-    background: var(--green);
-  }
-  .thumbs-down,
-  .thumbs-down:hover,
-  .thumbs-down::selection {
-    background: var(--red);
-  } */
   .ranked-chat {
     height: 100vh;
     display: grid;
