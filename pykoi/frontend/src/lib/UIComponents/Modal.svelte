@@ -1,21 +1,21 @@
 <script>
     export let showModal; // boolean
     export let dialog; // HTMLDialogElement
-
+    export let handleClose;
     $: if (dialog && showModal) dialog.showModal();
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog
     bind:this={dialog}
-    on:close={() => (showModal = false)}
-    on:click|self={() => dialog.close()}
+    on:close={handleClose}
+    on:click|self={handleClose}
 >
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click|stopPropagation>
         <!-- svelte-ignore a11y-autofocus -->
         <div class="btn-container">
-            <button class="close-button" on:click={() => dialog.close()}>X</button>
+            <button class="close-button" on:click={handleClose}>X</button>
         </div>
         <slot name="header" />
         <slot />
