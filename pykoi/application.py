@@ -702,7 +702,7 @@ class Application:
 
                 if not line:
                     break
-
+                # return url
                 match = re.search(r"(\bhttp[s]?://[^\s]+)", line)
                 if match:
                     public_url = match.group(1)
