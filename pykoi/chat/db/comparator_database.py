@@ -4,6 +4,9 @@ import os
 
 from typing import List, Tuple
 
+import pandas as pd
+
+
 from pykoi.chat.db.abs_database import AbsDatabase
 
 
@@ -64,9 +67,7 @@ class ComparatorQuestionDatabase(AbsDatabase):
         """
         Updates the database.
         """
-        raise NotImplementedError(
-            "ComparatorQuestionDatabase does not support update."
-        )
+        raise NotImplementedError("ComparatorQuestionDatabase does not support update.")
 
     def retrieve_all(self) -> List[Tuple]:
         """
@@ -175,9 +176,7 @@ class ComparatorDatabase(AbsDatabase):
         """
         with self._lock:
             cursor = self.get_cursor()
-            cursor.execute(
-                query, (kwargs["rank"], kwargs["qid"], kwargs["model"])
-            )
+            cursor.execute(query, (kwargs["rank"], kwargs["qid"], kwargs["model"]))
             self.get_connection().commit()
         if self._debug:
             rows = self.retrieve_all()
@@ -217,3 +216,35 @@ class ComparatorDatabase(AbsDatabase):
                 f"Answer: {row[4]}, "
                 f"Timestamp: {row[5]}"
             )
+
+    def retrieve_all_question_answers_as_pandas(self) -> pd.DataFrame:
+        """
+        Retrieves all data by joining the comparator and comparator_question tables as a pandas dataframe.
+
+        Returns:
+            DataFrame: A pandas dataframe.
+        """
+        join_query = """
+        SELECT 
+            comparator.id, 
+            comparator.model, 
+            comparator.qid, 
+            comparator_question.question, 
+            comparator.rank, 
+            comparator.answer, 
+            comparator.timestamp
+        FROM comparator
+        INNER JOIN comparator_question 
+        ON comparator.qid = comparator_question.id;
+        """
+
+        with self._lock:
+            cursor = self.get_cursor()
+            cursor.execute(join_query)
+            rows = cursor.fetchall()
+
+        df = pd.DataFrame(
+            rows,
+            columns=["ID", "Model", "QID", "Question", "Rank", "Answer", "Timestamp"],
+        )
+        return df
