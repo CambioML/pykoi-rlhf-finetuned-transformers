@@ -10,3 +10,4 @@ class ModelSource(Enum):
     OPENAI = "openai"
     HUGGINGFACE = "huggingface"
     PEFT_HUGGINGFACE = "peft_huggingface"
+    MLU = "mlu"
