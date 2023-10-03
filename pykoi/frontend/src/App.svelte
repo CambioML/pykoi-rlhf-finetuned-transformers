@@ -8,7 +8,7 @@
   import QuestionRating from "./lib/Annotations/QuestionRating.svelte";
   import RankedChatbot from "./lib/Chatbots/RankedChatbot.svelte";
   import RAG from "./lib/RAG/RAG.svelte";
-    import FeedbackWrapper from "./lib/Dashboards/FeedbackWrapper.svelte";
+  import FeedbackWrapper from "./lib/Dashboards/FeedbackWrapper.svelte";
 
   const components = writable([]);
   const selectedPage = writable(null);
@@ -18,6 +18,7 @@
     Dropdown: Dropdown,
     Feedback: FeedbackWrapper,
     Compare: ComparisonChat,
+    CompareDashboard: ComparisonChart,
     RetrievalQA: RAG,
   };
 
