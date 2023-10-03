@@ -66,6 +66,9 @@ class QATableToCSV(BaseModel):
 class RAGTableToCSV(BaseModel):
     file_name: str
 
+class ComparatorTableToCSV(BaseModel):
+    file_name: str
+
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
         self.username = username
@@ -458,17 +461,19 @@ class Application:
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
         ):
             try:
-                rows = component["component"].comparator_db.retrieve_all()
+                rows = component["component"].comparator_db.retrieve_all_question_answers()
                 data = []
                 for row in rows:
-                    _, model_name, qid, rank, answer, _ = row
+                    a_id, model_name, qid, question, answer, rank, _ = row
 
                     data.append(
                         {
+                            "id": a_id,
                             "model": model_name,
                             "qid": qid,
-                            "rank": rank,
+                            "question": question,
                             "answer": answer,
+                            "rank": rank,
                         }
                     )
                 return {"data": data, "log": "Table retrieved", "status": "200"}
@@ -485,6 +490,19 @@ class Application:
                 return {"log": "Table closed", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
+
+        @app.post("/chat/comparator/db/save_to_csv")
+        async def save_comparator_table_to_csv(
+            request_body: ComparatorTableToCSV,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                print("Saving Comparator to CSV", request_body.file_name)
+                component["component"].comparator_db.save_to_csv(request_body.file_name)
+                return {"log": f"Saved to {request_body.file_name}.csv", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Save to CSV failed: {ex}", "status": "500"}
+
 
     def create_qa_retrieval_route(self, app: FastAPI, component: Dict[str, Any]):
         """

@@ -1,10 +1,12 @@
 """Comparator Database"""
+import csv
 import datetime
 import os
 
 from typing import List, Tuple
 
 from pykoi.chat.db.abs_database import AbsDatabase
+from pykoi.chat.db.constants import COMPARATOR_CSV_HEADER
 
 
 class ComparatorQuestionDatabase(AbsDatabase):
@@ -200,6 +202,25 @@ class ComparatorDatabase(AbsDatabase):
             rows = cursor.fetchall()
         return rows
 
+    def retrieve_all_question_answers(self):
+        """
+        Retrieves all question-answer pairs from the database.
+
+        Returns:
+            rows: rows of data of the question-answer pairs.
+        """
+        query = """
+        SELECT comparator.id, comparator.model, comparator.qid, comparator_question.question, comparator.answer, comparator.rank, comparator.timestamp
+        FROM comparator
+        JOIN comparator_question
+        ON comparator.qid = comparator_question.id;
+        """
+        with self._lock:
+            cursor = self.get_cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        return rows
+
     def print_table(self, rows: List[Tuple]) -> None:
         """
         Prints the comparator table.
@@ -217,3 +238,25 @@ class ComparatorDatabase(AbsDatabase):
                 f"Answer: {row[4]}, "
                 f"Timestamp: {row[5]}"
             )
+
+    def save_to_csv(self, csv_file_name="comparator_table"):
+        """
+        This method saves the contents of the RAG table into a CSV file.
+
+        Args:
+            csv_file_name (str, optional): The name of the CSV file to which the data will be written.
+            Defaults to "comparator_table".
+
+        The CSV file will have the following columns: TODO. Each row in the
+        CSV file corresponds to a row in the question_answer table.
+
+        This method first retrieves all question-answer pairs from the database by calling the
+        retrieve_all method. It then writes this data to the CSV file.
+        """
+
+        my_sql_data = self.retrieve_all_question_answers()
+
+        with open(csv_file_name + ".csv", "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(COMPARATOR_CSV_HEADER)
+            writer.writerows(my_sql_data)
