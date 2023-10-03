@@ -20,7 +20,7 @@ from starlette.middleware.cors import CORSMiddleware
 from pykoi.interactives.chatbot import Chatbot
 from pykoi.telemetry.telemetry import Telemetry
 from pykoi.telemetry.events import AppStartEvent, AppStopEvent
-from pykoi.chat.db.constants import QA_LIST_SEPARATOR
+from pykoi.chat.db.constants import RAG_LIST_SEPARATOR
 
 
 oauth_scheme = HTTPBasic()
@@ -47,10 +47,8 @@ class RankingTableUpdate(BaseModel):
     up_ranking_answer: str
     low_ranking_answer: str
 
-
 class InferenceRankingTable(BaseModel):
     n: Optional[int] = 2
-
 
 class ModelAnswer(BaseModel):
     model: str
@@ -58,15 +56,21 @@ class ModelAnswer(BaseModel):
     rank: int
     answer: str
 
-
 class ComparatorInsertRequest(BaseModel):
     data: List[ModelAnswer]
-
 
 class RetrievalNewMessage(BaseModel):
     prompt: str
     file_names: List[str]
 
+class QATableToCSV(BaseModel):
+    file_name: str
+
+class RAGTableToCSV(BaseModel):
+    file_name: str
+
+class ComparatorTableToCSV(BaseModel):
+    file_name: str
 
 class UserInDB:
     def __init__(self, username: str, hashed_password: str):
@@ -246,6 +250,17 @@ class Application:
             except Exception as ex:
                 return {"log": f"Table update failed: {ex}", "status": "500"}
 
+        @app.post("/chat/qa_table/save_to_csv")
+        async def save_qa_table_to_csv(
+            request_body: QATableToCSV,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                component["component"].database.save_to_csv(request_body.file_name)
+                return {"log": f"Saved to {request_body.file_name}.csv", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Save to CSV failed: {ex}", "status": "500"}
+
         @app.get("/chat/qa_table/close")
         async def close_qa_table(
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
@@ -338,13 +353,24 @@ class Application:
                 modified_rows = []
                 for row in rows:
                     row_list = list(row)  # Convert the tuple to a list
-                    row_list[5] = row_list[5].split(QA_LIST_SEPARATOR)
-                    row_list[6] = row_list[6].split(QA_LIST_SEPARATOR)
-                    row_list[7] = row_list[7].split(QA_LIST_SEPARATOR)
+                    row_list[5] = row_list[5].split(RAG_LIST_SEPARATOR)
+                    row_list[6] = row_list[6].split(RAG_LIST_SEPARATOR)
+                    row_list[7] = row_list[7].split(RAG_LIST_SEPARATOR)
                     modified_rows.append(row_list)  # Append the modified list to the new list
                 return {"rows": modified_rows, "log": "RAG Table retrieved", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table retrieval failed: {ex}", "status": "500"}
+
+        @app.post("/chat/rag_table/save_to_csv")
+        async def save_rag_table_to_csv(
+            request_body: RAGTableToCSV,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                component["component"].database.save_to_csv(request_body.file_name)
+                return {"log": f"Saved to {request_body.file_name}.csv", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Save to CSV failed: {ex}", "status": "500"}
 
     def create_feedback_route(self, app: FastAPI, component: Dict[str, Any]):
         """
@@ -438,17 +464,19 @@ class Application:
             user: Union[None, UserInDB] = Depends(self.get_auth_dependency())
         ):
             try:
-                rows = component["component"].comparator_db.retrieve_all()
+                rows = component["component"].comparator_db.retrieve_all_question_answers()
                 data = []
                 for row in rows:
-                    _, model_name, qid, rank, answer, _ = row
+                    a_id, model_name, qid, question, answer, rank, _ = row
 
                     data.append(
                         {
+                            "id": a_id,
                             "model": model_name,
                             "qid": qid,
-                            "rank": rank,
+                            "question": question,
                             "answer": answer,
+                            "rank": rank,
                         }
                     )
                 return {"data": data, "log": "Table retrieved", "status": "200"}
@@ -465,6 +493,19 @@ class Application:
                 return {"log": "Table closed", "status": "200"}
             except Exception as ex:
                 return {"log": f"Table close failed: {ex}", "status": "500"}
+
+        @app.post("/chat/comparator/db/save_to_csv")
+        async def save_comparator_table_to_csv(
+            request_body: ComparatorTableToCSV,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                print("Saving Comparator to CSV", request_body.file_name)
+                component["component"].comparator_db.save_to_csv(request_body.file_name)
+                return {"log": f"Saved to {request_body.file_name}.csv", "status": "200"}
+            except Exception as ex:
+                return {"log": f"Save to CSV failed: {ex}", "status": "500"}
+
 
     def create_qa_retrieval_route(self, app: FastAPI, component: Dict[str, Any]):
         """
