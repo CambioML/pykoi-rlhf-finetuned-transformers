@@ -731,6 +731,18 @@ class Application:
                 ]
             )
 
+        @app.get("/file_exists/")
+        async def check_file_exists(
+            file_name: str,
+            user: Union[None, UserInDB] = Depends(self.get_auth_dependency()),
+        ):
+            try:
+                file_path = f"{os.getcwd()}/{file_name}"
+                file_exists = os.path.exists(file_path)
+                return {"log": f"Check if {file_name} exists succeeded.", "file_exists": file_exists, "status": "200"}
+            except Exception as ex:
+                return {"log": f"Check if {file_name} exists failed: {ex}", "status": "500"}
+
         def create_data_route(id: str, data_source: Any):
             """
             Create data route for the application.
