@@ -9,9 +9,6 @@ from pykoi.rlhf import SupervisedFinetuning
 import mlflow
 import datetime
 
-import torch
-torch.cuda.empty_cache()
-
 from pykoi.chat.db.constants import (
     QA_CSV_HEADER_ID,
     QA_CSV_HEADER_QUESTION,
