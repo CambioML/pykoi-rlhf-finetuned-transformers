@@ -180,7 +180,7 @@ example/flex/flex_sample/
 example/flex/vectordb/
 
 # mlflow
-example/rlhf/mlruns/
+example/rlhf/mlflow/mlruns/
 
 # mac
 .DS_Store

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/pykoi/example/rlhf/mlruns/0/08eb4c68b8b744be9930f3b9fe9c6d4e/artifacts
+end_time: 1696637617430
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 08eb4c68b8b744be9930f3b9fe9c6d4e
+run_name: ./rlhf_checkpoints
+run_uuid: 08eb4c68b8b744be9930f3b9fe9c6d4e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696637556813
+status: 3
+tags: []
+user_id: ubuntu
