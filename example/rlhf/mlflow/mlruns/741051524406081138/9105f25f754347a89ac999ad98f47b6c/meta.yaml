@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/pykoi/example/rlhf/mlflow/mlruns/741051524406081138/9105f25f754347a89ac999ad98f47b6c/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '741051524406081138'
+lifecycle_stage: active
+run_id: 9105f25f754347a89ac999ad98f47b6c
+run_name: unleashed-slug-368
+run_uuid: 9105f25f754347a89ac999ad98f47b6c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696637747767
+status: 1
+tags: []
+user_id: ubuntu

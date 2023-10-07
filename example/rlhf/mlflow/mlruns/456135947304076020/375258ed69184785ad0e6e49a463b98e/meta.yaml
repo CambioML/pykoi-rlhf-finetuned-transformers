@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/pykoi/example/rlhf/mlflow/mlruns/456135947304076020/375258ed69184785ad0e6e49a463b98e/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '456135947304076020'
+lifecycle_stage: active
+run_id: 375258ed69184785ad0e6e49a463b98e
+run_name: mercurial-hare-817
+run_uuid: 375258ed69184785ad0e6e49a463b98e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696636800561
+status: 1
+tags: []
+user_id: ubuntu

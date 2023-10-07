@@ -1,6 +1,6 @@
 """Demo for the reward fine tuning.
 
-python -m example.rlhf.demo_rw_finetuning
+python -m example.rlhf.demo_rw_finetuning_with_mlfow
 """
 
 from pykoi.rlhf import RLHFConfig
@@ -30,7 +30,7 @@ print("My local database has {} samples in total".format(my_data_pd.shape[0]))
 
 # Set up mlflow experiment name.
 # mlflow.set_tracking_uri("http://x.x.x.x:5000")
-experiment = "rlhf_step2_reward"
+experiment = "rlhf_step2_rw"
 current_time = str(datetime.datetime.now())
 mlflow_experiment_name = '/'.join([experiment, current_time])
 mlflow.set_experiment(mlflow_experiment_name)
