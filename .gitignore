@@ -172,6 +172,8 @@ cython_debug/
 
 # data
 *.csv
+!example/rlhf/mlflow/input_rw/ranking.csv
+!example/rlhf/ranking.csv
 rlhf_tests
 test_data
 example/flex/docs
