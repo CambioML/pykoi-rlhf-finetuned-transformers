@@ -1,6 +1,0 @@
-artifact_location: file:///home/ubuntu/pykoi/example/rlhf/mlflow/mlruns/331987787555961165
-creation_time: 1696633885945
-experiment_id: '331987787555961165'
-last_update_time: 1696633885945
-lifecycle_stage: active
-name: rlhf_step1_sft/2023-10-06 23:11:25.930569
