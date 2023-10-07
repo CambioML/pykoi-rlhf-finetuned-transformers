@@ -1,6 +1,6 @@
 """Demo for the supervised fine tuning.
 
-python -m example.rlhf.supervised_finetuning_demo_with_mlflow
+python -m example.rlhf.supervised_finetuning_demo_mlflow
 """
 
 from pykoi.chat import QuestionAnswerDatabase

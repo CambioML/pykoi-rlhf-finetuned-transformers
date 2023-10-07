@@ -182,6 +182,8 @@ example/flex/vectordb/
 # mlflow
 example/rlhf/mlflow/mlruns/
 example/rlhf/mlruns/
+mlruns/
+ppo_log_stats.json
 
 # mac
 .DS_Store

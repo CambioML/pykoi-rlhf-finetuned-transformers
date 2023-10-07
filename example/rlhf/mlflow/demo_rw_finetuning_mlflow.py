@@ -1,6 +1,6 @@
 """Demo for the reward fine tuning.
 
-python -m example.rlhf.demo_rw_finetuning_with_mlfow
+python -m example.rlhf.demo_rw_finetuning_mlfow
 """
 
 from pykoi.rlhf import RLHFConfig

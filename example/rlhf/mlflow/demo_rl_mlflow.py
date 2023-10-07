@@ -1,37 +1,45 @@
 """
+huggingface-cli login --token $HUGGINGFACE_TOKEN
+
 accelerate config
 
-LOCAL_DIR=/home/ubuntu/pykoi/pykoi # change this to your local path
+LOCAL_DIR=/home/ubuntu/pykoi # change this to your local path
 
 export PYTHONPATH=$PYTHONPATH:${LOCAL_DIR}
 
-accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 ${LOCAL_DIR}/example/rlhf/demo_rl.py
+accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 ${LOCAL_DIR}/example/rlhf/mlflow/demo_rl_mlflow.py
 """
-# accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/demo_rl.py
+# accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 example/rlhf/mlflow/demo_rl_mlflow.py
 
 from pykoi.rlhf import RLHFConfig
 from pykoi.rlhf import RLFinetuning
 import mlflow
 import datetime
 
-# Set up mlflow experiment name.
+# Log into huggingface with token if it is not done so in the command line.
+# https://huggingface.co/docs/huggingface_hub/quick-start#login
+# https://huggingface.co/settings/tokens
 
-# mlflow.set_tracking_uri("http://x.x.x.x:5000")
+# from huggingface_hub import login
+# login(token="")
+
+# Set up mlflow experiment name.
+mlflow.set_tracking_uri("example/rlhf/mlflow/mlruns")
 experiment = "rlhf_step3_rl"
 current_time = str(datetime.datetime.now())
 mlflow_experiment_name = '/'.join([experiment, current_time])
 mlflow.set_experiment(mlflow_experiment_name)
 
 # Set pykoi parameters.
-base_model_path = "models/rlhf_step1_sft"
+base_model_path = "example/rlhf/mlflow/models/rlhf_step1_sft"
 dataset_type = "local_db"
-reward_model_path = "models/rlhf_step2_rw"
+reward_model_path = "example/rlhf/mlflow/models/rlhf_step2_rw"
 dataset_subset_rl = "data"
 save_freq = 1
 ppo_batch_size = 32
 ppo_epochs = 4
 total_epochs = 5
-output_dir = "./models/rlhf_step3_rl"
+output_dir = "example/rlhf/mlflow/models/rlhf_step3_rl"
 
 # Manually log pykoi parameters into mlflow. Torch level parameters are automatically logged.
 mlflow.log_param("pykoi_base_model_path", base_model_path)
