@@ -16,7 +16,7 @@ from pykoi.rlhf import RLFinetuning
 import mlflow
 import datetime
 
-# Log into huggingface with token if it is not done so in the command line.
+# Log into huggingface with token if it is not done in the command line.
 # https://huggingface.co/docs/huggingface_hub/quick-start#login
 # https://huggingface.co/settings/tokens
 
