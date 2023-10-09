@@ -3,14 +3,7 @@
   import { line } from "d3-shape";
   import { comparisonData } from "./store";
 
-  $: firstData = $comparisonData
-    .filter((d) => d.qid === 3)
-    .map((d) => ({ model: d.model, rank: d.rank }));
-
-  $: console.log("firstData", $comparisonData);
-
   $: models = Array.from(new Set($comparisonData.map((d) => d.model)));
-  $: console.log("models", models);
 
   let outerHeight;
   let outerWidth;
@@ -46,16 +39,9 @@
   $: pathLine = line()
     .x((d) => xScale(d.qid))
     .y((d) => yScale(d.rank));
-  // .curve(curveBasis)
 
   $: modelData = models.map((model) =>
     $comparisonData.filter((d) => d.model === model)
-  );
-
-  $: console.log("md", modelData);
-  $: console.log(
-    "ranks",
-    $comparisonData.map((d) => d.rank)
   );
 
   $: xTickArray =
@@ -121,21 +107,6 @@
           >
         </g>
       {/if}
-    {/each}
-    <!-- y-ticks -->
-    {#each yScale.domain() as tick}
-      <g transform={`translate(${margin.left} ${yScale(tick) + 0})`}>
-        <!-- <text
-          class="axis-text"
-          x="-5"
-          y="0"
-          text-anchor="end"
-          dominant-baseline="middle"
-          >{firstData
-            .filter((d) => d.rank == tick)
-            .map((d) => d.model)[0]}</text
-        > -->
-      </g>
     {/each}
 
     <!-- axis labels -->

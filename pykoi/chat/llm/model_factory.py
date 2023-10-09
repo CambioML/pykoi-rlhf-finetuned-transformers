@@ -48,9 +48,11 @@ class ModelFactory:
                 from pykoi.chat.llm.peft_huggingface import PeftHuggingfacemodel
 
                 return PeftHuggingfacemodel(**kwargs)
+            elif model_source == ModelSource.MLU:
+                from pykoi.chat.llm.mlu import MLUWrapper
+
+                return MLUWrapper(**kwargs)
             else:
-                raise ValueError(
-                    f"[llm_factory]: Unknown model source {model_source}"
-                )
+                raise ValueError(f"[llm_factory]: Unknown model source {model_source}")
         except ValueError as ex:
             raise ValueError("[llm_factory]: initialize model failure") from ex

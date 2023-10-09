@@ -3,6 +3,8 @@
   import { compareChatLog } from "../../store";
   import Sortable from "sortablejs";
   import { select } from "d3-selection";
+    import { mode } from "d3-array";
+    import DownloadModal from "./Components/DownloadModal.svelte";
 
   export let numModels = 1;
   export let models = [0];
@@ -12,6 +14,7 @@
   let chatLoading = false;
   $: gridTemplate = "1fr ".repeat(numModels).trim();
   let answerOrder = [];
+  let showModal = false;
 
   onMount(async () => {
     // Give the DOM some time to render
@@ -25,20 +28,33 @@
       });
       answerOrder = sortable.toArray();
     }
-    // retrieveDBData();
+    retrieveDBData();
   });
 
   async function retrieveDBData() {
     const response = await fetch("/chat/comparator/db/retrieve");
     const data = await response.json();
-    // const dbRows = data["data"];
-    // const formattedRows = dbRows.map((row) => ({
-    //   id: row[0],
-    //   question: row[1],
-    //   up_ranking_answer: row[2],
-    //   low_ranking_answer: row[3],
-    // }));
-    // $compareChatLog = [...dbRows];
+    console.log(data);
+    const dbRows = data["data"];
+    let formattedRows = {};
+    let modelSet = new Set();
+
+    for (const row of dbRows) {
+      modelSet.add(row["model"]);
+      if (formattedRows[row["qid"]]) {
+        formattedRows[row["qid"]][row["model"]] = row["answer"];
+      } else {
+        formattedRows[row["qid"]] = {};
+        formattedRows[row["qid"]]["qid"] = row["qid"];
+        formattedRows[row["qid"]]["question"] = row["question"];
+        formattedRows[row["qid"]][row["model"]] = row["answer"];
+      }
+      console.log(formattedRows);
+    }
+    models = Array.from(modelSet);
+    numModels = models.length;
+    console.log(Object.values(formattedRows))
+    $compareChatLog = [...Object.values(formattedRows)];
   }
 
   const askModel = async (event) => {
@@ -53,6 +69,8 @@
       currentEntry[model] = "Loading...";
     }
     $compareChatLog = [...$compareChatLog, currentEntry];
+
+    console.log('compare chat log', compareChatLog)
 
     const response = await fetch(`/chat/comparator/${mymessage}`, {
       method: "POST",
@@ -190,7 +208,13 @@
     payload.push(entry);
     updateComparisonDB(payload);
   }
+
+  function handleDownloadClick () {
+    showModal = true;
+  }
 </script>
+
+<DownloadModal bind:showModal table="comparator/db"/>
 
 <div class="ranked-feedback-container">
   <div class="instructions">
@@ -202,7 +226,7 @@
       rank for each via the corresponding dropdown.
     </p>
     <br />
-    <button>Download Data</button>
+    <button on:click={handleDownloadClick}>Download Data</button>
   </div>
   <div class="ranked-chat">
     <section class="chatbox">

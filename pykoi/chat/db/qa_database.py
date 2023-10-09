@@ -180,13 +180,13 @@ class QuestionAnswerDatabase:
                 f"Answer: {row[2]}, Vote Status: {row[3]}, Timestamp: {row[4]}"
             )
 
-    def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
+    def save_to_csv(self, csv_file_name="question_answer_votes"):
         """
         This method saves the contents of the question_answer table into a CSV file.
 
         Args:
             csv_file_name (str, optional): The name of the CSV file to which the data will be written.
-            Defaults to "question_answer_votes.csv".
+            Defaults to "question_answer_votes".
 
         The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the
         CSV file corresponds to a row in the question_answer table.
@@ -196,7 +196,7 @@ class QuestionAnswerDatabase:
         """
         my_sql_data = self.retrieve_all_question_answers()
 
-        with open(csv_file_name, "w", newline="") as file:
+        with open(csv_file_name + ".csv", "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(QA_CSV_HEADER)
             writer.writerows(my_sql_data)

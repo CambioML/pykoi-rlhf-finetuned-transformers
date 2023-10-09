@@ -7,7 +7,7 @@ import threading
 
 import pandas as pd
 
-from pykoi.chat.db.constants import QA_CSV_HEADER, QA_LIST_SEPARATOR
+from pykoi.chat.db.constants import RAG_CSV_HEADER, RAG_LIST_SEPARATOR
 
 
 class RAGDatabase:
@@ -93,9 +93,9 @@ class RAGDatabase:
         INSERT INTO rag_question_answer (question, answer, edited_answer, rag_sources, source, source_content, vote_status, timestamp)
         VALUES (?, ?, '', ?, ?, ?, 'n/a', ?);
         """
-        rag_sources = QA_LIST_SEPARATOR.join(rag_sources)
-        source = QA_LIST_SEPARATOR.join(source)
-        source_content = QA_LIST_SEPARATOR.join(source_content)
+        rag_sources = RAG_LIST_SEPARATOR.join(rag_sources)
+        source = RAG_LIST_SEPARATOR.join(source)
+        source_content = RAG_LIST_SEPARATOR.join(source_content)
         print("rag insert question answer", rag_sources)
 
         with self._lock:
@@ -194,7 +194,7 @@ class RAGDatabase:
         """
         rows = self.retrieve_all_question_answers()
         rows_to_pd = pd.DataFrame(rows)
-        rows_to_pd.columns = QA_CSV_HEADER
+        rows_to_pd.columns = RAG_CSV_HEADER
         return rows_to_pd
 
     def close_connection(self):
@@ -222,15 +222,15 @@ class RAGDatabase:
                 f"Answer: {row[2]}, Vote Status: {row[3]}, Timestamp: {row[4]}"
             )
 
-    def save_to_csv(self, csv_file_name="question_answer_votes.csv"):
+    def save_to_csv(self, csv_file_name="rag_table"):
         """
-        This method saves the contents of the question_answer table into a CSV file.
+        This method saves the contents of the RAG table into a CSV file.
 
         Args:
             csv_file_name (str, optional): The name of the CSV file to which the data will be written.
-            Defaults to "question_answer_votes.csv".
+            Defaults to "rag_table".
 
-        The CSV file will have the following columns: ID, Question, Answer, Vote Status. Each row in the
+        The CSV file will have the following columns: ID, Question, Answer, Edited Answer, Vote Status, RAG Sources, Source, Source Content, and Timestamp. Each row in the
         CSV file corresponds to a row in the question_answer table.
 
         This method first retrieves all question-answer pairs from the database by calling the
@@ -238,7 +238,7 @@ class RAGDatabase:
         """
         my_sql_data = self.retrieve_all_question_answers()
 
-        with open(csv_file_name, "w", newline="") as file:
+        with open(csv_file_name + ".csv", "w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(QA_CSV_HEADER)
+            writer.writerow(RAG_CSV_HEADER)
             writer.writerows(my_sql_data)
