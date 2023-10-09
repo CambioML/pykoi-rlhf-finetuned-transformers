@@ -1,0 +1,27 @@
+Green Card Application Process
+There are essentially three steps in the employment-based green card application process:
+
+1. Labor Certification (PERM)
+With limited exceptions, all EB-2 and EB-3 green card applications require that the employer obtain a Labor Certification from the U.S. Department of Labor. For petitions requiring this step, the Labor Certification process is often the hardest and most arduous step. Prior to being able to file the Labor Certification application, the employer must obtain a prevailing wage from the Department of Labor and prove that there are no minimally qualified U.S. workers available for the positions through the completion of a competitive recruitment process.
+
+In the case of positions that contain teaching duties, the employer must document that the selected applicant is the “best qualified” for the position. This process is commonly called “Special Handling.”
+
+In both the “basic” and the “special handling” process, the employer must complete a formal recruitment process to document that there are no minimally qualified U.S. workers available or that, in the case of positions that have a teaching component, that the selected candidate is the best qualified. It is common that this recruitment process must be completed well after the foreign national employee started his or her position at the University.
+
+As soon as the Labor Certification has been filed with the Department of Labor, the “priority date” for the applicant is established. This date is important to determine when someone can complete step #3, i.e. the Adjustment of Status. (If no Labor Certification is required, the priority date is established with the filing of the Immigrant Petition/ Form I-140.
+
+2. Immigrant Petition
+Once the Department of Labor approves the Labor Certification, the Immigrant Petition (Form I-140) can be filed with USCIS. In cases where no Labor Certification is required (e.g. EB-1), the filing of the I-140 is the first step of the green card process.
+
+3. Adjustment of Status or Obtaining an Immigrant Visa
+Once the I-140 application has been approved by USCIS, the foreign national can apply for the adjustment of his or her non-immigrant status (Form I-485) to that of a legal permanent resident. Instead of applying for the Adjustment of Status, a foreign national may also apply for an immigrant visa at a U.S. consulate or embassy abroad.
+
+The I-485 Adjustment of Status application cannot be filed until and unless the “priority date” is current. In practice this means that, depending on one’s country of birth and EB-category, there may be a backlog. The backlog exists because more people apply for green cards in a given category than there are available green card visa numbers. The total number of green cards is further restricted by the fact that, with some exceptions, no more than seven percent of all green cards in a given preference category can go to individuals born in a given country. The backlog is updated each month by the U.S. Department of State and is published in the Visa Bulletin.
+
+Once someone’s priority date date has been reached, as indicated in the Visa Bulletin, the I-485 can be filed. The priority date is the date on which the Labor Certification was filed with the Department of Labor, or, if no Labor Certification was required, USCIS received the I-140 petition.
+
+Note that the Visa Bulletin contains two separate tables with priority cut-off dates. The actual cut-off dates are indicated in table A “Application Final Action Dates for Employment-based Preference Cases.” However, in some instances, USCIS may accept the I-485 application if the priority date is current based on table B “Dates for Filing of Employment-based Visa Applications.” Note that USCIS will make a determination whether Table B may be used several days after the official Visa Bulletin is published. USCIS publishes this information on its website dedicated to the Visa Bulletin.
+
+In some cases, it may be possible to file the I-140 and I-485 at the same time. This is not always recommended, even if it is possible. If the I-140 is denied, the I-485 will also be denied if filed concurrently.
+
+Whereas the International Center will file both the Labor Certification and I-140 (unless the petition as a whole is assigned to retained counsel), the Adjustment of Status application and related applications (Advance Parole and EAD) are filed by retained counsel only.
