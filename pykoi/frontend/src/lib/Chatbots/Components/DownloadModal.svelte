@@ -1,5 +1,4 @@
 <script>
-    import { onDestroy, onMount } from "svelte";
     import Modal from "../../UIComponents/Modal.svelte";
     export let showModal, table;
     let dialog;
@@ -39,8 +38,8 @@
         const response = await fetch(
             `/file_exists/?file_name=${file_name}.csv`
         );
-        const file_exists_response = await response.json();
-        if (file_exists_response.file_exists === true) {
+        const { file_exists } = await response.json();
+        if ( file_exists === true) {
             downloadState = DOWNLOAD_STATE.OVERWRITE;
         } else {
             saveToCSV(file_name);
