@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pykoi"
-version = "0.0.8"
+version = "0.0.9"
 description = "pykoi: Active learning in one unified interface"
 authors = ["CambioML <wanwanaiai45@gmail.com>"]
 license = "Apache"
