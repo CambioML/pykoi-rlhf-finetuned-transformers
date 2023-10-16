@@ -4,6 +4,7 @@
   import { select } from "d3-selection";
   import { writable } from "svelte/store";
   import DownloadModal from "./Components/DownloadModal.svelte";
+    import Answer from "./Components/Answer.svelte";
 
   let showModal = false;
 
@@ -173,22 +174,7 @@
                   <p>{message.question}</p>
                 </div>
                 <div class="answers">
-                  <div class="answer">
-                    <h5 class="bold">Response:</h5>
-                    <p>{message.answer}</p>
-                    {#if feedback}
-                      <div class="feedback-buttons">
-                        <button
-                          on:click={(event) => logVote(event, "up", index)}
-                          class="small-button thumbs-up">👍</button
-                        >
-                        <button
-                          on:click={(event) => logVote(event, "down", index)}
-                          class="small-button thumbs-down">👎</button
-                        >
-                      </div>
-                    {/if}
-                  </div>
+                  <Answer {feedback} {message} {index} title={true}/>
                 </div>
               </div>
             </div>
@@ -450,4 +436,14 @@
     background: inherit;
     clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
   }
+
+  .vote-selected {
+        border: "3px solid black";
+        opacity: 1;
+    }
+
+    .vote-not-selected {
+        border: "3px solid transparent";
+        opacity: 0.65;
+    }
 </style>
