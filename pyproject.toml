@@ -48,16 +48,17 @@ huggingface = [
     "einops",
     "accelerate",
     "bitsandbytes",
-    "sentence-transformers"
+    "sentence-transformers",
+    "xformers"
 ]
 rag = [
-    "langchain", 
-    "scikit-learn", 
-    "chromadb", 
-    "pyepsilla", 
-    "pdfminer-six", 
-    "docx2txt", 
-    "python-multipart", 
+    "langchain",
+    "scikit-learn",
+    "chromadb",
+    "pyepsilla",
+    "pdfminer-six",
+    "docx2txt",
+    "python-multipart",
     "tiktoken"
 ]
 rlhf = [
