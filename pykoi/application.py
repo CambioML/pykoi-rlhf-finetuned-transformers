@@ -644,13 +644,13 @@ class Application:
             try:
                 print("[/retrieval]: model inference.....", request_body.prompt)
                 component["component"].retrieval_model.re_init(request_body.file_names)
-                output = component[
-                    "component"
-                ].retrieval_model.run_with_return_source_documents(
-                    {"query": request_body.prompt}
-                )
-                print("output", output, output["result"])
-                if output["source_documents"] == []:
+                output = component["component"].retrieval_model.run_with_return_source_documents({"query": request_body.prompt})
+                print('output', output, output["result"])
+                if "source_documents" not in output:
+                    print('no source documents', output)
+                    source = ["N/A"]
+                    source_content = ["N/A"]
+                elif output["source_documents"] == []:
                     source = ["N/A"]
                     source_content = ["N/A"]
                 else:

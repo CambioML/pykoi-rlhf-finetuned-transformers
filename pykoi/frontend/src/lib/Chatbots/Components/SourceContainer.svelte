@@ -8,7 +8,7 @@
 <div class="sources">
     {#if sources !== undefined}
         {#if sources[0] === "N/A"}
-            <h5 class="bold">⚠️ No Retrieval Sources selected</h5>
+            <h5 class="bold">⚠️ No Retrieval Sources selected or received</h5>
         {:else if sources[0] === "Loading..."}
             <h5 class="bold">📖 Loading...</h5>
         {:else if sources[0] === "Not loaded"}

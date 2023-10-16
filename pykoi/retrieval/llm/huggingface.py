@@ -13,15 +13,15 @@ MIN_DOCS = 2
 
 class HuggingFaceModel(AbsLlm):
     """
-    A class representing a language model that uses OpenAI's GPT-3 to generate text.
+    A class representing a language model that uses Huggingface's model to generate text.
     """
 
     def __init__(self, vector_db: AbsVectorDb, **kwargs):
         """
-        Initializes the OpenAIModel class.
+        Initializes the HuggingFaceModel class.
         """
         try:
-            llm = HuggingFacePipeline.from_model_id(
+            self._llm = HuggingFacePipeline.from_model_id(
                 model_id=kwargs.get("model_name"),
                 task="text-generation",
                 device=torch.cuda.device_count() - 1,
@@ -30,19 +30,47 @@ class HuggingFaceModel(AbsLlm):
                     "temperature": 0,
                     "max_length": kwargs.get("max_length", 500),
                     "trust_remote_code": kwargs.get("trust_remote_code", True),
-                    # "load_in_8bit": True,
                 },
             )
 
-            vector_db = vector_db.vector_db
+            self._vector_db = vector_db.vector_db
 
-            retrieve_qa = RetrievalQA.from_chain_type(
-                llm=llm,
+            self._retrieve_qa = RetrievalQA.from_chain_type(
+                llm=self._llm,
                 chain_type="stuff",
-                retriever=vector_db.as_retriever(search_kwargs={"k": MIN_DOCS}),
+                retriever=self._vector_db.as_retriever(search_kwargs={"k": MIN_DOCS, "filter": {}}),
                 verbose=True,
+                return_source_documents=True,
             )
-            print("HuggingFaceModel initialized successfully")
-            super().__init__(retrieve_qa)
+            print("HuggingFaceModel initialized successfully!")
+            super().__init__(self._retrieve_qa)
         except Exception as ex:
             print("Inference initialization failed: {}".format(ex))
+
+    def re_init(self, file_names: list[str]):
+        """
+        Re-initializes the HuggingFaceModel class.
+        """
+        try:
+            if file_names == []:
+                metadata_filename_filter = {"file_name": ""}
+            elif len(file_names) == 1:
+                metadata_filename_filter = {"file_name": file_names[0]}
+            else:
+                metadata_filename_filter = {
+                    "$or": [{"file_name": name} for name in file_names]
+                }
+
+            self._retrieve_qa = RetrievalQA.from_chain_type(
+                llm=self._llm,
+                chain_type="stuff",
+                retriever=self._vector_db.as_retriever(search_kwargs={"k": MIN_DOCS, "filter": metadata_filename_filter}),
+                verbose=True,
+                return_source_documents=True,
+            )
+
+            print("Re-initialized HuggingFaceModel successfully with filter: ", metadata_filename_filter)
+
+            super().__init__(self._retrieve_qa)
+        except Exception as ex:
+            print("Inference re-init failed: {}".format(ex))
