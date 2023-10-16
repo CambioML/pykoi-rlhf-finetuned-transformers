@@ -1,10 +1,10 @@
 <script>
     import { chatLog } from "../../../store.js";
-    import { select } from "d3-selection";
 
     export let message = {};
     export let feedback = false;
     export let index = 0;
+    export let title = false;
 
     async function insertVote(feedbackUpdate) {
         const response = await fetch("/chat/rag_table/update", {
@@ -17,6 +17,7 @@
 
         if (response.ok) {
             console.log("response", response);
+            message.vote_status = feedbackUpdate.vote_status;
         } else {
             const err = await response.text();
             alert(err);
@@ -30,36 +31,43 @@
             id: index + 1, // increment bc sqlite 1-indexed
             vote_status: vote,
         };
-
         insertVote(feedbackUpdate);
-
-        select(event.currentTarget.parentNode)
-            .selectAll("button")
-            .style("border", "3px solid transparent")
-            .style("opacity", 0.65);
-        select(event.currentTarget)
-            .style("border", "3px solid var(--black)")
-            .style("opacity", 1);
     }
+    console.log("Answer", message.vote_status);
 </script>
 
-<div>
-    {message.answer}
+<div class="answer">
+    {#if title}
+        <h5 class="bold">Response:</h5>
+    {/if}
+    <p>{message.answer}</p>
+    {#if feedback}
+        <div class="feedback-buttons">
+            <button
+                on:click={(event) => logVote(event, "up", index)}
+                class="small-button thumbs-up"
+                class:vote-selected={message.vote_status === "up"}
+                class:vote-not-selected={message.vote_status === "down"}
+                >👍</button
+            >
+            <button
+                on:click={(event) => logVote(event, "down", index)}
+                class="small-button thumbs-down"
+                class:vote-selected={message.vote_status === "down"}
+                class:vote-not-selected={message.vote_status === "up"}
+                >👎</button
+            >
+        </div>
+    {/if}
 </div>
-{#if feedback}
-    <div class="feedback-buttons">
-        <button
-            on:click={(event) => logVote(event, "up", index)}
-            class="small-button thumbs-up">👍</button
-        >
-        <button
-            on:click={(event) => logVote(event, "down", index)}
-            class="small-button thumbs-down">👎</button
-        >
-    </div>
-{/if}
 
 <style>
+    .answer {
+        display: inline-block;
+        text-align: left;
+        padding: 10px;
+        border: 1px solid var(--black);
+    }
     .small-button {
         margin-left: 10px;
         background: none;
@@ -91,5 +99,15 @@
     .thumbs-down:hover,
     .thumbs-down::selection {
         background: var(--red);
+    }
+
+    .vote-selected {
+        border: 3px solid black;
+        opacity: 1;
+    }
+
+    .vote-not-selected {
+        border: 3px solid transparent;
+        opacity: 0.65;
     }
 </style>
