@@ -1,4 +1,6 @@
 """
+huggingface-cli login --token $HUGGINGFACE_TOKEN
+
 accelerate config
 
 LOCAL_DIR=/home/ubuntu/pykoi/pykoi # change this to your local path
@@ -12,12 +14,19 @@ accelerate launch --num_machines 1  --num_processes 1 --mixed_precision fp16 ${L
 from pykoi.rlhf import RLHFConfig
 from pykoi.rlhf import RLFinetuning
 
+# Log into huggingface with token if it is not done in the command line.
+# https://huggingface.co/docs/huggingface_hub/quick-start#login
+# https://huggingface.co/settings/tokens
+
+# from huggingface_hub import login
+# login(token="")
+
 
 # use huggingface sft and reward model
 config = RLHFConfig(
     base_model_path="models/rlhf_step1_sft",    #"elinas/llama-7b-hf-transformers-4.29", 
-    dataset_type="huggingface", 
-    dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
+    dataset_type="local_db", 
+    # dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
     dataset_subset_rl="data",
     reward_model_path="models/rlhf_step2_rw/", #"cambioml/rlhf_reward_model",
     save_freq=1,

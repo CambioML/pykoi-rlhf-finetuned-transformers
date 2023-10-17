@@ -41,6 +41,7 @@ datasets = { version = "2.13.1", optional = true }
 evaluate = { version = "0.4.0", optional = true }
 peft = { version = "0.5.0", optional = true }
 trl = { version = "0.4.7", optional = true }
+mlflow = { version = "2.7.1", optional = true }
 
 [tool.poetry.extras]
 huggingface = [
@@ -70,7 +71,8 @@ rlhf = [
     "datasets",
     "evaluate",
     "peft",
-    "trl"
+    "trl",
+    "mlflow"
 ]
 
 [tool.poetry.group.dev.dependencies]

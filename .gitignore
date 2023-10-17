@@ -172,12 +172,20 @@ cython_debug/
 
 # data
 *.csv
+!example/rlhf/mlflow/input_rw/ranking.csv
+!example/rlhf/ranking.csv
 rlhf_tests
 test_data
 example/flex/docs
 example/flex/flex.ipynb
 example/flex/flex_sample/
 example/flex/vectordb/
+
+# mlflow
+example/rlhf/mlflow/mlruns/
+example/rlhf/mlruns/
+mlruns/
+ppo_log_stats.json
 
 # mac
 .DS_Store
