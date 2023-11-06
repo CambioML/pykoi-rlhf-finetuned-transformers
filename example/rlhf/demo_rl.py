@@ -1,7 +1,7 @@
 """
 accelerate config
 
-LOCAL_DIR=/home/ubuntu/pykoi/pykoi # change this to your local path
+LOCAL_DIR=/home/ubuntu/pykoi # change this to your local path
 
 export PYTHONPATH=$PYTHONPATH:${LOCAL_DIR}
 
@@ -17,7 +17,7 @@ from pykoi.rlhf import RLFinetuning
 config = RLHFConfig(
     base_model_path="models/rlhf_step1_sft",    #"elinas/llama-7b-hf-transformers-4.29", 
     dataset_type="huggingface", 
-    dataset_name="goldmermaid/stack_exchange_rank_10k_dataset",
+    dataset_name="cambioml/stack_exchange_rank_10k_dataset",
     dataset_subset_rl="data",
     reward_model_path="models/rlhf_step2_rw/", #"cambioml/rlhf_reward_model",
     save_freq=1,
