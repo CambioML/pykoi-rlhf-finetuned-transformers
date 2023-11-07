@@ -25,7 +25,7 @@ from pykoi.component import Chatbot, Dashboard
 
 model = ModelFactory.create_model(
     model_source="peft_huggingface",
-    base_model_path="elinas/llama-7b-hf-transformers-4.29",
+    base_model_path="meta-llama/Llama-2-7b-chat-hf",
     lora_model_path="/home/ubuntu/pykoi/models/rlhf_step1_sft",
 )
 

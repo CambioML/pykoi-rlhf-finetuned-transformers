@@ -113,6 +113,6 @@ class PeftHuggingfacemodel(AbsLlm):
         ]
         print("response: ", response)
 
-        response = [resp.split("\n")[1] for resp in response if "\n" in resp]
+        # response = [resp.split("\n")[1] for resp in response if "\n" in resp]
 
         return response
