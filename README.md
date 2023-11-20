@@ -136,6 +136,11 @@ pip3 uninstall -y torch
 pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
 
+Now you are done with installing, try to modify one of the examples and run the below command!
+
+```
+python -m example.retrieval_qa.retrieval_qa_huggingface_demo
+```
 
 ### Frontend Dev Setup
 ```
@@ -148,7 +153,8 @@ npm run build
 If you are on EC2, you can launch a GPU instance with the following config:
 - EC2 `g5.2xlarge` (if you want to run a pretrained LLM with 7B parameters)
 - Deep Learning AMI PyTorch GPU 2.0.1 (Ubuntu 20.04)
-    <img src="example/image/readme_ec2_ami.jpg" alt="Alt text" width="50%" height="50%"/>
+    <img src="example/image/readme_ec2_ami.jpg" alt="Alt text" width="75%" height="75%"/>
 - EBS: at least 100G
+
     <img src="example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 

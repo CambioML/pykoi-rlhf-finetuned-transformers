@@ -125,6 +125,8 @@ For example, here is a command to run `cambioml\pykoi` version `0.1_ec2_linux`.
 docker run -d -e RETRIEVAL_MODEL=mistralai/Mistral-7B-v0.1 -p 5000:5000 --gpus all --name pykoi_test cambioml/pykoi:0.1_ec2_linux
 ```
 
+***Note: this command may take a few minutes*** since it's loading a LLM.
+
 If you are running it in the background, with a `-d` tag, you can check the logs using the following command:
 ```
 docker logs [CONTAINER_NAME]
