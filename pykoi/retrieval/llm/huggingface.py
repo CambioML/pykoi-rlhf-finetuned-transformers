@@ -30,7 +30,7 @@ class HuggingFaceModel(AbsLlm):
                     "temperature": 0,
                     "max_length": kwargs.get("max_length", 500),
                     "load_in_8bit": True,
-                    "trust_remote_code": kwargs.get("trust_remote_code", True),
+                    "trust_remote_code": kwargs.get("trust_remote_code", True)
                 },
             )
 

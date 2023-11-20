@@ -1,9 +1,3 @@
-<<<<<<< Updated upstream
-"""Demo for the retrieval_qa application.
-
-python -m example.retrieval_qa.retrieval_qa_huggingface_demo
-"""
-=======
 """
 Demo for the retrieval QA application using open source LLMs from Huggingface.
 
@@ -17,8 +11,6 @@ Demo for the retrieval QA application using open source LLMs from Huggingface.
         python -m example.retrieval_qa.retrieval_qa_huggingface_demo
         ```
 """
-
->>>>>>> Stashed changes
 
 import os
 import argparse
