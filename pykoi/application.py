@@ -97,7 +97,7 @@ class Application:
         debug: bool = False,
         username: Union[None, str, List] = None,
         password: Union[None, str, List] = None,
-        host: str = "127.0.0.1",
+        host: str = "0.0.0.0",
         port: int = 5000,
         enable_telemetry: bool = True,
     ):

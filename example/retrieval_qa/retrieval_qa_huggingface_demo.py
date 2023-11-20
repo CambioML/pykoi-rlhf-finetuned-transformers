@@ -1,4 +1,7 @@
-"""Demo for the retrieval_qa application."""
+"""Demo for the retrieval_qa application.
+
+python -m example.retrieval_qa.retrieval_qa_huggingface_demo
+"""
 
 import os
 import argparse
@@ -7,6 +10,13 @@ from pykoi.chat import RAGDatabase
 from pykoi.retrieval import RetrievalFactory
 from pykoi.retrieval import VectorDbFactory
 from pykoi.component import Chatbot, Dashboard, RetrievalQA
+from dotenv import load_dotenv
+
+# NOTE: Configure your retrieval model as RETRIEVAL_MODEL in .env file.
+# Load environment variables from .env file
+load_dotenv()
+
+RETRIEVAL_MODEL = os.getenv("RETRIEVAL_MODEL")
 
 
 def main(**kwargs):
@@ -27,10 +37,11 @@ def main(**kwargs):
     )
 
     # retrieval model with vector database
+    print("model", RETRIEVAL_MODEL)
     retrieval_model = RetrievalFactory.create(
         model_source=MODEL_SOURCE,
         vector_db=vector_db,
-        model_name="databricks/dolly-v2-3b",
+        model_name=RETRIEVAL_MODEL,
         trust_remote_code=True,
         max_length=1000
     )
@@ -48,6 +59,7 @@ def main(**kwargs):
     app.add_component(retriever)
     app.add_component(chatbot)
     app.add_component(dashboard)
+    print("RUNNING APP IN DEMO MODE")
     app.run()
 
 
