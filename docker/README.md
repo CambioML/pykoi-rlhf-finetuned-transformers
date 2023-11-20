@@ -15,37 +15,28 @@ To run a `pykoi` Docker container, launch a GPU instance with the following conf
 
 ### Installing Docker on your EC2
 1. First, in your EC2 terminal apply any updates:
-```
-sudo apt update
-```
+  ```
+  sudo apt update
+  ```
+1. Install docker by running the following:
+  ```
+  sudo apt install docker -y
+  ```
+1. Add group membership for the default ubuntu so you can run all docker commands without using the sudo command:
+  ```
+  sudo usermod -aG docker ubuntu
+  id ubuntu
+  newgrp docker # Reload a Linux user's group assignments to docker w/o logout
+  ```
+1. Enable docker service at AMI boot time:
+  ```
+  sudo systemctl enable docker.service
+  ```
+1. Start the Docker service:
+  ```
+  sudo systemctl start docker.service
+  ```
 
-2. Search for the Docker package:
-```
-sudo apt search docker
-```
-3. Get the version information
-```
-sudo apt info docker
-```
-4. Install docker by running the following:
-```
-sudo apt install docker
-```
-5. Add group membership for the default ubuntu so you can run all docker commands without using the sudo command:
-```
-sudo usermod -a -G docker ubuntu
-id ubuntu
-# Reload a Linux user's group assignments to docker w/o logout
-newgrp docker
-```
-6. Enable docker service at AMI boot time:
-```
-sudo systemctl enable docker.service
-```
-7. Start the Docker service:
-```
-sudo systemctl start docker.service
-```
 #### Verifying Docker Installation
 Verify the `Docker` installation by the checking the `docker` service status:
 ```
@@ -120,9 +111,9 @@ docker run -d -e [ENV_VAR_NAME]=[ENV_VAR_VALUE] -p 5000:5000 --gpus [NUM_GPUS]--
 - `--gpus`: specifies the number of GPUs to use.
 - `--name`: A custom name for your container. If you don't specify, Docker will randomly generate one. It's best to create one so it's easy to remember to use for commands.
 
-For example, here is a command to run `cambioml\pykoi` version `0.1_ec2_linux`.
+For example, here is a command to run `cambioml\pykoi` latest version.
 ```
-docker run -d -e RETRIEVAL_MODEL=mistralai/Mistral-7B-v0.1 -p 5000:5000 --gpus all --name pykoi_test cambioml/pykoi:0.1_ec2_linux
+docker run -d -e RETRIEVAL_MODEL=mistralai/Mistral-7B-v0.1 -p 5000:5000 --gpus all --name pykoi_test cambioml/pykoi
 ```
 
 ***Note: this command may take a few minutes*** since it's loading a LLM.
