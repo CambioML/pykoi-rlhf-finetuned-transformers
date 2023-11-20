@@ -2,38 +2,39 @@
 You can also launch a `pykoi` image that has been released by `CambioML` on [Docker Hub](https://hub.docker.com/u/cambioml).
 
 ## Running Docker on EC2 Instance
-For best performance, it is recommended to run the `pykoi` Docker images on an EC2.
+For best performance, it is recommended to run the `pykoi` Docker images on a GPU instance on EC2.
 
 ### EC2 Setup
 To run a `pykoi` Docker container, launch a GPU instance with the following config:
-- EC2 `g4dn.xlarge` or `p3.8xlarge` (if you want to run a pretrained LLM with 7B parameters)
+- EC2 `g5.2xlarge` (if you want to run a pretrained LLM with 7B parameters)
 - Deep Learning AMI PyTorch GPU 2.0.1 (Ubuntu 20.04)
-<img src="../example/image/readme_ec2_ami.jpg" alt="Alt text" width="50%" height="50%"/>
+  <img src="../example/image/readme_ec2_ami.jpg" alt="Alt text" width="75%" height="75%"/>
 - EBS: at least 100G
-<img src="../example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
+  
+  <img src="../example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 
 ### Installing Docker on your EC2
 1. First, in your EC2 terminal apply any updates:
 ```
-sudo yum update
+sudo apt update
 ```
 
 2. Search for the Docker package:
 ```
-sudo yum search docker
+sudo apt search docker
 ```
 3. Get the version information
 ```
-sudo yum info docker
+sudo apt info docker
 ```
 4. Install docker by running the following:
 ```
-sudo yum install docker
+sudo apt install docker
 ```
-5. Add group membership for the default ec2-user so you can run all docker commands without using the sudo command:
+5. Add group membership for the default ubuntu so you can run all docker commands without using the sudo command:
 ```
-sudo usermod -a -G docker ec2-user
-id ec2-user
+sudo usermod -a -G docker ubuntu
+id ubuntu
 # Reload a Linux user's group assignments to docker w/o logout
 newgrp docker
 ```
@@ -67,23 +68,24 @@ If the installation is successful, you will see a message indicating that Docker
 In order to launch the running `pykoi` container in your browser, you must add a new rule to your `EC2` instance's security group for port 5000.
 
 First, go to the __Security__ tab, and click on the __security group__.
-<img src="../example/image/docker_security-group.png" alt="Selecting the EC2 security group." width="50%" height="50%"/>
+<img src="../example/image/docker_security-group.png" alt="Selecting the EC2 security group." width="75%" height="75%"/>
 
 Then from the __Inbound rules__ tab, select the __Edit inbound rules__ button.
-<img src="../example/image/docker_ec2-inbound-rules.png" alt="Selecting the EC2 security group." width="50%" height="50%"/>
+<img src="../example/image/docker_ec2-inbound-rules.png" alt="Selecting the EC2 security group." width="75%" height="75%"/>
 
 Next, click on the __Add rule__ button.
 
-<img src="../example/image/docker_ec2-add-rule.png" alt="Selecting the EC2 security group." width="50%" height="50%"/>
+<img src="../example/image/docker_ec2-add-rule.png" alt="Selecting the EC2 security group." width="75%" height="75%"/>
 
 Fill out the rule as shown here:
 
-<img src="../example/image/docker_ec2-create-rule.png" alt="Selecting the EC2 security group." width="50%" height="50%"/>
+<img src="../example/image/docker_ec2-create-rule.png" alt="Selecting the EC2 security group." width="75%" height="75%"/>
 
 Finally save the rule. This may take a bit to take effect, but once this is working and your `pykoi` Docker instance is running, you should be able to acces it at the Public IPv4 DNS at port 5000.
 ```
 http://ec2-XX-XXX-XX-XXX.YOUR-REGION.compute.amazonaws.com:5000
 ```
+
 ## Pulling and Running a Docker Container
 ### Pulling the Docker Repo
 To pull a Docker Container, first locate the repository on the [CambioML Docker Hub](https://hub.docker.com/u/cambioml).
@@ -105,8 +107,10 @@ For example, to pull the latest `cambioml/pykoi` repository, you can run this co
 ```
 docker pull cambioml/pykoi
 ```
+
 ### Running the Docker Image
 To run the Docker image, you can use the following command, with different options depending on which repository you are running.
+
 ```
 docker run -d -e [ENV_VAR_NAME]=[ENV_VAR_VALUE] -p 5000:5000 --gpus [NUM_GPUS]--name [CUSTOM_CONTAINER_NAME] [DOCKER_REPO_NAME]:[TAG]
 ```
@@ -131,7 +135,7 @@ docker logs pykoi_test
 ```
 
 A container may take some time to build. Once it's done, you should see the following output:
-<img src="../example/image/docker_logs-running.png" alt="Selecting the EC2 security group." width="50%" height="50%"/>
+<img src="../example/image/docker_logs-running.png" alt="Selecting the EC2 security group." width="75%" height="75%"/>
 
 Now you can go to port 5000 to interact with the `pykoi` app!
 

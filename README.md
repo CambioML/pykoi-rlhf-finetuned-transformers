@@ -132,6 +132,7 @@ Then, based the feature you need to develop, run one or more installation option
 
 Finally, if you are on a GPU, install [pytorch based on your cuda version](https://pytorch.org/get-started/locally/). You can find your CUDA version via `nvcc -V`.
 ```
+pip3 uninstall -y torch
 pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121  # cu121 means cuda 12.1
 ```
 
@@ -145,7 +146,7 @@ npm run build
 
 ### EC2 Dev Setup
 If you are on EC2, you can launch a GPU instance with the following config:
-- EC2 `g4dn.xlarge` (if you want to run a pretrained LLM with 7B parameters)
+- EC2 `g5.2xlarge` (if you want to run a pretrained LLM with 7B parameters)
 - Deep Learning AMI PyTorch GPU 2.0.1 (Ubuntu 20.04)
     <img src="example/image/readme_ec2_ami.jpg" alt="Alt text" width="50%" height="50%"/>
 - EBS: at least 100G
