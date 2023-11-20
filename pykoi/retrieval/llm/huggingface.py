@@ -25,7 +25,7 @@ class HuggingFaceModel(AbsLlm):
                 model_id=kwargs.get("model_name"),
                 task="text-generation",
                 device=torch.cuda.device_count() - 1,
-                pipeline_kwargs={"device_map": "auto"},
+                # pipeline_kwargs={"device_map": "auto"},
                 model_kwargs={
                     "temperature": 0,
                     "max_length": kwargs.get("max_length", 500),

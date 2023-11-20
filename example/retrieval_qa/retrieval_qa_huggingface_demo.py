@@ -16,6 +16,12 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+## Set the RETRIEVAL_MODEL, pykoi supports most of the open-source LLMs, e.g.
+        # "HuggingFaceH4/zephyr-7b-beta"
+        # "meta-llama/Llama-2-7b-chat-hf"
+        # "mistralai/Mistral-7B-v0.1"
+        # "databricks/dolly-v2-3b" 
+        
 RETRIEVAL_MODEL = os.getenv("RETRIEVAL_MODEL")
 
 
