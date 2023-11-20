@@ -1,18 +1,3 @@
-# Overview
-In this folder, we create the different dockerfiles for using pykoi.
-
-1. `pykoi-cpu`: The base image for the cpu-based usage.
-2. `pykoi-cpu-custom`: When you run this docker image, try to modify the `app.py` and mount it when running the docker container.
-
-To run a docker container, we can use the following command:
-```bash
-docker run -dp 5000:5000 -v $(pwd)/app.py:/app/app.py \
-        --name alex_test \
-        pykoi/pykoi-cpu:app
-```
-
-Note that we need to keep the exposed port as 5000 (default value) to make the server work.
-
 # Launching Docker Hub `pykoi` Image
 You can also launch a `pykoi` image that has been released by `CambioML` on [Docker Hub](https://hub.docker.com/u/cambioml).
 
@@ -123,16 +108,17 @@ docker pull cambioml/pykoi
 ### Running the Docker Image
 To run the Docker image, you can use the following command, with different options depending on which repository you are running.
 ```
-docker run -d -e [ENV_NAME]=[ENV_VALUE] -p 5000:5000 --name [CUSTOM_CONTAINER_NAME] [DOCKER_REPO_NAME]:[TAG]
+docker run -d -e [ENV_VAR_NAME]=[ENV_VAR_VALUE] -p 5000:5000 --gpus [NUM_GPUS]--name [CUSTOM_CONTAINER_NAME] [DOCKER_REPO_NAME]:[TAG]
 ```
 - `-d`: specifies to run the container in the background
 - `-e`: specifies any environment variables to use
 - `-p`: specifies the port binding. Default `CambioML` is to use port 5000
+- `--gpus`: specifies the number of GPUs to use.
 - `--name`: A custom name for your container. If you don't specify, Docker will randomly generate one. It's best to create one so it's easy to remember to use for commands.
 
 For example, here is a command to run `cambioml\pykoi` version `0.1_ec2_linux`.
 ```
-docker run -d -e RETRIEVAL_MODEL=mistralai/Mistral-7B-v0.1 -p 5000:5000 --name pykoi_test cambioml/pykoi:0.1_ec2_linux
+docker run -d -e RETRIEVAL_MODEL=mistralai/Mistral-7B-v0.1 -p 5000:5000 --gpus all --name pykoi_test cambioml/pykoi:0.1_ec2_linux
 ```
 
 If you are running it in the background, with a `-d` tag, you can check the logs using the following command:
@@ -160,3 +146,18 @@ To delete a container, run the following command.
 ```
 docker rm [CONTAINER_NAME]
 ```
+
+# Building Custom Docker Images
+In this folder, we create the different dockerfiles for using pykoi.
+
+1. `pykoi-cpu`: The base image for the cpu-based usage.
+2. `pykoi-cpu-custom`: When you run this docker image, try to modify the `app.py` and mount it when running the docker container.
+
+To run a docker container, we can use the following command:
+```bash
+docker run -dp 5000:5000 -v $(pwd)/app.py:/app/app.py \
+        --name alex_test \
+        pykoi/pykoi-cpu:app
+```
+
+Note that we need to keep the exposed port as 5000 (default value) to make the server work.
