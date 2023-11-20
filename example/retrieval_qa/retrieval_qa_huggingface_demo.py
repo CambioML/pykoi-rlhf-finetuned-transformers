@@ -50,8 +50,7 @@ def main(**kwargs):
     retrieval_model = RetrievalFactory.create(
         model_source=MODEL_SOURCE,
         vector_db=vector_db,
-        model_name="mistralai/Mistral-7B-v0.1", # "Mistral-7B-Instruct-v0.1", #"databricks/dolly-v2-3b",
-        load_in_8bit=True,
+        model_name=RETRIEVAL_MODEL,
         trust_remote_code=True,
         max_length=1000
     )
