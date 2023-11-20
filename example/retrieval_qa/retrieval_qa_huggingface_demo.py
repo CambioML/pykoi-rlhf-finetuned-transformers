@@ -1,7 +1,24 @@
+<<<<<<< Updated upstream
 """Demo for the retrieval_qa application.
 
 python -m example.retrieval_qa.retrieval_qa_huggingface_demo
 """
+=======
+"""
+Demo for the retrieval QA application using open source LLMs from Huggingface.
+
+- Prerequisites:
+    To run this jupyter notebook, you need a `pykoi` environment with the `huggingface` option. 
+    You can follow [the installation guide](https://github.com/CambioML/pykoi/tree/install#option-2-rag-gpu) 
+    to set up the environment. 
+- Run the demo:
+    1. On terminal and `~/pykoi` directory, run
+        ```
+        python -m example.retrieval_qa.retrieval_qa_huggingface_demo
+        ```
+"""
+
+>>>>>>> Stashed changes
 
 import os
 import argparse
@@ -41,7 +58,8 @@ def main(**kwargs):
     retrieval_model = RetrievalFactory.create(
         model_source=MODEL_SOURCE,
         vector_db=vector_db,
-        model_name=RETRIEVAL_MODEL,
+        model_name="mistralai/Mistral-7B-v0.1", # "Mistral-7B-Instruct-v0.1", #"databricks/dolly-v2-3b",
+        load_in_8bit=True,
         trust_remote_code=True,
         max_length=1000
     )
