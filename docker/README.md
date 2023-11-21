@@ -14,28 +14,29 @@ To run a `pykoi` Docker container, launch a GPU instance with the following conf
   <img src="../example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 
 ### Installing Docker on your EC2
+
 1. First, in your EC2 terminal apply any updates:
-  ```
-  sudo apt update
-  ```
+    ```
+    sudo apt update
+    ```
 1. Install docker by running the following:
-  ```
-  sudo apt install docker -y
-  ```
+    ```
+    sudo apt install docker -y
+    ```
 1. Add group membership for the default ubuntu so you can run all docker commands without using the sudo command:
-  ```
-  sudo usermod -aG docker ubuntu
-  id ubuntu
-  newgrp docker # Reload a Linux user's group assignments to docker w/o logout
-  ```
+    ```
+    sudo usermod -aG docker ubuntu
+    id ubuntu
+    newgrp docker # Reload a Linux user's group assignments to docker w/o logout
+    ```
 1. Enable docker service at AMI boot time:
-  ```
-  sudo systemctl enable docker.service
-  ```
+    ```
+    sudo systemctl enable docker.service
+    ```
 1. Start the Docker service:
-  ```
-  sudo systemctl start docker.service
-  ```
+    ```
+    sudo systemctl start docker.service
+    ```
 
 #### Verifying Docker Installation
 Verify the `Docker` installation by the checking the `docker` service status:
