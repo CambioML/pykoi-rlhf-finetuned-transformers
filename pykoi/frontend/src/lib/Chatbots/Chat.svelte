@@ -13,7 +13,7 @@
   <Chatbot feedback={true} {is_retrieval} />
 {/if}
 {#if feedback === "rag"}
-  <RAGChatbot feedback={true} {is_retrieval} />
+  <RAGChatbot feedback={false} {is_retrieval} />
 {/if}
 {#if feedback === "rank"}
   <!-- TODO: Refactor to support ranking with retrieval-->

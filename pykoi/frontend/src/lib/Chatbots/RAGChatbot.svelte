@@ -155,17 +155,19 @@
 <DownloadModal bind:showModal table="rag_table" />
 
 <div class="ranked-feedback-container">
-  <div class="instructions">
-    <h5 class="underline bold">Vote Feedback Instructions</h5>
-    <p>
-      Ask a question to receive an answer from the chatbot. If the response is
-      satisfactory, click on the <span class="inline-button green">👍</span>
-      button. If the response is not satisfactory, click on the
-      <span class="inline-button red">👎</span> button.
-    </p>
-    <button on:click={handleDownloadClick}>Download Data</button>
-  </div>
-  <div class="ranked-chat">
+  {#if feedback}
+    <div class="instructions">
+      <h5 class="underline bold">Vote Feedback Instructions</h5>
+      <p>
+        Ask a question to receive an answer from the chatbot. If the response is
+        satisfactory, click on the <span class="inline-button green">👍</span>
+        button. If the response is not satisfactory, click on the
+        <span class="inline-button red">👎</span> button.
+      </p>
+      <button on:click={handleDownloadClick}>Download Data</button>
+    </div>
+  {/if}
+  <div class="ranked-chat" style:grid-column={feedback ? "span 1" : "span 2"}>
     <section class="chatbox">
       <div class="chat-log">
         {#each $chatLog as message, index (index)}
@@ -235,7 +237,7 @@
     height: 100vh;
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 80% 20%;
+    grid-template-rows: 65% 35%;
   }
 
   .message {

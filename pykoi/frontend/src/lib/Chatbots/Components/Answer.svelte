@@ -67,6 +67,7 @@
         text-align: left;
         padding: 10px;
         border: 1px solid var(--black);
+        width: 100%;
     }
     .small-button {
         margin-left: 10px;

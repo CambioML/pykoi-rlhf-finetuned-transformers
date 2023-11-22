@@ -20,8 +20,8 @@ load_dotenv()
         # "HuggingFaceH4/zephyr-7b-beta"
         # "meta-llama/Llama-2-7b-chat-hf"
         # "mistralai/Mistral-7B-v0.1"
-        # "databricks/dolly-v2-3b" 
-        
+        # "databricks/dolly-v2-3b"
+
 RETRIEVAL_MODEL = os.getenv("RETRIEVAL_MODEL")
 
 
@@ -55,7 +55,7 @@ def main(**kwargs):
     # retrieval, chatbot, and dashboard pykoi components
     retriever = RetrievalQA(retrieval_model=retrieval_model, vector_db=vector_db, feedback="rag")
     chatbot = Chatbot(None, feedback="rag", is_retrieval=True)
-    dashboard = Dashboard(RAGDatabase(), feedback="rag")
+    # dashboard = Dashboard(RAGDatabase(), feedback="rag")
 
     ############################################################
     # Starting the application and retrieval qa as a component #
@@ -64,8 +64,7 @@ def main(**kwargs):
     app = Application(debug=False, share=False)
     app.add_component(retriever)
     app.add_component(chatbot)
-    app.add_component(dashboard)
-    print("RUNNING APP IN DEMO MODE")
+    # app.add_component(dashboard)
     app.run()
 
 

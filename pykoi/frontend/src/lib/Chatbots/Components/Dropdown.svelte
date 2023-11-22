@@ -3,6 +3,7 @@
   import { checkedDocs } from "../../../store";
   import { selectAll } from "d3-selection";
   import { tooltip } from "../../../utils.js";
+  import { clickOutside } from "../../../utils.js";
 
   export let documents = [];
 
@@ -44,12 +45,18 @@
     return text;
   }
 
+  function handleClickOutside(e) {
+    e.preventDefault();
+    console.log('click outside');
+    expanded = false;
+  }
+
   $: console.log($checkedDocs);
 </script>
 
 <form>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="multiselect">
+  <div class="multiselect" use:clickOutside on:click_outside={handleClickOutside}>
     <div class="selectBox" on:click={toggleCheckboxes}>
       <select>
         <option>Documents</option>
