@@ -10,7 +10,7 @@ To run a `pykoi` Docker container, launch a GPU instance with the following conf
 - Deep Learning AMI PyTorch GPU 2.0.1 (Ubuntu 20.04)
   <img src="../example/image/readme_ec2_ami.jpg" alt="Alt text" width="75%" height="75%"/>
 - EBS: at least 100G
-  
+
   <img src="../example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 
 ### Installing Docker on your EC2
@@ -146,10 +146,28 @@ docker rm [CONTAINER_NAME]
 ```
 
 # Building Custom Docker Images
-In this folder, we create the different dockerfiles for using pykoi.
+In this folder, we have the different Dockerfiles for using `pykoi`.
+
+## Building from the Repo
+Some of these examples build from the pykoi repository. For example, you can reference the Dockerfile in the `pykoi-retrieval-huggingface`.
+
+In order to build the docker image, first ensure you are in the base directory of the `pykoi` repo. __You will encounter errors if you're not in the base directory__
+
+Then, you can run the following command:
+```
+docker build -t [name]:[tag] . -f [file_path_to_dockerfile]
+```
+
+Here's and example of building the `pykoi-retrieval-huggingface` Dockerfile.
+```
+docker build -t pykoi:0.1 . -f docker/pykoi-retrieval-huggingface/Dockerfile
+```
+
+## Building based on pykoi library
+There are also examples to build based on the `pykoi` package. These examples install `pykoi` via `pip` and run different applications from there. This relies on the latest pypi released versions.
 
 1. `pykoi-cpu`: The base image for the cpu-based usage.
-2. `pykoi-cpu-custom`: When you run this docker image, try to modify the `app.py` and mount it when running the docker container.
+1. `pykoi-cpu-custom`: When you run this docker image, try to modify the `app.py` and mount it when running the docker container.
 
 To run a docker container, we can use the following command:
 ```bash
