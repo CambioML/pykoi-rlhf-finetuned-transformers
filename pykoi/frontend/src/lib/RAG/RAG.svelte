@@ -3,12 +3,33 @@
   import Table from "./Components/tanstackTable/Table.svelte";
   import { onMount } from "svelte";
   import { uploadedFiles, projections } from "../store.js";
+  import CloudArrowUp from "../../assets/CloudArrowUp.svelte";
 
   let selectedFiles = [];
   let indexed = false;
   let indexing = false;
   async function handleFileChange(event) {
-    selectedFiles = event.target.files;
+    event.preventDefault();
+    let selectedFiles = [];
+    if (event.dataTransfer) {
+      if (event.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        [...event.dataTransfer.items].forEach((item, i) => {
+          // If dropped items aren't files, reject them
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            selectedFiles.push(file);
+          }
+        });
+      } else {
+        // Use DataTransfer interface to access the file(s)
+        [...event.dataTransfer.files].forEach((file, i) => {
+          selectedFiles.push(file);
+        });
+      }
+    } else {
+      selectedFiles = event.target.files;
+    }
     const formData = new FormData();
     // iterate over selectedFiles and add them to array
     for (let i = 0; i < selectedFiles.length; i++) {
@@ -56,6 +77,12 @@
     $projections = embeddingData;
   }
 
+  function dragOverHandler(event) {
+    console.log("File(s) in drop zone");
+    // Prevent default behavior (Prevent file from being opened)
+    event.preventDefault();
+  }
+
   onMount(() => {
     loadServerData();
   });
@@ -76,18 +103,27 @@
     <div class="upload-container">
       <div class="upload-box">
         <h4>Upload Data</h4>
-        <br />
-        <form>
-          <input type="file" multiple on:change={handleFileChange} />
-        </form>
+        <p>These are the files your model will use as context.</p>
+        <div class="upload-files-container">
+          <form>
+            <input type="file" multiple on:change={handleFileChange} />
+          </form>
+          <div
+            class="drop-zone"
+            on:drop={handleFileChange}
+            on:dragover={dragOverHandler}
+          >
+            <CloudArrowUp height={32} width={32} />
+            Drag and drop files here
+          </div>
+        </div>
         {#if indexing && !indexed}
           <p>{dots}</p>
         {/if}
         {#if indexed}
           <p>Data Successfully indexed!</p>
         {/if}
-        <p>These are the files your model will use as context.</p>
-        <p>Currently <strong>pdf</strong>, txt, and md are supported.</p>
+        <p>Currently pdf, txt, and md are supported.</p>
       </div>
     </div>
   </div>
@@ -100,6 +136,17 @@
 </div>
 
 <style>
+  .drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--grey);
+    background-color: var(--lightGrey);
+    width: 100%;
+    color: #444;
+    min-height: 300px;
+  }
   .file-container {
     display: grid;
     height: calc(100% - var(--headerHeight));
@@ -123,7 +170,7 @@
   .data-grid {
     display: grid;
     grid-template-columns: 45% 50%;
-    gap: 0;
+    gap: 8px;
     margin: auto;
     max-width: 1200px;
     padding-top: 20px;
@@ -131,14 +178,24 @@
 
   .upload-box {
     display: flex;
+    gap: 10px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
-    max-height: 50vh;
     margin: auto;
-    border: 5px dashed var(--grey);
     padding: 20px;
+    border: 1px solid #333;
     box-sizing: border-box;
+  }
+  .upload-files-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+  }
+
+  p {
+    margin: 0;
   }
 </style>
