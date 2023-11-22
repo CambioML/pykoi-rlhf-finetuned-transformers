@@ -149,7 +149,7 @@ docker rm [CONTAINER_NAME]
 In this folder, we have the different Dockerfiles for using `pykoi`.
 
 ## Building from the Repo
-Some of these examples build from the pykoi repository. For example, you can reference the Dockerfile in the `pykoi-retrieval-huggingface`.
+Some of these examples build from the pykoi repository. For example, you can reference the Dockerfile in the [`pykoi-retrieval-huggingface`](./pykoi-retrieval-huggingface/Dockerfile).
 
 In order to build the docker image, first ensure you are in the base directory of the `pykoi` repo. __You will encounter errors if you're not in the base directory__
 
@@ -164,7 +164,7 @@ docker build -t pykoi:0.1 . -f docker/pykoi-retrieval-huggingface/Dockerfile
 ```
 
 ## Building based on pykoi library
-There are also examples to build based on the `pykoi` package. These examples install `pykoi` via `pip` and run different applications from there. This relies on the latest pypi released versions.
+There are also examples to build based on the `pykoi` package. These examples install `pykoi` via `pip` and run different applications from there. This relies on the latest pypi released versions. To see an example, you can reference the Dockerfile in [`pykoi-cpu-custom`](./pykoi-cpu-custom/Dockerfile).
 
 1. `pykoi-cpu`: The base image for the cpu-based usage.
 1. `pykoi-cpu-custom`: When you run this docker image, try to modify the `app.py` and mount it when running the docker container.
