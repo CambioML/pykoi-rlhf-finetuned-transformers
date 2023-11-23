@@ -47,7 +47,6 @@
 
   function handleClickOutside(e) {
     e.preventDefault();
-    console.log('click outside');
     expanded = false;
   }
 
