@@ -4,12 +4,31 @@
   import { onMount } from "svelte";
   import { uploadedFiles, projections } from "../store.js";
   import CloudArrowUp from "../../assets/CloudArrowUp.svelte";
+  import { slide } from "svelte/transition";
+
+  const UPLOAD_STATES = {
+    WAITING: "waiting",
+    IN_PROGRESS: "in-progress",
+    DONE: "done",
+  };
 
   let selectedFiles = [];
-  let indexed = false;
-  let indexing = false;
+  let uploadState = UPLOAD_STATES.WAITING;
+  let indexState = UPLOAD_STATES.WAITING;
+  let loadState = UPLOAD_STATES.WAITING;
+  let embedState = UPLOAD_STATES.WAITING;
+
+  function resetStates() {
+    uploadState = UPLOAD_STATES.WAITING;
+    indexState = UPLOAD_STATES.WAITING;
+    loadState = UPLOAD_STATES.WAITING;
+    embedState = UPLOAD_STATES.WAITING;
+  }
+
   async function handleFileChange(event) {
     event.preventDefault();
+    resetStates();
+    uploadState = UPLOAD_STATES.IN_PROGRESS;
     let selectedFiles = [];
     if (event.dataTransfer) {
       if (event.dataTransfer.items) {
@@ -39,12 +58,17 @@
       method: "POST",
       body: formData,
     });
+    const data = await response.json();
+    console.log("Upload complete! Response:", data);
+    uploadState = UPLOAD_STATES.DONE;
     indexFiles();
     loadServerData();
     getEmbeddings();
   }
 
   async function loadServerData() {
+    if (indexState === UPLOAD_STATES.IN_PROGRESS)
+      loadState = UPLOAD_STATES.IN_PROGRESS;
     const response = await fetch("/retrieval/file/get");
     const data = await response.json();
     // Transform the received data
@@ -56,30 +80,31 @@
       };
     });
     $uploadedFiles = [...filesData];
+    if (loadState === UPLOAD_STATES.IN_PROGRESS)
+      loadState = UPLOAD_STATES.DONE;
   }
 
   async function indexFiles() {
     console.log("index!");
-    indexing = true;
+    indexState = UPLOAD_STATES.IN_PROGRESS;
     const response = await fetch("/retrieval/vector_db/index", {
       method: "POST",
     });
     const data = await response.json();
-    indexed = true;
-    indexing = false;
+    indexState = UPLOAD_STATES.DONE;
   }
 
   async function getEmbeddings() {
+    embedState = UPLOAD_STATES.IN_PROGRESS;
     console.log("getting embeddings...");
     const response = await fetch("/retrieval/vector_db/get");
     const embeddingData = await response.json();
     console.log("embeddingData", embeddingData);
     $projections = embeddingData;
+    embedState = UPLOAD_STATES.DONE;
   }
 
   function dragOverHandler(event) {
-    console.log("File(s) in drop zone");
-    // Prevent default behavior (Prevent file from being opened)
     event.preventDefault();
   }
 
@@ -87,15 +112,25 @@
     loadServerData();
   });
 
-  let dotState = 0;
+  $: {
+    if (
+      indexState === UPLOAD_STATES.DONE &&
+      loadState === UPLOAD_STATES.DONE &&
+      embedState === UPLOAD_STATES.DONE
+    ) {
+      setTimeout(resetStates, 3000);
+    }
+  }
 
-  // Set an interval to periodically change the number of dots
-  setInterval(() => {
-    dotState = (dotState + 1) % 4;
-  }, 200);
+  // let dotState = 0;
 
-  // Use a reactive statement to create the string with the correct number of dots
-  $: dots = "Indexing" + ".".repeat(dotState);
+  // // Set an interval to periodically change the number of dots
+  // setInterval(() => {
+  //   dotState = (dotState + 1) % 4;
+  // }, 200);
+
+  // // Use a reactive statement to create the string with the correct number of dots
+  // $: dots = ".".repeat(dotState);
 </script>
 
 <div class="data-grid">
@@ -117,11 +152,13 @@
             Drag and drop files here
           </div>
         </div>
-        {#if indexing && !indexed}
-          <p>{dots}</p>
-        {/if}
-        {#if indexed}
-          <p>Data Successfully indexed!</p>
+        {#if uploadState !== UPLOAD_STATES.WAITING}
+          <div class="upload-status" transition:slide={{ duration: 250 }}>
+            <div class={`loading load-left ${uploadState}`}>Upload</div>
+            <div class={`loading ${indexState}`}>Index</div>
+            <div class={`loading ${loadState}`}>Load</div>
+            <div class={`loading load-right ${embedState}`}>Embed</div>
+          </div>
         {/if}
         <p>Currently pdf, txt, and md are supported.</p>
       </div>
@@ -194,8 +231,61 @@
     gap: 10px;
     width: 90%;
   }
+  .upload-status {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    border-radius: 500px;
+    padding: 0 10px;
+  }
 
+  @keyframes color {
+    0% {
+      background-color: var(--yellow);
+    }
+    50% {
+      background-color: var(--lightGrey);
+    }
+    100% {
+      background-color: var(--yellow);
+    }
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 0 10px;
+    border-radius: 2px;
+  }
+  .waiting {
+    background-color: var(--lightGrey);
+    color: var(--grey);
+  }
+  .in-progress {
+    background-color: var(--yellow);
+    animation-name: color;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+  }
+
+  .done {
+    background-color: var(--green);
+    color: var(--lightGrey);
+  }
   p {
     margin: 0;
+  }
+  .load-left {
+    border-top-left-radius: 0.5em;
+    border-bottom-left-radius: 0.5em;
+  }
+
+  .load-right {
+    border-top-right-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
   }
 </style>
