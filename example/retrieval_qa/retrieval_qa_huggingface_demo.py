@@ -22,8 +22,7 @@ load_dotenv()
         # "mistralai/Mistral-7B-v0.1"
         # "databricks/dolly-v2-3b"
 
-RETRIEVAL_MODEL = os.getenv("RETRIEVAL_MODEL")
-
+RETRIEVAL_MODEL = os.getenv("RETRIEVAL_MODEL", default="mistralai/Mistral-7B-v0.1")
 
 def main(**kwargs):
     os.environ["DOC_PATH"] = os.path.join(os.getcwd(), "temp/docs")
