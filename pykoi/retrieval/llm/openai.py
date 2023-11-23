@@ -8,10 +8,14 @@ from langchain.llms import OpenAI
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
+from dotenv import load_dotenv
 
+# NOTE: Configure your MIN_DOCS as RAG_NUM_SOURCES in .env file.
+# Load environment variables from .env file
+load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-MIN_DOCS = 2
+MIN_DOCS = int(os.getenv("RAG_NUM_SOURCES", default=2))
 
 
 class OpenAIModel(AbsLlm):
@@ -26,7 +30,7 @@ class OpenAIModel(AbsLlm):
         try:
             self._llm = OpenAI(
                 model_name="gpt-4",
-                temperature=0, 
+                temperature=0,
                 max_tokens=500)
 
             self._vector_db = vector_db.vector_db

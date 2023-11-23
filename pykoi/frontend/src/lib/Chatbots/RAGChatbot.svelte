@@ -33,9 +33,15 @@
     },
   ];
 
+  async function loadRetrievalFilesAndSelect() {
+    await loadRetrievalFiles();
+    $checkedDocs = new Set($uploadedFiles.map((doc) => doc.name));
+    checkedDocs.set(new Set($checkedDocs));
+  }
+
   onMount(() => {
     getDataFromDB();
-    loadRetrievalFiles();
+    loadRetrievalFilesAndSelect();
   });
 
   async function loadRetrievalFiles() {
@@ -237,7 +243,7 @@
     height: 100vh;
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 65% 35%;
+    grid-template-rows: 80% 20%;
   }
 
   .message {

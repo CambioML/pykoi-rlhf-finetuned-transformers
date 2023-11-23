@@ -47,7 +47,6 @@
 
   function handleClickOutside(e) {
     e.preventDefault();
-    console.log('click outside');
     expanded = false;
   }
 
@@ -121,7 +120,7 @@
 
   .dropdown-content {
     position: absolute; /* has to be abs to prevent document overflow */
-    top: 100%;
+    bottom: 100%;
     left: 0;
     width: 100%;
     border: 1px #dadada solid;

@@ -7,9 +7,13 @@ from langchain.llms import HuggingFacePipeline
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
+from dotenv import load_dotenv
 
-MIN_DOCS = 2
+# NOTE: Configure your MIN_DOCS as RAG_NUM_SOURCES in .env file.
+# Load environment variables from .env file
+load_dotenv()
 
+MIN_DOCS = int(os.getenv("RAG_NUM_SOURCES", default=2))
 
 class HuggingFaceModel(AbsLlm):
     """
