@@ -1,6 +1,9 @@
 name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
-on: push #test
+on:
+    push:
+        tags:
+        - '*'  # push to PyPI and TestPypi on tag pushes
 
 jobs:
   build:
