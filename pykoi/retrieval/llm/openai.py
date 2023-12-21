@@ -1,14 +1,13 @@
 """OpenAI language model for retrieval"""
 import os
-
 from typing import List
 
+from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
-from dotenv import load_dotenv
 
 # NOTE: Configure your MIN_DOCS as RAG_NUM_SOURCES in .env file.
 # Load environment variables from .env file
@@ -28,10 +27,7 @@ class OpenAIModel(AbsLlm):
         Initializes the OpenAIModel class.
         """
         try:
-            self._llm = OpenAI(
-                model_name="gpt-4",
-                temperature=0,
-                max_tokens=500)
+            self._llm = ChatOpenAI(model_name="gpt-4", temperature=0, max_tokens=500)
 
             self._vector_db = vector_db.vector_db
 

@@ -15,25 +15,20 @@ Demo for launching a chatbot UI (with database) from an OpenAI model.
         python -m example.chatbot.demo_launch_app_cpu_openai
         ```
 """
-import os
 
 from dotenv import load_dotenv
 
 from pykoi import Application
-from pykoi.chat import ModelFactory
-from pykoi.chat import QuestionAnswerDatabase
+from pykoi.chat import ModelFactory, QuestionAnswerDatabase
 from pykoi.component import Chatbot, Dashboard
 
 ##########################################################
 # Creating an OpenAI model (requires an OpenAI API key) #
 ##########################################################
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
 
 # Creating an OpenAI model
-model = ModelFactory.create_model(
-    model_source="openai",
-    api_key=api_key)
+model = ModelFactory.create_model(model_source="openai")
 
 #####################################
 # Creating a chatbot with the model #
