@@ -2,7 +2,6 @@
 import abc
 import sqlite3
 import threading
-
 from typing import List, Tuple
 
 
@@ -71,9 +70,7 @@ class AbsDatabase:
         Args:
             kwargs (dict): The key-value pairs to insert into the database.
         """
-        raise NotImplementedError(
-            "Insert method must be implemented by subclasses."
-        )
+        raise NotImplementedError("Insert method must be implemented by subclasses.")
 
     @abc.abstractmethod
     def update(self, **kwargs) -> None:
@@ -83,17 +80,13 @@ class AbsDatabase:
         Args:
             kwargs (dict): The key-value pairs to update in the database.
         """
-        raise NotImplementedError(
-            "Update method must be implemented by subclasses."
-        )
+        raise NotImplementedError("Update method must be implemented by subclasses.")
 
     def retrieve_all(self) -> List[Tuple]:
         """
         Retrieves all pairs from the database.
         """
-        raise NotImplementedError(
-            "Retrieve method must be implemented by subclasses."
-        )
+        raise NotImplementedError("Retrieve method must be implemented by subclasses.")
 
     @abc.abstractmethod
     def print_table(self, rows: str) -> None:
@@ -103,6 +96,4 @@ class AbsDatabase:
         Args:
             rows (str): The rows to print.
         """
-        raise NotImplementedError(
-            "Print method must be implemented by subclasses."
-        )
+        raise NotImplementedError("Print method must be implemented by subclasses.")

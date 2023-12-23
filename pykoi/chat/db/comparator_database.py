@@ -2,11 +2,9 @@
 import csv
 import datetime
 import os
-
 from typing import List, Tuple
 
 import pandas as pd
-
 
 from pykoi.chat.db.abs_database import AbsDatabase
 from pykoi.chat.db.constants import COMPARATOR_CSV_HEADER
@@ -238,7 +236,6 @@ class ComparatorDatabase(AbsDatabase):
                 f"Timestamp: {row[5]}"
             )
 
-
     def save_to_csv(self, csv_file_name="comparator_table"):
         """
         This method saves the contents of the RAG table into a CSV file.
@@ -292,4 +289,3 @@ class ComparatorDatabase(AbsDatabase):
             columns=["ID", "Model", "QID", "Question", "Rank", "Answer", "Timestamp"],
         )
         return df
-

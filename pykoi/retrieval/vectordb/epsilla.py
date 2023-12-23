@@ -1,14 +1,14 @@
 """Vector store Epsilla module"""
 import os
-import numpy as np
 import types
-
 from typing import List
+
+import numpy as np
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.schema import BaseRetriever, Document
-from langchain.embeddings import OpenAIEmbeddings
-from sklearn.decomposition import PCA
 from pyepsilla import vectordb
+from sklearn.decomposition import PCA
 
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
 
@@ -127,9 +127,7 @@ class Epsilla(AbsVectorDb):
             ],
         )
         if status_code == 409:
-            print(
-                f"{result['message']}. Continuing with the existing table."
-            )
+            print(f"{result['message']}. Continuing with the existing table.")
 
         super().__init__()
 

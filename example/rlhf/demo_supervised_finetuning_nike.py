@@ -3,10 +3,9 @@
 python -m example.rlhf.demo_supervised_finetuning_nike
 """
 
-from pykoi.rlhf import RLHFConfig
-from pykoi.rlhf import SupervisedFinetuning
 from peft import LoraConfig, TaskType
 
+from pykoi.rlhf import RLHFConfig, SupervisedFinetuning
 
 base_model_path = "meta-llama/Llama-2-7b-chat-hf"
 dataset_name = "./output_self_instructed_data_nike_10k_2023_FULL.csv"
@@ -22,7 +21,7 @@ eval_freq = 2000
 save_freq = 200
 train_test_split_ratio = 0.0001
 dataset_subset_sft_train = 999999999
-size_valid_set = 0 
+size_valid_set = 0
 
 r = 8
 lora_alpha = 16
@@ -36,13 +35,13 @@ lora_config = LoraConfig(
     lora_dropout=lora_dropout,
     bias=bias,
     task_type=task_type,
-    )
+)
 
 
 # run supervised finetuning
 config = RLHFConfig(
-    base_model_path=base_model_path, 
-    dataset_type=dataset_type, 
+    base_model_path=base_model_path,
+    dataset_type=dataset_type,
     dataset_name=dataset_name,
     learning_rate=learning_rate,
     weight_decay=weight_decay,
@@ -55,7 +54,7 @@ config = RLHFConfig(
     train_test_split_ratio=train_test_split_ratio,
     dataset_subset_sft_train=dataset_subset_sft_train,
     size_valid_set=size_valid_set,
-    lora_config_rl=lora_config
-    )
+    lora_config_rl=lora_config,
+)
 rlhf_step1_sft = SupervisedFinetuning(config)
 rlhf_step1_sft.train_and_save(peft_model_path)

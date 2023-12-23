@@ -13,10 +13,8 @@ Demo for the chatbot application using open source LLMs from Huggingface Peft.
 """
 
 from pykoi import Application
-from pykoi.chat import ModelFactory
-from pykoi.chat import QuestionAnswerDatabase
+from pykoi.chat import ModelFactory, QuestionAnswerDatabase
 from pykoi.component import Chatbot, Dashboard
-
 
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-7b (EC2 g5.4xlarge with 100GB space) #

@@ -1,8 +1,7 @@
 """MLU HF model."""
 from transformers import GenerationConfig
-from pykoi.chat.llm.abs_llm import AbsLlm
 
-from transformers import GenerationConfig
+from pykoi.chat.llm.abs_llm import AbsLlm
 
 
 class MLUWrapper(AbsLlm):

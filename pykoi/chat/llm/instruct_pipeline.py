@@ -6,7 +6,6 @@ from typing import List
 
 import numpy as np
 from transformers import Pipeline, PreTrainedTokenizer
-
 from transformers.utils import is_tf_available
 
 if is_tf_available():
@@ -91,9 +90,7 @@ class InstructionTextGenerationPipeline(Pipeline):
             **kwargs,
         )
 
-    def _sanitize_parameters(
-        self, return_full_text: bool = None, **generate_kwargs
-    ):
+    def _sanitize_parameters(self, return_full_text: bool = None, **generate_kwargs):
         preprocess_params = {}
 
         # newer versions of the tokenizer configure the response key as a special token.  newer versions still may
@@ -133,9 +130,7 @@ class InstructionTextGenerationPipeline(Pipeline):
         return preprocess_params, forward_params, postprocess_params
 
     def preprocess(self, instruction_text, **generate_kwargs):
-        prompt_text = PROMPT_FOR_GENERATION_FORMAT.format(
-            instruction=instruction_text
-        )
+        prompt_text = PROMPT_FOR_GENERATION_FORMAT.format(instruction=instruction_text)
         inputs = self.tokenizer(
             prompt_text,
             return_tensors="pt",
@@ -192,9 +187,7 @@ class InstructionTextGenerationPipeline(Pipeline):
         generated_sequence = model_outputs["generated_sequence"][0]
         instruction_text = model_outputs["instruction_text"]
 
-        generated_sequence: List[
-            List[int]
-        ] = generated_sequence.numpy().tolist()
+        generated_sequence: List[List[int]] = generated_sequence.numpy().tolist()
         records = []
         for sequence in generated_sequence:
             # The response will be set to this variable if we can identify it.
@@ -251,9 +244,7 @@ class InstructionTextGenerationPipeline(Pipeline):
                     if m:
                         decoded = m.group(1).strip()
                     else:
-                        logger.warn(
-                            f"Failed to find response in:\n{fully_decoded}"
-                        )
+                        logger.warn(f"Failed to find response in:\n{fully_decoded}")
 
             # If the full text is requested, then append the decoded text to the original instruction.
             # This technically isn't the full text, as we format the instruction in the prompt the model has been

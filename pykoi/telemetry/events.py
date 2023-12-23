@@ -1,12 +1,12 @@
 """This module contains telemetry events for PyKoi."""
 
 import os
-from dataclasses import asdict, dataclass
-from typing import ClassVar, Dict, Any
 import platform
-import requests
-import pynvml
+from dataclasses import asdict, dataclass
+from typing import Any, ClassVar, Dict
 
+import pynvml
+import requests
 
 try:
     pynvml.nvmlInit()
@@ -96,6 +96,7 @@ class AppStartEvent(TelemetryEvent):
         system (str): The name of the operating system.
         release (str): The release version of the operating system.
     """
+
     name: ClassVar[str] = "app_start"
     start_time: float
     date_time: str
@@ -116,6 +117,7 @@ class AppStopEvent(TelemetryEvent):
         date_time (str): The date and time when the application stopped.
         duration (str): The duration of the application.
     """
+
     name: ClassVar[str] = "app_end"
     end_time: float
     date_time: str
@@ -136,6 +138,7 @@ class SFTStartEvent(TelemetryEvent):
         system (str): The name of the operating system.
         release (str): The release version of the operating system.
     """
+
     name: ClassVar[str] = "sft_start"
     start_time: float
     date_time: str
@@ -156,6 +159,7 @@ class SFTStopEvent(TelemetryEvent):
         date_time (str): The date and time when the supervised finetuning stopped.
         duration (str): The duration of the supervised finetuning.
     """
+
     name: ClassVar[str] = "sft_end"
     end_time: float
     date_time: str
@@ -176,6 +180,7 @@ class RWStartEvent(TelemetryEvent):
         system (str): The name of the operating system.
         release (str): The release version of the operating system.
     """
+
     name: ClassVar[str] = "rw_start"
     start_time: float
     date_time: str
@@ -196,6 +201,7 @@ class RWStopEvent(TelemetryEvent):
         date_time (str): The date and time when the reward model finetuning stopped.
         duration (str): The duration of the reward model finetuning.
     """
+
     name: ClassVar[str] = "rw_end"
     end_time: float
     date_time: str
@@ -216,6 +222,7 @@ class RLStartEvent(TelemetryEvent):
         system (str): The name of the operating system.
         release (str): The release version of the operating system.
     """
+
     name: ClassVar[str] = "rl_start"
     start_time: float
     date_time: str
@@ -236,6 +243,7 @@ class RLStopEvent(TelemetryEvent):
         date_time (str): The date and time when the reinforcement learning finetuning stopped.
         duration (str): The duration of the reinforcement learning finetuning.
     """
+
     name: ClassVar[str] = "rl_end"
     end_time: float
     date_time: str

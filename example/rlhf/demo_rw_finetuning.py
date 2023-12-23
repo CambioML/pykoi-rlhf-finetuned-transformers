@@ -3,23 +3,24 @@
 python -m example.rlhf.demo_rw_finetuning
 """
 
-from pykoi.rlhf import RLHFConfig
-from pykoi.rlhf import RewardFinetuning
 from pykoi.chat import RankingDatabase
-from pykoi.chat.db.constants import (
-    RANKING_CSV_HEADER_ID,
-    RANKING_CSV_HEADER_QUESTION,
-    RANKING_CSV_HEADER_UP_RANKING_ANSWER,
-    RANKING_CSV_HEADER_LOW_RANKING_ANSWER)
+from pykoi.chat.db.constants import (RANKING_CSV_HEADER_ID,
+                                     RANKING_CSV_HEADER_LOW_RANKING_ANSWER,
+                                     RANKING_CSV_HEADER_QUESTION,
+                                     RANKING_CSV_HEADER_UP_RANKING_ANSWER)
+from pykoi.rlhf import RewardFinetuning, RLHFConfig
 
 # get data from local database
 ranking_database = RankingDatabase()
 my_data_pd = ranking_database.retrieve_all_question_answers_as_pandas()
-my_data_pd = my_data_pd[[
-    RANKING_CSV_HEADER_ID,
-    RANKING_CSV_HEADER_QUESTION,
-    RANKING_CSV_HEADER_UP_RANKING_ANSWER,
-    RANKING_CSV_HEADER_LOW_RANKING_ANSWER]]
+my_data_pd = my_data_pd[
+    [
+        RANKING_CSV_HEADER_ID,
+        RANKING_CSV_HEADER_QUESTION,
+        RANKING_CSV_HEADER_UP_RANKING_ANSWER,
+        RANKING_CSV_HEADER_LOW_RANKING_ANSWER,
+    ]
+]
 
 # analyze the data
 print(my_data_pd)

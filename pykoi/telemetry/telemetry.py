@@ -1,16 +1,15 @@
 """This module contains telemetry for PyKoi."""
+import logging
 import os
 import sys
 import uuid
-import logging
-
-from typing import Dict, Any
 from pathlib import Path
+from typing import Any, Dict
+
 from posthog import Posthog
 
 import pykoi
 from pykoi.telemetry.events import TelemetryEvent
-
 
 logger = logging.getLogger(__name__)
 

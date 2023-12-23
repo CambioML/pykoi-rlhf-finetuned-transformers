@@ -1,9 +1,7 @@
 """Module for the compiled Svelte Barchart interactive."""
 import json
-
 from random import randint
-
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class Barchart:

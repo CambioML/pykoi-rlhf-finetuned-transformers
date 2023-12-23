@@ -1,34 +1,25 @@
 """superised_finetuning."""
 import os
-from typing import Optional
-import torch
 import time
-
 from datetime import datetime
+from typing import Optional
+
+import torch
 from datasets import Dataset, load_dataset
 from peft import PeftConfig, PeftModel
-from transformers import (
-    AutoModelForCausalLM,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    TrainingArguments,
-)
-
+from transformers import (AutoModelForCausalLM,
+                          AutoModelForSequenceClassification, AutoTokenizer,
+                          TrainingArguments)
 from trl import SFTTrainer
 from trl.trainer.utils import ConstantLengthDataset
-from pykoi.chat.db.constants import (
-    QA_CSV_HEADER_ID,
-    QA_CSV_HEADER_QUESTION,
-    QA_CSV_HEADER_ANSWER,
-    QA_CSV_HEADER_VOTE_STATUS,
-)
+
+from pykoi.chat.db.constants import (QA_CSV_HEADER_ANSWER, QA_CSV_HEADER_ID,
+                                     QA_CSV_HEADER_QUESTION,
+                                     QA_CSV_HEADER_VOTE_STATUS)
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
+from pykoi.telemetry.events import SFTStartEvent, SFTStopEvent
 from pykoi.telemetry.telemetry import Telemetry
-from pykoi.telemetry.events import (
-    SFTStartEvent,
-    SFTStopEvent,
-)
 
 
 class SupervisedFinetuning:
@@ -46,9 +37,7 @@ class SupervisedFinetuning:
         trainer (SFTTrainer): The trainer object used for training the model.
     """
 
-    def __init__(self,
-                 rlhf_config: RLHFConfig,
-                 enable_telemetry: bool = True) -> None:
+    def __init__(self, rlhf_config: RLHFConfig, enable_telemetry: bool = True) -> None:
         """
         Initializes the SFTTrainer object.
 
@@ -58,18 +47,12 @@ class SupervisedFinetuning:
         """
         self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            rlhf_config.base_model_path
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.base_model_path)
         self.num_proc = (
-            self._rlhf_config.num_workers
-            if not self._rlhf_config.streaming
-            else None
+            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         )
         self.dataset = self.create_datasets(self.tokenizer, self._rlhf_config)
-        self.torch_dtype = (
-            torch.bfloat16 if self._rlhf_config.bf16 else torch.float16
-        )
+        self.torch_dtype = torch.bfloat16 if self._rlhf_config.bf16 else torch.float16
         # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
         self.training_args = TrainingArguments(
             output_dir=self._rlhf_config.output_dir,
@@ -86,6 +69,9 @@ class SupervisedFinetuning:
             warmup_steps=self._rlhf_config.num_warmup_steps,
             gradient_accumulation_steps=self._rlhf_config.gradient_accumulation_steps,
             gradient_checkpointing=self._rlhf_config.gradient_checkpointing,
+            gradient_checkpointing_kwargs={
+                "use_reentrant": self._rlhf_config.gradient_checkpointing_use_reentrant
+            },
             fp16=self._rlhf_config.fp16,
             bf16=self._rlhf_config.bf16,
             weight_decay=self._rlhf_config.weight_decay,
@@ -158,7 +144,7 @@ class SupervisedFinetuning:
     def train_and_save(self, output_path=None):
         start_event = SFTStartEvent(
             start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
-        )        
+        )
         self._telemetry.capture(start_event)
         self.trainer.train()
         self.save(output_path)
@@ -182,9 +168,7 @@ class SupervisedFinetuning:
         if args.dataset_type == "local_db":
             qa_database = QuestionAnswerDatabase()
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
-            my_data_pd = my_data_pd[
-                my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"
-            ]
+            my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"]
             my_data_pd = my_data_pd[
                 [QA_CSV_HEADER_ID, QA_CSV_HEADER_QUESTION, QA_CSV_HEADER_ANSWER]
             ]

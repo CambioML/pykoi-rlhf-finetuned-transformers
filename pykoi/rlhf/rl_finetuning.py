@@ -1,46 +1,33 @@
 """rl finetuning."""
+import json
+import os
 import time
 from datetime import datetime
-from pykoi.rlhf.config import RLHFConfig
-from pykoi.chat.db.constants import (
-    QA_CSV_HEADER_ID,
-    QA_CSV_HEADER_QUESTION,
-    QA_CSV_HEADER_ANSWER,
-    QA_CSV_HEADER_VOTE_STATUS,
-)
 
-import os
-import json
 import numpy as np
 import torch
-from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from accelerate import Accelerator
 from datasets import Dataset, load_dataset
-
+from huggingface_hub import hf_hub_download
+from peft import AutoPeftModelForCausalLM, PeftConfig, PeftModel
 from tqdm import tqdm
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    Trainer,
-    pipeline,
-    set_seed,
-)
+from transformers import (AutoModelForCausalLM,
+                          AutoModelForSequenceClassification, AutoTokenizer,
+                          Trainer, pipeline, set_seed)
 from trl import AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer
 from trl.core import LengthSampler
-from huggingface_hub import hf_hub_download
-from transformers import AutoModelForCausalLM
-from peft import PeftModel, PeftConfig, AutoPeftModelForCausalLM
+
+from pykoi.chat.db.constants import (QA_CSV_HEADER_ANSWER, QA_CSV_HEADER_ID,
+                                     QA_CSV_HEADER_QUESTION,
+                                     QA_CSV_HEADER_VOTE_STATUS)
+from pykoi.chat.db.qa_database import QuestionAnswerDatabase
+from pykoi.rlhf.config import RLHFConfig
+from pykoi.telemetry.events import RLStartEvent, RLStopEvent
 from pykoi.telemetry.telemetry import Telemetry
-from pykoi.telemetry.events import (
-    RLStartEvent,
-    RLStopEvent,
-)
 
 
 class RLFinetuning(Trainer):
-    def __init__(self,
-                 rlhf_config: RLHFConfig,
-                 enable_telemetry: bool = True) -> None:
+    def __init__(self, rlhf_config: RLHFConfig, enable_telemetry: bool = True) -> None:
         """
         RLFinetuning class for finetuning a language model using reinforcement learning.
 
@@ -51,9 +38,7 @@ class RLFinetuning(Trainer):
         self._rlhf_config = rlhf_config
         self.accelerator = Accelerator()
         self.num_proc = (
-            self._rlhf_config.num_workers
-            if not self._rlhf_config.streaming
-            else None
+            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         )
         set_seed(rlhf_config.seed)
 
@@ -75,53 +60,55 @@ class RLFinetuning(Trainer):
         )
 
         ## Load the reward model and tokenizer and define the reward pipeline
-        self.reward_tokenizer = self.create_tokenizer(
-            rlhf_config.reward_model_path
-        )
+        self.reward_tokenizer = self.create_tokenizer(rlhf_config.reward_model_path)
         self.reward_dataset = self.create_dataset(self.reward_tokenizer)
 
         reward_model_path = rlhf_config.reward_model_path
 
         try:
             # If there is a trained peft adapter in the hub, load its config.
-            remote_adapter_config_reward = hf_hub_download(reward_model_path, "adapter_config.json")
+            remote_adapter_config_reward = hf_hub_download(
+                reward_model_path, "adapter_config.json"
+            )
         except:
             remote_adapter_config_reward = None
 
-
-        local_adapter_present_reward =  os.path.exists(
+        local_adapter_present_reward = os.path.exists(
             os.path.join(reward_model_path, "adapter_config.json")
         )
 
         # # Load the trained peft adapter config
         if local_adapter_present_reward:
-            trained_adapter_config_reward = PeftConfig.from_pretrained(reward_model_path)
+            trained_adapter_config_reward = PeftConfig.from_pretrained(
+                reward_model_path
+            )
         else:
-            trained_adapter_config = PeftConfig.from_pretrained(remote_adapter_config_reward)
+            trained_adapter_config = PeftConfig.from_pretrained(
+                remote_adapter_config_reward
+            )
 
         ## Load the pretrained base model
         pretrained_kwargs_reward = {
             "num_labels": 1,
-            "load_in_8bit": False, #True,
+            "load_in_8bit": False,  # True,
             "device_map": {"": Accelerator().local_process_index},
-            }   # TODO: ADD
+        }  # TODO: ADD
         pretrained_model_reward = AutoModelForSequenceClassification.from_pretrained(
             trained_adapter_config_reward.base_model_name_or_path,
-            **pretrained_kwargs_reward
+            **pretrained_kwargs_reward,
         )
         ## TODO: LOAD MERGED BASE MODEL FROM STEP 2
 
         # Load the Peft model by combing the base model with the trained adapter
-        reward_model = PeftModel.from_pretrained(pretrained_model_reward, reward_model_path, is_trainable=False) # TODO: fix this. This should not be trainable.
+        reward_model = PeftModel.from_pretrained(
+            pretrained_model_reward, reward_model_path, is_trainable=False
+        )  # TODO: fix this. This should not be trainable.
         self.reward_model = reward_model.merge_and_unload()
-        #pretrained_model.print_trainable_parameters()
+        # pretrained_model.print_trainable_parameters()
         print("\nTrained peft adapter loaded for reward model\n")
         # have to specify the pad_token_id or will lead to error: "Cannot handle batch sizes > 1 if no padding token is defined"
         # see https://stackoverflow.com/questions/68084302/assertionerror-cannot-handle-batch-sizes-1-if-no-padding-token-is-defined
         self.reward_model.config.pad_token_id = self.reward_tokenizer.pad_token_id
-        
-
-
 
         self.reward_kwargs = {
             "top_k": None,
@@ -145,74 +132,78 @@ class RLFinetuning(Trainer):
         self.base_dataset = self.create_dataset(self.base_tokenizer)
 
         pretrained_model_name_or_path = rlhf_config.base_model_path
-        # #NOTE: TODO: peft config will be directly inferred from the pre-trained model. rlhf_config.lora_config_rl will be ignored in previous implementation. Do we want to use it, in the flow of using merged model as base model and then add peft adapter again?? 
+        # #NOTE: TODO: peft config will be directly inferred from the pre-trained model. rlhf_config.lora_config_rl will be ignored in previous implementation. Do we want to use it, in the flow of using merged model as base model and then add peft adapter again??
 
         pretrained_kwargs = {
             "load_in_8bit": rlhf_config.load_in_8bit,
             "device_map": {"": Accelerator().local_process_index},
         }
 
-        assert isinstance(pretrained_model_name_or_path, str), "The `pretrained_model_path` should be a string."
+        assert isinstance(
+            pretrained_model_name_or_path, str
+        ), "The `pretrained_model_path` should be a string."
         try:
             # If there is a trained peft adapter in the hub, load its config.
-            remote_adapter_config = hf_hub_download(pretrained_model_name_or_path, "adapter_config.json")
+            remote_adapter_config = hf_hub_download(
+                pretrained_model_name_or_path, "adapter_config.json"
+            )
         except:
             remote_adapter_config = None
 
-
-        local_adapter_present =  os.path.exists(
+        local_adapter_present = os.path.exists(
             os.path.join(pretrained_model_name_or_path, "adapter_config.json")
         )
 
         # # Load the trained peft adapter config
         if local_adapter_present:
-            trained_adapter_config = PeftConfig.from_pretrained(pretrained_model_name_or_path)
+            trained_adapter_config = PeftConfig.from_pretrained(
+                pretrained_model_name_or_path
+            )
         else:
             trained_adapter_config = PeftConfig.from_pretrained(remote_adapter_config)
 
         # # Load the pretrained base model
         pretrained_model = AutoModelForCausalLM.from_pretrained(
-            trained_adapter_config.base_model_name_or_path,
-            **pretrained_kwargs
+            trained_adapter_config.base_model_name_or_path, **pretrained_kwargs
         )
 
         # Load the Peft model by combing the base model with the trained adapter
-        is_trainable = True # TODO: If following merge+train new adapter flow. Below should not be trainable!
-        pretrained_model = PeftModel.from_pretrained(pretrained_model, pretrained_model_name_or_path, is_trainable=is_trainable)
+        is_trainable = True  # TODO: If following merge+train new adapter flow. Below should not be trainable!
+        pretrained_model = PeftModel.from_pretrained(
+            pretrained_model, pretrained_model_name_or_path, is_trainable=is_trainable
+        )
 
-        #pretrained_model.print_trainable_parameters()
+        # pretrained_model.print_trainable_parameters()
         print("\nTrained peft adapter loaded for policy model\n")
 
         # Alternatively, load a peft model from a local path. See https://huggingface.co/docs/peft/quicktour. # TODO: DELETE. doesn't work
         # peft_model = AutoPeftModelForCausalLM.from_pretrained(pretrained_model_name_or_path)
 
-
         # Add value head to the pretrained peft model to create a policy network.
         if isinstance(pretrained_model, PeftModel):
             is_peft_model = True
-        trl_model_args = {} # args for the value head
+        trl_model_args = {}  # args for the value head
         # TODO: weights of v_head initialized using v_head_init_strategy="random" by default. trl also suports initialization using "norm".
         model = AutoModelForCausalLMWithValueHead(pretrained_model, **trl_model_args)
         # TODO: 1 VALUE HEAD REQURIES GRAD = FALSE AND NOT IN CUDA. CHECK IF BELOW CODE FIX THIS. 2. PEFTMODEL PRINT TRAINABLE PARAMETERS REUTRNS ... AND NONE
-    
 
         # For back compatibility for class AutoModelForCausalLMWithValueHead. is_peft_model needs to be specified or calling model.state_dict() will fail.
         model.is_peft_model = is_peft_model
         # For back compatibility
         model.is_sequential_parallel = True
         model.current_device = Accelerator().local_process_index
-        reward_adapter = None  # TODO: Consider adding reward adapter here? 
+        reward_adapter = None  # TODO: Consider adding reward adapter here?
         if is_peft_model and reward_adapter is not None:
             model.add_and_load_reward_modeling_adapter(reward_adapter)
             model.supports_rm_adapter = True
         else:
             model.supports_rm_adapter = False
 
-
-        # Adding v_head to device and register hook. See AutoModelForCausalLMWithValueHead.post_init(). 
+        # Adding v_head to device and register hook. See AutoModelForCausalLMWithValueHead.post_init().
         # TODO: is register_forward_hook necessary? outputs should be already on cuda
         first_device = list(set(model.pretrained_model.hf_device_map.values()))[0]
         model.v_head = model.v_head.to(first_device)
+
         def set_device_hook(module, input, outputs):
             new_output = ()
             for output in outputs:
@@ -221,9 +212,10 @@ class RLFinetuning(Trainer):
                 else:
                     new_output += (output,)
             return new_output
+
         model.register_forward_hook(set_device_hook)
         self.base_model = model
-        #breakpoint()
+        # breakpoint()
         # self.base_model = AutoModelForCausalLMWithValueHead.from_pretrained(
         #     rlhf_config.base_model_path,
         #     load_in_8bit=rlhf_config.load_in_8bit,
@@ -288,19 +280,13 @@ class RLFinetuning(Trainer):
         """
         args = self._rlhf_config
         if args.dataset_type == "local_db":
-            qa_database = QuestionAnswerDatabase(
-                db_file=self._rlhf_config.dataset_name
-            )
+            qa_database = QuestionAnswerDatabase(db_file=self._rlhf_config.dataset_name)
             my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
-            my_data_pd = my_data_pd[
-                my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"
-            ]
+            my_data_pd = my_data_pd[my_data_pd[QA_CSV_HEADER_VOTE_STATUS] == "up"]
             my_data_pd = my_data_pd[
                 [QA_CSV_HEADER_ID, QA_CSV_HEADER_QUESTION, QA_CSV_HEADER_ANSWER]
             ]
-            print(
-                "My local database has {} samples".format(my_data_pd.shape[0])
-            )
+            print("My local database has {} samples".format(my_data_pd.shape[0]))
             dataset = Dataset.from_dict(my_data_pd)
         elif args.dataset_type == "local_csv":  ## TODO: test
             dataset = load_dataset("csv", data_files=args.dataset_name)
@@ -338,9 +324,7 @@ class RLFinetuning(Trainer):
                 query = "Question: " + question + "\n\nAnswer: "
                 tokenized_question = tokenizer(query, truncation=True)
                 new_examples["query"].append(query)
-                new_examples["input_ids"].append(
-                    tokenized_question["input_ids"]
-                )
+                new_examples["input_ids"].append(tokenized_question["input_ids"])
             return new_examples
 
         dataset = dataset.map(
@@ -388,20 +372,13 @@ class RLFinetuning(Trainer):
                 response_tensors, skip_special_tokens=True
             )
             # compute rewards and run PPO
-            texts = [
-                q + r
-                for q, r in zip(batch["query"], batch[QA_CSV_HEADER_ANSWER])
-            ]
+            texts = [q + r for q, r in zip(batch["query"], batch[QA_CSV_HEADER_ANSWER])]
             pipe_outputs = self.reward_pipe(texts, **self.reward_kwargs)
             rewards = [
-                torch.tensor(
-                    output[0]["score"] - self._rlhf_config.reward_baseline
-                )
+                torch.tensor(output[0]["score"] - self._rlhf_config.reward_baseline)
                 for output in pipe_outputs
             ]
-            stats = self.ppo_trainer.step(
-                question_tensors, response_tensors, rewards
-            )
+            stats = self.ppo_trainer.step(question_tensors, response_tensors, rewards)
 
             ## log stats
             self.log_stats_to_json(epoch=epoch, stats=stats, reward=rewards[0])
@@ -422,9 +399,7 @@ class RLFinetuning(Trainer):
                     )
                 self.ppo_trainer.save_pretrained(save_checkpoints_path)
 
-    def log_stats_to_json(
-        self, epoch, stats, reward, filename="ppo_log_stats.json"
-    ):
+    def log_stats_to_json(self, epoch, stats, reward, filename="ppo_log_stats.json"):
         """
         Log the PPO stats to a json file.
         Args:
@@ -480,7 +455,7 @@ class RLFinetuning(Trainer):
         """
         start_event = RLStartEvent(
             start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
-        )        
+        )
         self._telemetry.capture(start_event)
         self.train(save_checkpoints_path=output_path)
         self.save(output_path)
