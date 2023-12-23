@@ -1,6 +1,6 @@
 import os
-import numpy as np
 
+import numpy as np
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores import Chroma
 from sklearn.decomposition import PCA

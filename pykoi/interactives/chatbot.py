@@ -1,8 +1,6 @@
 import json
-
 from random import randint
-
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class Chatbot:

@@ -2,13 +2,13 @@
 import uuid
 from typing import Callable, List, Optional, Union
 
-from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
-from pykoi.component.constants import FeedbackType
 from pykoi.chat.db.comparator_database import ComparatorDatabase
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.chat.db.rag_database import RAGDatabase
 from pykoi.chat.db.ranking_database import RankingDatabase
 from pykoi.chat.llm.abs_llm import AbsLlm
+from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
+from pykoi.component.constants import FeedbackType
 
 
 class DataSource:

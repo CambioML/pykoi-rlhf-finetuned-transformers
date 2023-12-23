@@ -65,6 +65,7 @@ class RLHFConfig:
     # batch_size: int = field(
     #     default=8,
     #     metadata={"help": "Batch size."})
+    # TODO: for trl 0.7.4 there is a OOM issue with batch size > 1, need to revisit
     per_device_train_batch_size: Optional[int] = field(
         default=1, metadata={"help": "Batch size per device for training."}
     )

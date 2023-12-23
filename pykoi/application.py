@@ -4,20 +4,20 @@ import os
 import re
 import subprocess
 import time
-
 from datetime import datetime
-from typing import List, Optional, Any, Dict, Union
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from passlib.context import CryptContext
+from typing import Any, Dict, List, Optional, Union
+
+from fastapi import Depends, FastAPI, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
+from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
-from pykoi.telemetry.telemetry import Telemetry
-from pykoi.telemetry.events import AppStartEvent, AppStopEvent
-from pykoi.chat.db.constants import RAG_LIST_SEPARATOR
 
+from pykoi.chat.db.constants import RAG_LIST_SEPARATOR
+from pykoi.telemetry.events import AppStartEvent, AppStopEvent
+from pykoi.telemetry.telemetry import Telemetry
 
 oauth_scheme = HTTPBasic()
 
@@ -644,10 +644,14 @@ class Application:
             try:
                 print("[/retrieval]: model inference.....", request_body.prompt)
                 component["component"].retrieval_model.re_init(request_body.file_names)
-                output = component["component"].retrieval_model.run_with_return_source_documents({"query": request_body.prompt})
-                print('output', output, output["result"])
+                output = component[
+                    "component"
+                ].retrieval_model.run_with_return_source_documents(
+                    {"query": request_body.prompt}
+                )
+                print("output", output, output["result"])
                 if "source_documents" not in output:
-                    print('no source documents', output)
+                    print("no source documents", output)
                     source = ["N/A"]
                     source_content = ["N/A"]
                 elif output["source_documents"] == []:
@@ -791,9 +795,16 @@ class Application:
             try:
                 file_path = f"{os.getcwd()}/{file_name}"
                 file_exists = os.path.exists(file_path)
-                return {"log": f"Check if {file_name} exists succeeded.", "file_exists": file_exists, "status": "200"}
+                return {
+                    "log": f"Check if {file_name} exists succeeded.",
+                    "file_exists": file_exists,
+                    "status": "200",
+                }
             except Exception as ex:
-                return {"log": f"Check if {file_name} exists failed: {ex}", "status": "500"}
+                return {
+                    "log": f"Check if {file_name} exists failed: {ex}",
+                    "status": "500",
+                }
 
         def create_data_route(id: str, data_source: Any):
             """

@@ -6,7 +6,6 @@ from pykoi import Application
 from pykoi.chat.llm.huggingface import HuggingfaceModel
 from pykoi.component import Compare
 
-
 ######################################################################################
 # Creating a Huggingface model tiiuae/falcon-rw-1b (EC2 g4.2xlarge with 100GB space) #
 ######################################################################################
@@ -73,9 +72,7 @@ models = [hf_model_1, hf_model_2, hf_model_3]
 tokenizers = [hf_tokenizer_1, hf_tokenizer_2, hf_tokenizer_3]
 
 models_list = [
-    HuggingfaceModel.create(
-        model=model, tokenizer=tokenizer, name=name, max_length=100
-    )
+    HuggingfaceModel.create(model=model, tokenizer=tokenizer, name=name, max_length=100)
     for model, tokenizer, name in zip(models, tokenizers, model_name)
 ]
 

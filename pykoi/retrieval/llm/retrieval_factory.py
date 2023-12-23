@@ -28,9 +28,11 @@ class RetrievalFactory:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
                 from pykoi.retrieval.llm.openai import OpenAIModel
+
                 return OpenAIModel(vector_db)
             if model_source == ModelSource.HUGGINGFACE:
                 from pykoi.retrieval.llm.huggingface import HuggingFaceModel
+
                 return HuggingFaceModel(vector_db, **kwargs)
         except Exception as ex:
             raise Exception(f"Unknown model: {model_source}") from ex

@@ -1,19 +1,20 @@
 """OpenAI language model for retrieval"""
 import os
-import torch
 
+import torch
+from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.llms import HuggingFacePipeline
 
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
-from dotenv import load_dotenv
 
 # NOTE: Configure your MIN_DOCS as RAG_NUM_SOURCES in .env file.
 # Load environment variables from .env file
 load_dotenv()
 
 MIN_DOCS = int(os.getenv("RAG_NUM_SOURCES", default=2))
+
 
 class HuggingFaceModel(AbsLlm):
     """
@@ -34,7 +35,7 @@ class HuggingFaceModel(AbsLlm):
                     "temperature": 0,
                     "max_length": kwargs.get("max_length", 500),
                     "load_in_8bit": True,
-                    "trust_remote_code": kwargs.get("trust_remote_code", True)
+                    "trust_remote_code": kwargs.get("trust_remote_code", True),
                 },
             )
 
@@ -43,7 +44,9 @@ class HuggingFaceModel(AbsLlm):
             self._retrieve_qa = RetrievalQA.from_chain_type(
                 llm=self._llm,
                 chain_type="stuff",
-                retriever=self._vector_db.as_retriever(search_kwargs={"k": MIN_DOCS, "filter": {}}),
+                retriever=self._vector_db.as_retriever(
+                    search_kwargs={"k": MIN_DOCS, "filter": {}}
+                ),
                 verbose=True,
                 return_source_documents=True,
             )
@@ -69,12 +72,17 @@ class HuggingFaceModel(AbsLlm):
             self._retrieve_qa = RetrievalQA.from_chain_type(
                 llm=self._llm,
                 chain_type="stuff",
-                retriever=self._vector_db.as_retriever(search_kwargs={"k": MIN_DOCS, "filter": metadata_filename_filter}),
+                retriever=self._vector_db.as_retriever(
+                    search_kwargs={"k": MIN_DOCS, "filter": metadata_filename_filter}
+                ),
                 verbose=True,
                 return_source_documents=True,
             )
 
-            print("Re-initialized HuggingFaceModel successfully with filter: ", metadata_filename_filter)
+            print(
+                "Re-initialized HuggingFaceModel successfully with filter: ",
+                metadata_filename_filter,
+            )
 
             super().__init__(self._retrieve_qa)
         except Exception as ex:

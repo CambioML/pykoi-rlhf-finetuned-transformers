@@ -7,21 +7,15 @@ from typing import Optional
 import torch
 from datasets import Dataset, load_dataset
 from peft import PeftConfig, PeftModel
-from transformers import (
-    AutoModelForCausalLM,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    TrainingArguments,
-)
+from transformers import (AutoModelForCausalLM,
+                          AutoModelForSequenceClassification, AutoTokenizer,
+                          TrainingArguments)
 from trl import SFTTrainer
 from trl.trainer.utils import ConstantLengthDataset
 
-from pykoi.chat.db.constants import (
-    QA_CSV_HEADER_ANSWER,
-    QA_CSV_HEADER_ID,
-    QA_CSV_HEADER_QUESTION,
-    QA_CSV_HEADER_VOTE_STATUS,
-)
+from pykoi.chat.db.constants import (QA_CSV_HEADER_ANSWER, QA_CSV_HEADER_ID,
+                                     QA_CSV_HEADER_QUESTION,
+                                     QA_CSV_HEADER_VOTE_STATUS)
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
 from pykoi.telemetry.events import SFTStartEvent, SFTStopEvent
