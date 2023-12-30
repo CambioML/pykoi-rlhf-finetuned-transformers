@@ -1,3 +1,5 @@
 from pykoi.application import Application
 
-__version__ = "0.0.9"
+__all__ = ["Application"]
+
+__version__ = "0.0.10"

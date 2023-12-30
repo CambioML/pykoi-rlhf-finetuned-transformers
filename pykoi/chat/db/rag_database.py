@@ -72,7 +72,14 @@ class RAGDatabase:
             print("Table contents after creating table:")
             self.print_table(rows)
 
-    def insert_question_answer(self, question: str, answer: str, rag_sources: list, source: list, source_content: list):
+    def insert_question_answer(
+        self,
+        question: str,
+        answer: str,
+        rag_sources: list,
+        source: list,
+        source_content: list,
+    ):
         """
         Inserts a new question-answer pair into the database with the given question and answer.
         The vote_status field is set to 'n/a' by default.
@@ -100,7 +107,10 @@ class RAGDatabase:
 
         with self._lock:
             cursor = self.get_cursor()
-            cursor.execute(query, (question, answer, rag_sources, source, source_content, timestamp))
+            cursor.execute(
+                query,
+                (question, answer, rag_sources, source, source_content, timestamp),
+            )
             self.get_connection().commit()
 
         if self._debug:
@@ -155,7 +165,7 @@ class RAGDatabase:
         SET edited_answer = ?
         WHERE id = ?;
         """
-        print('update_answer',new_answer)
+        print("update_answer", new_answer)
         with self._lock:
             cursor = self.get_cursor()
             cursor.execute(query, (new_answer, id))

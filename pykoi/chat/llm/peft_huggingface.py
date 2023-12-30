@@ -1,8 +1,7 @@
 """Huggingface PEFT model for Language Model (LLM)."""
 import torch
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from pykoi.chat.llm.abs_llm import AbsLlm
 
@@ -108,8 +107,7 @@ class PeftHuggingfacemodel(AbsLlm):
         )
         print("[HuggingfaceModel] decode...")
         response = [
-            self._tokenizer.decode(ids, skip_special_tokens=True)
-            for ids in output_ids
+            self._tokenizer.decode(ids, skip_special_tokens=True) for ids in output_ids
         ]
         print("response: ", response)
 

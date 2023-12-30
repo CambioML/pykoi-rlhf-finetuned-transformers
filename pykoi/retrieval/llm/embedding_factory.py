@@ -1,8 +1,8 @@
 """Embedding factory for LLM"""
 from typing import Union
 
+from langchain.embeddings import HuggingFaceEmbeddings, OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
-from langchain.embeddings import OpenAIEmbeddings, HuggingFaceEmbeddings
 
 from pykoi.retrieval.llm.constants import ModelSource
 
@@ -28,9 +28,11 @@ class EmbeddingFactory:
             model_source = ModelSource(model_source)
             if model_source == ModelSource.OPENAI:
                 from langchain.embeddings import OpenAIEmbeddings
+
                 return OpenAIEmbeddings()
             elif model_source == ModelSource.HUGGINGFACE:
                 from langchain.embeddings import HuggingFaceEmbeddings
+
                 return HuggingFaceEmbeddings(
                     model_name=kwargs.get("model_name"),
                 )

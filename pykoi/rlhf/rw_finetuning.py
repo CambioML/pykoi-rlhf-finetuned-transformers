@@ -1,37 +1,26 @@
 """reward model finetuning."""
 import os
 import time
-
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import evaluate
 import numpy as np
 import torch
-
 from datasets import Dataset, load_dataset
 from peft import get_peft_model
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    Trainer,
-    TrainingArguments,
-)
+from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                          Trainer, TrainingArguments)
 
-from pykoi.rlhf.config import RLHFConfig
-from pykoi.chat.db.constants import (
-    RANKING_CSV_HEADER_ID,
-    RANKING_CSV_HEADER_QUESTION,
-    RANKING_CSV_HEADER_LOW_RANKING_ANSWER,
-    RANKING_CSV_HEADER_UP_RANKING_ANSWER,
-)
+from pykoi.chat.db.constants import (RANKING_CSV_HEADER_ID,
+                                     RANKING_CSV_HEADER_LOW_RANKING_ANSWER,
+                                     RANKING_CSV_HEADER_QUESTION,
+                                     RANKING_CSV_HEADER_UP_RANKING_ANSWER)
 from pykoi.chat.db.ranking_database import RankingDatabase
+from pykoi.rlhf.config import RLHFConfig
+from pykoi.telemetry.events import RWStartEvent, RWStopEvent
 from pykoi.telemetry.telemetry import Telemetry
-from pykoi.telemetry.events import (
-    RWStartEvent,
-    RWStopEvent,
-)
 
 
 @dataclass
@@ -70,9 +59,7 @@ class RewardDataCollatorWithPadding:
 
 
 class RewardFinetuning(Trainer):
-    def __init__(self,
-                 rlhf_config: RLHFConfig,
-                 enable_telemetry: bool = True) -> None:
+    def __init__(self, rlhf_config: RLHFConfig, enable_telemetry: bool = True) -> None:
         self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
         self.args = TrainingArguments(
@@ -95,16 +82,14 @@ class RewardFinetuning(Trainer):
             logging_steps=rlhf_config.logging_steps,
             # optim=rlhf_config.optim,
             # lr_scheduler_type=rlhf_config.lr_scheduler_type_rw,
-            adam_epsilon = 1e-7 # Language model is loaded in torch.float16. Adam optimizer adds epsilon to avoid zero denominator.
-                                # NOTE: torch.float 16 will round any number smaller than 6e-8 to 0. Do not change episolon to smaller than 6e-8. 
+            adam_epsilon=1e-7  # Language model is loaded in torch.float16. Adam optimizer adds epsilon to avoid zero denominator.
+            # NOTE: torch.float 16 will round any number smaller than 6e-8 to 0. Do not change episolon to smaller than 6e-8.
         )
         self.torch_dtype = torch.bfloat16 if rlhf_config.bf16 else torch.float16
         # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
 
         # Load the tokenizer and the model
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            rlhf_config.reward_model_path
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.reward_model_path)
         self.tokenizer.pad_token = self.tokenizer.eos_token
 
         self.base_model = AutoModelForSequenceClassification.from_pretrained(
@@ -114,16 +99,12 @@ class RewardFinetuning(Trainer):
             load_in_8bit=rlhf_config.load_in_8bit,
             device_map=rlhf_config.device_map,
         )
-        self.model = get_peft_model(
-            self.base_model, rlhf_config.lora_config_reward
-        )
+        self.model = get_peft_model(self.base_model, rlhf_config.lora_config_reward)
         self.model.print_trainable_parameters()
         self.model.config.pad_token_id = self.tokenizer.eos_token_id
         self.model.config.use_cache = not rlhf_config.gradient_checkpointing
         self.num_proc = (
-            self._rlhf_config.num_workers
-            if not self._rlhf_config.streaming
-            else None
+            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         )
 
         self.dataset = self.create_datasets()
@@ -191,9 +172,7 @@ class RewardFinetuning(Trainer):
         # based on dataset_type (e.g. "huggingface", "csv", etc.), load the data
         if self._rlhf_config.dataset_type == "local_db":
             ranking_database = RankingDatabase()
-            my_data_pd = (
-                ranking_database.retrieve_all_question_answers_as_pandas()
-            )
+            my_data_pd = ranking_database.retrieve_all_question_answers_as_pandas()
             my_data_pd = my_data_pd[
                 [
                     RANKING_CSV_HEADER_ID,
@@ -219,9 +198,7 @@ class RewardFinetuning(Trainer):
         #         streaming=self._rlhf_config.streaming,
         #     )
         elif self._rlhf_config.dataset_type == "csv":
-            dataset = load_dataset(
-                "csv", data_files=self._rlhf_config.dataset_name
-            )
+            dataset = load_dataset("csv", data_files=self._rlhf_config.dataset_name)
         else:
             raise FileNotFoundError(
                 "No (supported) data files or dataset script found"
@@ -235,8 +212,7 @@ class RewardFinetuning(Trainer):
             num_proc=self.num_proc,
         )
         dataset = dataset.filter(
-            lambda x: len(x["input_ids_x"])
-            <= self._rlhf_config.max_seq_length_reward
+            lambda x: len(x["input_ids_x"]) <= self._rlhf_config.max_seq_length_reward
             and len(x["input_ids_y"]) <= self._rlhf_config.max_seq_length_reward
         )
 
@@ -318,7 +294,7 @@ class RewardFinetuning(Trainer):
         """
         start_event = RWStartEvent(
             start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
-        )        
+        )
         self._telemetry.capture(start_event)
         self.train()
         self.save(output_path)

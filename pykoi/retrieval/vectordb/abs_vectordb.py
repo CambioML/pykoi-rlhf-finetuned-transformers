@@ -1,9 +1,9 @@
 import os
-import docx2txt
-
 from abc import ABC, abstractmethod
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from pathlib import Path
+
+import docx2txt
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from pdfminer.high_level import extract_text
 
 

@@ -1,15 +1,13 @@
 """Chatbot comparator component."""
 import time
-import pandas as pd
-
 from typing import List
 
-from pykoi.component.base import Component
-from pykoi.chat.db.comparator_database import (
-    ComparatorDatabase,
-    ComparatorQuestionDatabase,
-)
+import pandas as pd
+
+from pykoi.chat.db.comparator_database import (ComparatorDatabase,
+                                               ComparatorQuestionDatabase)
 from pykoi.chat.llm.abs_llm import AbsLlm
+from pykoi.component.base import Component
 from pykoi.interactives.barchart import Barchart
 
 

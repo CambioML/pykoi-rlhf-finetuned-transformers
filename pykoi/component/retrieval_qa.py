@@ -1,10 +1,9 @@
 """Retrieval QA component."""
 
+from pykoi.component.base import Component
+from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
 from pykoi.retrieval.llm.abs_llm import AbsLlm
 from pykoi.retrieval.vectordb.abs_vectordb import AbsVectorDb
-from pykoi.component.chatbot_database_factory import ChatbotDatabaseFactory
-
-from pykoi.component.base import Component
 
 
 class RetrievalQA(Component):

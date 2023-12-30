@@ -16,7 +16,6 @@ Demo for the chatbot application using multiple OpenAI models.
         ```
 """
 
-import os
 
 from dotenv import load_dotenv
 
@@ -24,22 +23,20 @@ from pykoi import Application
 from pykoi.chat import ModelFactory
 from pykoi.component import Compare
 
-
 ##########################################################
 # Creating an OpenAI model (requires an OpenAI API key) #
 ##########################################################
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
 
 # Creating an OpenAI model
 openai_model_1 = ModelFactory.create_model(
-    model_source="openai", name="openai_babbage", api_key=api_key, engine="babbage"
+    model_source="openai", name="openai_babbage", model="babbage"
 )
 openai_model_2 = ModelFactory.create_model(
-    model_source="openai", name="openai_curie", api_key=api_key, engine="curie"
+    model_source="openai", name="openai_curie", model="curie"
 )
 openai_model_3 = ModelFactory.create_model(
-    model_source="openai", name="openai_davinci", api_key=api_key, engine="davinci"
+    model_source="openai", name="openai_davinci", model="davinci"
 )
 
 ###################################################################################

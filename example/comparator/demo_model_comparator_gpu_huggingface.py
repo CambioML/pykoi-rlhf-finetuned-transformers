@@ -15,7 +15,6 @@ from pykoi import Application
 from pykoi.chat import ModelFactory
 from pykoi.component import Compare
 
-
 ###################################################################################
 # Creating a Huggingface model tiiuae/falcon-rw-1b (EC2 g4.2xlarge with 100GB space) #
 ###################################################################################

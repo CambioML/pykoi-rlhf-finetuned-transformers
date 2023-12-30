@@ -1,10 +1,10 @@
 """Chatbot Database Factory class."""
 from typing import Union
 
-from pykoi.component.constants import FeedbackType
 from pykoi.chat.db.qa_database import QuestionAnswerDatabase
-from pykoi.chat.db.ranking_database import RankingDatabase
 from pykoi.chat.db.rag_database import RAGDatabase
+from pykoi.chat.db.ranking_database import RankingDatabase
+from pykoi.component.constants import FeedbackType
 
 
 class ChatbotDatabaseFactory:

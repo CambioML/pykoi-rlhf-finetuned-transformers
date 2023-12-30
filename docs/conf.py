@@ -79,5 +79,5 @@ html_theme_options = {
             """,
             "class": "",
         },
-    ]
+    ],
 }

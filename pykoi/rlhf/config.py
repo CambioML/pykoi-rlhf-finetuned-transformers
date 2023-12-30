@@ -19,9 +19,7 @@ class RLHFConfig:
 
     base_model_path: str = field(
         default="elinas/llama-7b-hf-transformers-4.29",
-        metadata={
-            "help": "Huggingface model name or a local path to the base model."
-        },
+        metadata={"help": "Huggingface model name or a local path to the base model."},
     )
     dataset_type: Optional[str] = field(
         default="local_db",
@@ -67,8 +65,9 @@ class RLHFConfig:
     # batch_size: int = field(
     #     default=8,
     #     metadata={"help": "Batch size."})
+    # TODO: for trl 0.7.4 there is a OOM issue with batch size > 1, need to revisit
     per_device_train_batch_size: Optional[int] = field(
-        default=2, metadata={"help": "Batch size per device for training."}
+        default=1, metadata={"help": "Batch size per device for training."}
     )
     per_device_eval_batch_size: Optional[int] = field(
         default=8, metadata={"help": "Batch size per device for evaluation."}
@@ -89,12 +88,8 @@ class RLHFConfig:
     local_rank: Optional[int] = field(
         default=-1, metadata={"help": "Used for multi-gpu."}
     )
-    fp16: Optional[bool] = field(
-        default=True, metadata={"help": "Enable FP16."}
-    )
-    bf16: Optional[bool] = field(
-        default=False, metadata={"help": "Enable BF16."}
-    )
+    fp16: Optional[bool] = field(default=True, metadata={"help": "Enable FP16."})
+    bf16: Optional[bool] = field(default=False, metadata={"help": "Enable BF16."})
     load_in_8bit: Optional[bool] = field(
         default=True,
         metadata={"help": "Whether load the model weights in 8-bit or not."},
@@ -113,6 +108,9 @@ class RLHFConfig:
     gradient_checkpointing: Optional[bool] = field(
         default=False, metadata={"help": "Enable gradient checkpointing."}
     )
+    gradient_checkpointing_use_reentrant: Optional[bool] = field(
+        default=True, metadata={"help": "Enable reentrant for gradient checkpointing."}
+    )
     seed: Optional[int] = field(default=0, metadata={"help": "Random seed."})
     num_workers: Optional[int] = field(
         default=None, metadata={"help": "Number of workers."}
@@ -121,9 +119,7 @@ class RLHFConfig:
         default="./rlhf_checkpoints",
         metadata={"help": "Output directory for all model weights."},
     )
-    log_freq: Optional[int] = field(
-        default=1, metadata={"help": "Logging frequency."}
-    )
+    log_freq: Optional[int] = field(default=1, metadata={"help": "Logging frequency."})
     eval_freq: Optional[int] = field(
         default=1000, metadata={"help": "Evaluation frequency."}
     )
@@ -135,7 +131,7 @@ class RLHFConfig:
         metadata={"help": "Whether push to Huggingface Hub or not."},
     )
 
-    ## Step 1 SFT parameters
+    # Step 1 SFT parameters
     max_steps: Optional[int] = field(
         default=5, metadata={"help": "Maximum number of training steps."}
     )
@@ -145,9 +141,7 @@ class RLHFConfig:
     )
     dataset_subset_sft_train: Optional[int] = field(
         default=10000,
-        metadata={
-            "help": "The size of the subset of the training data to use."
-        },
+        metadata={"help": "The size of the subset of the training data to use."},
     )
     split: Optional[str] = field(
         default="train", metadata={"help": "Dataset split to use."}
@@ -167,8 +161,7 @@ class RLHFConfig:
         default="step1_supervised_finetuning_lora_final/",
         metadata={
             "help": (
-                "Output directory for step 1 supervised finetuning's Lora"
-                " weights."
+                "Output directory for step 1 supervised finetuning's Lora" " weights."
             )
         },
     )
@@ -194,17 +187,14 @@ class RLHFConfig:
     reward_model_path: Optional[str] = field(
         default="databricks/dolly-v2-3b",
         metadata={
-            "help": (
-                "Huggingface model name or a local path to the reward model."
-            )
+            "help": ("Huggingface model name or a local path to the reward model.")
         },
     )
     reward_lora_path: Optional[str] = field(
         default="step2_reward_finetuning_lora_final/",
         metadata={
             "help": (
-                "Output directory for step 1 supervised finetuning's Lora"
-                " weights."
+                "Output directory for step 1 supervised finetuning's Lora" " weights."
             )
         },
     )
@@ -222,9 +212,7 @@ class RLHFConfig:
     )
     reward_num_of_data: Optional[int] = field(
         default=1000,
-        metadata={
-            "help": "The size of the subset of the training data to use."
-        },
+        metadata={"help": "The size of the subset of the training data to use."},
     )
     max_seq_length_reward: Optional[int] = field(
         default=512, metadata={"help": "Maximum sequence length."}
@@ -246,9 +234,7 @@ class RLHFConfig:
     )
     label_names: Optional[List[str]] = field(
         default_factory=list,
-        metadata={
-            "help": "List of column names in the dataset to use as labels."
-        },
+        metadata={"help": "List of column names in the dataset to use as labels."},
     )
     logging_strategy: Optional[str] = field(
         default="steps",
@@ -284,20 +270,14 @@ class RLHFConfig:
     )
     dataset_subset_rl_train: Optional[int] = field(
         default=10000,
-        metadata={
-            "help": "The size of the subset of the training data to use."
-        },
+        metadata={"help": "The size of the subset of the training data to use."},
     )
     adafactor: Optional[bool] = field(
         default=False,
         metadata={"help": "whether to use the adafactor optimizer"},
     )
-    top_k: Optional[float] = field(
-        default=0.0, metadata={"help": "Value for top_k"}
-    )
-    top_p: Optional[float] = field(
-        default=1.0, metadata={"help": "Value for top_p"}
-    )
+    top_k: Optional[float] = field(default=0.0, metadata={"help": "Value for top_k"})
+    top_p: Optional[float] = field(default=1.0, metadata={"help": "Value for top_p"})
     do_sample: Optional[bool] = field(
         default=True, metadata={"help": "Flag for sampling"}
     )
@@ -318,9 +298,7 @@ class RLHFConfig:
     )
     ppo_epochs: Optional[int] = field(
         default=10,
-        metadata={
-            "help": "the number of optimisation epochs per batch of samples"
-        },
+        metadata={"help": "the number of optimisation epochs per batch of samples"},
     )
     total_epochs: Optional[int] = field(
         default=100, metadata={"help": "number of total epochs"}
@@ -333,9 +311,7 @@ class RLHFConfig:
     )
     reward_baseline: Optional[float] = field(
         default=0.0,
-        metadata={
-            "help": "a baseline value that is subtracted from the reward"
-        },
+        metadata={"help": "a baseline value that is subtracted from the reward"},
     )
     init_kl_coef: Optional[float] = field(
         default=0.2,
@@ -354,8 +330,7 @@ class RLHFConfig:
         default="step3_reinforcement_learning_final_lora_weights/",
         metadata={
             "help": (
-                "Output directory for step 3 reinforcement learning's Lora"
-                " weights."
+                "Output directory for step 3 reinforcement learning's Lora" " weights."
             )
         },
     )

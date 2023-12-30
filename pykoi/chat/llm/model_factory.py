@@ -45,7 +45,8 @@ class ModelFactory:
 
                 return HuggingfaceModel(**kwargs)
             elif model_source == ModelSource.PEFT_HUGGINGFACE:
-                from pykoi.chat.llm.peft_huggingface import PeftHuggingfacemodel
+                from pykoi.chat.llm.peft_huggingface import \
+                    PeftHuggingfacemodel
 
                 return PeftHuggingfacemodel(**kwargs)
             elif model_source == ModelSource.MLU:

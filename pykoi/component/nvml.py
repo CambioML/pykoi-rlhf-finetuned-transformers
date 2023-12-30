@@ -1,8 +1,8 @@
 """nvml component"""
 
 
-from pykoi.ops.nvml import Nvml as Nv
 from pykoi.component.base import Component
+from pykoi.ops.nvml import Nvml as Nv
 
 
 class Nvml(Component):
