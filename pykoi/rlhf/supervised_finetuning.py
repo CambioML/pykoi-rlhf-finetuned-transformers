@@ -20,7 +20,7 @@ from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
 from pykoi.telemetry.events import SFTStartEvent, SFTStopEvent
 from pykoi.telemetry.telemetry import Telemetry
-
+from pykoi.rlhf.customize_data_collator import DataCollatorForCompletionOnlyLM
 
 class SupervisedFinetuning:
     """
@@ -48,6 +48,13 @@ class SupervisedFinetuning:
         self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
         self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.base_model_path)
+        # dh: add special tokens to tokenizer
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        END_KEY = "### End"
+        INSTRUCTION_KEY = "### Instruction:"
+        RESPONSE_KEY = "### Response:"
+        RESPONSE_KEY_NL = f"{RESPONSE_KEY}\n"
+        self.tokenizer.add_special_tokens({"additional_special_tokens": [END_KEY, INSTRUCTION_KEY, RESPONSE_KEY_NL]})        
         self.num_proc = (
             self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
         )
@@ -83,13 +90,23 @@ class SupervisedFinetuning:
             load_in_8bit=self._rlhf_config.load_in_8bit,
             device_map=self._rlhf_config.device_map,
         )
+        # resize the token embeddings to include the added special tokens
+        self.model.resize_token_embeddings(len(self.tokenizer))
+
+        # dh: try the customized data collator that only predicts the answer part
+        data_collator = DataCollatorForCompletionOnlyLM(
+        tokenizer=self.tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8
+        )
+
         self.trainer = SFTTrainer(
             model=self.model,
             args=self.training_args,
             train_dataset=self.dataset["train"],
             eval_dataset=self.dataset["eval"],
-            peft_config=self._rlhf_config.lora_config_rl,
+            peft_config=self._rlhf_config.lora_config_rl, ## TODO: DH: LoraConfig MAY BE IGNORED IF USING FROM_PRETRAINED
             packing=True,
+            data_collator=data_collator,
+            dataset_text_field="text",
         )
 
     def train(self):
@@ -103,6 +120,8 @@ class SupervisedFinetuning:
         base_model_path: Optional[str] = None,
         lora_model_path: Optional[str] = None,
     ):
+        #import pdb; pdb.set_trace()
+        # dh: not used
         if base_model_path is None:
             base_model_path = self._rlhf_config.base_model_path
 
@@ -163,6 +182,65 @@ class SupervisedFinetuning:
             f"    Answer: {example[self._rlhf_config.answer_title]}"
         )
         return text
+    
+
+    def prepare_d2l_text(self, example):
+        """Prepare the text from a sample of the d2l dataset ."""
+        INTRO_BLURB = (
+            "Below is an instruction that describes a task. Write a response that appropriately completes the request."
+        )
+        INSTRUCTION_KEY = "### Instruction:"
+        INPUT_KEY = "Input:"
+        RESPONSE_KEY = "### Response:"
+        END_KEY = "### End"
+        RESPONSE_KEY_NL = f"{RESPONSE_KEY}\n"
+        DEFAULT_SEED = 42
+
+        # This is a training prompt that does not contain an input string.  The instruction by itself has enough information
+        # to respond.  For example, the instruction might ask for the year a historic figure was born.
+        PROMPT_NO_INPUT_FORMAT = """{intro}
+        {instruction_key}
+        {instruction}
+        {response_key}
+        {response}
+        {end_key}""".format(
+            intro=INTRO_BLURB,
+            instruction_key=INSTRUCTION_KEY,
+            instruction="{instruction}",
+            response_key=RESPONSE_KEY,
+            response="{response}",
+            end_key=END_KEY,
+        )
+
+        # This is a training prompt that contains an input string that serves as context for the instruction.  For example,
+        # the input might be a passage from Wikipedia and the intruction is to extract some information from it.
+        PROMPT_WITH_INPUT_FORMAT = """{intro}
+        {instruction_key}
+        {instruction}
+        {input_key}
+        {input}
+        {response_key}
+        {response}
+        {end_key}""".format(
+            intro=INTRO_BLURB,
+            instruction_key=INSTRUCTION_KEY,
+            instruction="{instruction}",
+            input_key=INPUT_KEY,
+            input="{input}",
+            response_key=RESPONSE_KEY,
+            response="{response}",
+            end_key=END_KEY,
+        )
+        
+        context = example.get("context")
+        if context:
+            text = PROMPT_WITH_INPUT_FORMAT.format(instruction=example["instruction"], response=example["response"], input=context)
+        else:
+            text = PROMPT_NO_INPUT_FORMAT.format(instruction=example["instruction"], response=example["instruction"])
+
+
+
+        return text
 
     def create_datasets(self, tokenizer, args):
         if args.dataset_type == "local_db":
@@ -181,6 +259,7 @@ class SupervisedFinetuning:
         elif args.dataset_type == "local_csv":
             dataset = load_dataset("csv", data_files=args.dataset_name)
             dataset = dataset[args.split]  # Convert DatasetDict to Dataset
+            dataset2 = load_dataset("csv", data_files=args.dataset_name, split='train[:10%]')
         elif args.dataset_type == "huggingface":
             dataset = load_dataset(
                 args.dataset_name,
@@ -208,7 +287,7 @@ class SupervisedFinetuning:
         train_dataset = ConstantLengthDataset(
             tokenizer,
             dataset["train"],
-            formatting_func=self.prepare_sample_text,
+            formatting_func=self.prepare_d2l_text,
             infinite=True,
             seq_length=args.max_seq_length,
             # chars_per_token=chars_per_token,
@@ -216,7 +295,7 @@ class SupervisedFinetuning:
         eval_dataset = ConstantLengthDataset(
             tokenizer,
             dataset["test"],
-            formatting_func=self.prepare_sample_text,
+            formatting_func=self.prepare_d2l_text,
             infinite=False,
             seq_length=args.max_seq_length,
             # chars_per_token=chars_per_token,
