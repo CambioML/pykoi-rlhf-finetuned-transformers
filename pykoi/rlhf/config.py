@@ -120,6 +120,7 @@ class RLHFConfig:
         default="./rlhf_checkpoints",
         metadata={"help": "Output directory for all model weights."},
     )
+    num_train_epochs: Optional[int] = field(default=5, metadata={"help": "supervised fine tuning training epochs"})
     log_freq: Optional[int] = field(default=1, metadata={"help": "Logging frequency."})
     eval_freq: Optional[int] = field(
         default=1000, metadata={"help": "Evaluation frequency."}
