@@ -84,6 +84,7 @@ class SupervisedFinetuning:
             weight_decay=self._rlhf_config.weight_decay,
             run_name="step1_supervised_finetuning",
             ddp_find_unused_parameters=False,
+            num_train_epochs=self._rlhf_config.num_train_epochs,
         )
         self.model = AutoModelForCausalLM.from_pretrained(
             self._rlhf_config.base_model_path,
@@ -257,9 +258,14 @@ class SupervisedFinetuning:
             )
             dataset = Dataset.from_dict(my_data_pd)
         elif args.dataset_type == "local_csv":
-            dataset = load_dataset("csv", data_files=args.dataset_name)
-            dataset = dataset[args.split]  # Convert DatasetDict to Dataset
-            dataset2 = load_dataset("csv", data_files=args.dataset_name, split='train[:10%]')
+            ## this way will load 1660 enetries
+            # dataset = load_dataset("csv", data_files=args.dataset_name)
+            # dataset = dataset[args.split]  # Convert DatasetDict to Dataset
+
+            # this way will load 166 entries
+
+            dataset = load_dataset("csv", data_files=args.dataset_name, split='train[:10%]')
+
         elif args.dataset_type == "huggingface":
             dataset = load_dataset(
                 args.dataset_name,
@@ -275,29 +281,34 @@ class SupervisedFinetuning:
                 "No (supported) data files or dataset script found"
                 f" {args.dataset_type}"
             )
-
-        dataset = dataset.train_test_split(
-            test_size=args.train_test_split_ratio, seed=args.seed
-        )
+        
+        # dh: temp change. No test set
+        # dataset = dataset.train_test_split(
+        #     test_size=args.train_test_split_ratio, seed=args.seed
+        # )
         print(
-            f"Size of the train set: {len(dataset['train'])}.              "
-            f" Size of the validation set: {len(dataset['test'])}"
+            f"Size of the train set: {len(dataset)}.              "
+            #f"Size of the train set: {len(dataset['train'])}.              "
+            #f" Size of the validation set: {len(dataset['test'])}"
         )
 
         train_dataset = ConstantLengthDataset(
             tokenizer,
-            dataset["train"],
+            dataset,
+            #dataset["train"], #dh: temp change. No test set
             formatting_func=self.prepare_d2l_text,
             infinite=True,
             seq_length=args.max_seq_length,
             # chars_per_token=chars_per_token,
         )
-        eval_dataset = ConstantLengthDataset(
-            tokenizer,
-            dataset["test"],
-            formatting_func=self.prepare_d2l_text,
-            infinite=False,
-            seq_length=args.max_seq_length,
-            # chars_per_token=chars_per_token,
-        )
+        # temp change: no test set
+        # eval_dataset = ConstantLengthDataset(
+        #     tokenizer,
+        #     dataset["test"],
+        #     formatting_func=self.prepare_d2l_text,
+        #     infinite=False,
+        #     seq_length=args.max_seq_length,
+        #     # chars_per_token=chars_per_token,
+        # )
+        eval_dataset = None
         return {"train": train_dataset, "eval": eval_dataset}
