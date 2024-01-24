@@ -184,6 +184,18 @@ class RLHFConfig:
         ),
         metadata={"help": "LoRA configuration."},
     )
+    data_collator: Optional[str] = field(
+        default=None,
+        metadata={"help": "The name of data collator to use for training."},
+    )
+    no_evaluation: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether to disable evaluations during training."},
+    )
+    prepare_text: Optional[str] = field(
+        default="sample",
+        metadata={"help": "How to prepare the text for the model."},
+    )
 
     # Step 2 reward modeling parameters
     reward_model_path: Optional[str] = field(

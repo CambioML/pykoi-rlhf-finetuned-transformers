@@ -22,6 +22,7 @@ from pykoi.telemetry.events import SFTStartEvent, SFTStopEvent
 from pykoi.telemetry.telemetry import Telemetry
 from pykoi.rlhf.customize_data_collator import DataCollatorForCompletionOnlyLM
 
+
 class SupervisedFinetuning:
     """
     A class representing the supervised finetuning trainer.
@@ -37,7 +38,10 @@ class SupervisedFinetuning:
         trainer (SFTTrainer): The trainer object used for training the model.
     """
 
-    def __init__(self, rlhf_config: RLHFConfig, enable_telemetry: bool = True) -> None:
+    def __init__(
+            self,
+            rlhf_config: RLHFConfig,
+            enable_telemetry: bool = True) -> None:
         """
         Initializes the SFTTrainer object.
 
@@ -47,17 +51,18 @@ class SupervisedFinetuning:
         """
         self._telemetry = Telemetry(enable_telemetry)
         self._rlhf_config = rlhf_config
-        self.tokenizer = AutoTokenizer.from_pretrained(rlhf_config.base_model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            rlhf_config.base_model_path)
         # dh: add special tokens to tokenizer
         self.tokenizer.pad_token = self.tokenizer.eos_token
         END_KEY = "### End"
         INSTRUCTION_KEY = "### Instruction:"
         RESPONSE_KEY = "### Response:"
         RESPONSE_KEY_NL = f"{RESPONSE_KEY}\n"
-        self.tokenizer.add_special_tokens({"additional_special_tokens": [END_KEY, INSTRUCTION_KEY, RESPONSE_KEY_NL]})        
+        self.tokenizer.add_special_tokens(
+            {"additional_special_tokens": [END_KEY, INSTRUCTION_KEY, RESPONSE_KEY_NL]})
         self.num_proc = (
-            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None
-        )
+            self._rlhf_config.num_workers if not self._rlhf_config.streaming else None)
         self.dataset = self.create_datasets(self.tokenizer, self._rlhf_config)
         self.torch_dtype = torch.bfloat16 if self._rlhf_config.bf16 else torch.float16
         # self.torch_dtype = torch.bfloat16 if bf16 else (torch.float16 if fp16 else torch.float32)
@@ -77,8 +82,7 @@ class SupervisedFinetuning:
             gradient_accumulation_steps=self._rlhf_config.gradient_accumulation_steps,
             gradient_checkpointing=self._rlhf_config.gradient_checkpointing,
             gradient_checkpointing_kwargs={
-                "use_reentrant": self._rlhf_config.gradient_checkpointing_use_reentrant
-            },
+                "use_reentrant": self._rlhf_config.gradient_checkpointing_use_reentrant},
             fp16=self._rlhf_config.fp16,
             bf16=self._rlhf_config.bf16,
             weight_decay=self._rlhf_config.weight_decay,
@@ -93,18 +97,20 @@ class SupervisedFinetuning:
         )
         # resize the token embeddings to include the added special tokens
         self.model.resize_token_embeddings(len(self.tokenizer))
-
-        # dh: try the customized data collator that only predicts the answer part
-        data_collator = DataCollatorForCompletionOnlyLM(
-        tokenizer=self.tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8
-        )
+        data_collator = None
+        if self._rlhf_config.data_collator == "DataCollatorForCompletionOnlyLM":
+            # dh: try the customized data collator that only predicts the
+            # answer part
+            data_collator = DataCollatorForCompletionOnlyLM(
+                tokenizer=self.tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8)
 
         self.trainer = SFTTrainer(
             model=self.model,
             args=self.training_args,
             train_dataset=self.dataset["train"],
             eval_dataset=self.dataset["eval"],
-            peft_config=self._rlhf_config.lora_config_rl, ## TODO: DH: LoraConfig MAY BE IGNORED IF USING FROM_PRETRAINED
+            peft_config=self._rlhf_config.lora_config_rl,
+            # TODO: DH: LoraConfig MAY BE IGNORED IF USING FROM_PRETRAINED
             packing=True,
             data_collator=data_collator,
             dataset_text_field="text",
@@ -163,8 +169,9 @@ class SupervisedFinetuning:
 
     def train_and_save(self, output_path=None):
         start_event = SFTStartEvent(
-            start_time=time.time(), date_time=datetime.utcfromtimestamp(time.time())
-        )
+            start_time=time.time(),
+            date_time=datetime.utcfromtimestamp(
+                time.time()))
         self._telemetry.capture(start_event)
         self.trainer.train()
         self.save(output_path)
@@ -180,10 +187,8 @@ class SupervisedFinetuning:
         """Prepare the text from a sample of the dataset."""
         text = (
             f"Question: {example[self._rlhf_config.question_title]}\n\n        "
-            f"    Answer: {example[self._rlhf_config.answer_title]}"
-        )
+            f"    Answer: {example[self._rlhf_config.answer_title]}")
         return text
-    
 
     def prepare_d2l_text(self, example):
         """Prepare the text from a sample of the d2l dataset ."""
@@ -198,7 +203,8 @@ class SupervisedFinetuning:
         DEFAULT_SEED = 42
 
         # This is a training prompt that does not contain an input string.  The instruction by itself has enough information
-        # to respond.  For example, the instruction might ask for the year a historic figure was born.
+        # to respond.  For example, the instruction might ask for the year a
+        # historic figure was born.
         PROMPT_NO_INPUT_FORMAT = """{intro}
         {instruction_key}
         {instruction}
@@ -214,7 +220,8 @@ class SupervisedFinetuning:
         )
 
         # This is a training prompt that contains an input string that serves as context for the instruction.  For example,
-        # the input might be a passage from Wikipedia and the intruction is to extract some information from it.
+        # the input might be a passage from Wikipedia and the intruction is to
+        # extract some information from it.
         PROMPT_WITH_INPUT_FORMAT = """{intro}
         {instruction_key}
         {instruction}
@@ -232,14 +239,17 @@ class SupervisedFinetuning:
             response="{response}",
             end_key=END_KEY,
         )
-        
+
         context = example.get("context")
         if context:
-            text = PROMPT_WITH_INPUT_FORMAT.format(instruction=example["instruction"], response=example["response"], input=context)
+            text = PROMPT_WITH_INPUT_FORMAT.format(
+                instruction=example["instruction"],
+                response=example["response"],
+                input=context)
         else:
-            text = PROMPT_NO_INPUT_FORMAT.format(instruction=example["instruction"], response=example["instruction"])
-
-
+            text = PROMPT_NO_INPUT_FORMAT.format(
+                instruction=example["instruction"],
+                response=example["instruction"])
 
         return text
 
@@ -258,13 +268,16 @@ class SupervisedFinetuning:
             )
             dataset = Dataset.from_dict(my_data_pd)
         elif args.dataset_type == "local_csv":
-            ## this way will load 1660 enetries
+            # this way will load 1660 enetries
             # dataset = load_dataset("csv", data_files=args.dataset_name)
             # dataset = dataset[args.split]  # Convert DatasetDict to Dataset
 
             # this way will load 166 entries
 
-            dataset = load_dataset("csv", data_files=args.dataset_name, split='train[:10%]')
+            dataset = load_dataset(
+                "csv",
+                data_files=args.dataset_name,
+                split='train[:10%]')
 
         elif args.dataset_type == "huggingface":
             dataset = load_dataset(
@@ -281,34 +294,50 @@ class SupervisedFinetuning:
                 "No (supported) data files or dataset script found"
                 f" {args.dataset_type}"
             )
-        
-        # dh: temp change. No test set
-        # dataset = dataset.train_test_split(
-        #     test_size=args.train_test_split_ratio, seed=args.seed
-        # )
-        print(
-            f"Size of the train set: {len(dataset)}.              "
-            #f"Size of the train set: {len(dataset['train'])}.              "
-            #f" Size of the validation set: {len(dataset['test'])}"
-        )
 
-        train_dataset = ConstantLengthDataset(
-            tokenizer,
-            dataset,
-            #dataset["train"], #dh: temp change. No test set
-            formatting_func=self.prepare_d2l_text,
-            infinite=True,
-            seq_length=args.max_seq_length,
-            # chars_per_token=chars_per_token,
-        )
-        # temp change: no test set
-        # eval_dataset = ConstantLengthDataset(
-        #     tokenizer,
-        #     dataset["test"],
-        #     formatting_func=self.prepare_d2l_text,
-        #     infinite=False,
-        #     seq_length=args.max_seq_length,
-        #     # chars_per_token=chars_per_token,
-        # )
-        eval_dataset = None
+        if args.prepare_text == "d2l":
+            self.prepare_text = self.prepare_d2l_text
+        else:
+            self.prepare_text = self.prepare_sample_text
+        # No test set during training
+        if args.no_evaluation:
+            print(
+                f"Size of the train set: {len(dataset)}.              "
+            )
+
+            train_dataset = ConstantLengthDataset(
+                tokenizer,
+                dataset,
+                formatting_func=self.prepare_text,
+                infinite=True,
+                seq_length=args.max_seq_length,
+                # chars_per_token=chars_per_token,
+            )
+            eval_dataset = None
+        else:
+            dataset = dataset.train_test_split(
+                test_size=args.train_test_split_ratio, seed=args.seed
+            )
+            print(
+                f"Size of the train set: {len(dataset['train'])}.              "
+                f" Size of the validation set: {len(dataset['test'])}")
+
+            train_dataset = ConstantLengthDataset(
+                tokenizer,
+                dataset["train"],
+                formatting_func=self.prepare_text,
+                infinite=True,
+                seq_length=args.max_seq_length,
+                # chars_per_token=chars_per_token,
+            )
+
+            eval_dataset = ConstantLengthDataset(
+                tokenizer,
+                dataset["test"],
+                formatting_func=self.prepare_text,
+                infinite=False,
+                seq_length=args.max_seq_length,
+                # chars_per_token=chars_per_token,
+            )
+
         return {"train": train_dataset, "eval": eval_dataset}
