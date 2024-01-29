@@ -50,6 +50,7 @@ config = RLHFConfig(base_model_path="mistralai/Mistral-7B-Instruct-v0.1",
                     data_collator="DataCollatorForCompletionOnlyLM",
                     no_evaluation=True,
                     prepare_text="d2l",
+                    split = "train[:10%]"
                     )
 rlhf_step1_sft = SupervisedFinetuning(config)
 rlhf_step1_sft.train_and_save("./models/rlhf_step1_sft")

@@ -11,8 +11,6 @@ from transformers import (AutoModelForCausalLM,
                           AutoModelForSequenceClassification, AutoTokenizer,
                           TrainingArguments)
 from trl import SFTTrainer
-from trl.trainer.utils import ConstantLengthDataset
-
 from pykoi.chat.db.constants import (QA_CSV_HEADER_ANSWER, QA_CSV_HEADER_ID,
                                      QA_CSV_HEADER_QUESTION,
                                      QA_CSV_HEADER_VOTE_STATUS)
@@ -20,7 +18,8 @@ from pykoi.chat.db.qa_database import QuestionAnswerDatabase
 from pykoi.rlhf.config import RLHFConfig
 from pykoi.telemetry.events import SFTStartEvent, SFTStopEvent
 from pykoi.telemetry.telemetry import Telemetry
-from pykoi.rlhf.customize_data_collator import DataCollatorForCompletionOnlyLM
+from trl import DataCollatorForCompletionOnlyLM
+# from pykoi.rlhf.customize_data_collator import DataCollatorForCompletionOnlyLM
 
 
 class SupervisedFinetuning:
@@ -101,8 +100,9 @@ class SupervisedFinetuning:
         if self._rlhf_config.data_collator == "DataCollatorForCompletionOnlyLM":
             # dh: try the customized data collator that only predicts the
             # answer part
-            data_collator = DataCollatorForCompletionOnlyLM(
-                tokenizer=self.tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8)
+            response_template = RESPONSE_KEY
+            data_collator = DataCollatorForCompletionOnlyLM(response_template,
+                tokenizer=self.tokenizer)
 
         self.trainer = SFTTrainer(
             model=self.model,
@@ -111,9 +111,10 @@ class SupervisedFinetuning:
             eval_dataset=self.dataset["eval"],
             peft_config=self._rlhf_config.lora_config_rl,
             # TODO: DH: LoraConfig MAY BE IGNORED IF USING FROM_PRETRAINED
-            packing=True,
+            packing=False,  # required for compatibility with the completiononly data collator
             data_collator=data_collator,
             dataset_text_field="text",
+            max_seq_length=self._rlhf_config.max_seq_length,
         )
 
     def train(self):
@@ -270,14 +271,14 @@ class SupervisedFinetuning:
         elif args.dataset_type == "local_csv":
             # this way will load 1660 enetries
             # dataset = load_dataset("csv", data_files=args.dataset_name)
-            # dataset = dataset[args.split]  # Convert DatasetDict to Dataset
+            # dataset = dataset["train"]  # Convert DatasetDict to Dataset
 
             # this way will load 166 entries
 
             dataset = load_dataset(
                 "csv",
                 data_files=args.dataset_name,
-                split='train[:10%]')
+                split=args.split)
 
         elif args.dataset_type == "huggingface":
             dataset = load_dataset(
@@ -305,14 +306,7 @@ class SupervisedFinetuning:
                 f"Size of the train set: {len(dataset)}.              "
             )
 
-            train_dataset = ConstantLengthDataset(
-                tokenizer,
-                dataset,
-                formatting_func=self.prepare_text,
-                infinite=True,
-                seq_length=args.max_seq_length,
-                # chars_per_token=chars_per_token,
-            )
+            train_dataset = dataset
             eval_dataset = None
         else:
             dataset = dataset.train_test_split(
@@ -322,22 +316,8 @@ class SupervisedFinetuning:
                 f"Size of the train set: {len(dataset['train'])}.              "
                 f" Size of the validation set: {len(dataset['test'])}")
 
-            train_dataset = ConstantLengthDataset(
-                tokenizer,
-                dataset["train"],
-                formatting_func=self.prepare_text,
-                infinite=True,
-                seq_length=args.max_seq_length,
-                # chars_per_token=chars_per_token,
-            )
+            train_dataset = dataset["train"]
 
-            eval_dataset = ConstantLengthDataset(
-                tokenizer,
-                dataset["test"],
-                formatting_func=self.prepare_text,
-                infinite=False,
-                seq_length=args.max_seq_length,
-                # chars_per_token=chars_per_token,
-            )
+            eval_dataset = dataset["test"]
 
         return {"train": train_dataset, "eval": eval_dataset}
