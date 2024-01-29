@@ -1,11 +1,11 @@
-"""Demo for the supervised fine tuning.
+"""Demo for the pre-training.
 
-python -m example.rlhf.demo_supervised_finetuning_nike
+python -m example.rlhf.demo_pre_training_nike
 """
 
 from peft import LoraConfig, TaskType
 
-from pykoi.rlhf import RLHFConfig, SupervisedFinetuning
+from pykoi.rlhf import RLHFConfig, PreTraining
 
 base_model_path = "meta-llama/Llama-2-7b-chat-hf"
 dataset_name = "./output_self_instructed_data_nike_10k_2023_FULL.csv"
@@ -38,7 +38,7 @@ lora_config = LoraConfig(
 )
 
 
-# run supervised finetuning
+# run pre-training
 config = RLHFConfig(
     base_model_path=base_model_path,
     dataset_type=dataset_type,
@@ -56,5 +56,5 @@ config = RLHFConfig(
     size_valid_set=size_valid_set,
     lora_config_rl=lora_config,
 )
-rlhf_step1_sft = SupervisedFinetuning(config)
+rlhf_step1_sft = PreTraining(config)
 rlhf_step1_sft.train_and_save(peft_model_path)
