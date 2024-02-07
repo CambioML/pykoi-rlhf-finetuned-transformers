@@ -9,22 +9,9 @@ from pykoi.chat.db.constants import (QA_CSV_HEADER_ANSWER, QA_CSV_HEADER_ID,
                                      QA_CSV_HEADER_QUESTION,
                                      QA_CSV_HEADER_VOTE_STATUS)
 from pykoi.rlhf import RLHFConfig, SupervisedFinetuning
+from trl import DataCollatorForCompletionOnlyLM
 
-# get data from local database
-qa_database = QuestionAnswerDatabase()
-my_data_pd = qa_database.retrieve_all_question_answers_as_pandas()
-my_data_pd = my_data_pd[
-    [
-        QA_CSV_HEADER_ID,
-        QA_CSV_HEADER_QUESTION,
-        QA_CSV_HEADER_ANSWER,
-        QA_CSV_HEADER_VOTE_STATUS,
-    ]
-]
 
-# analyze the data
-print(my_data_pd)
-print("My local database has {} samples in total".format(my_data_pd.shape[0]))
 
 # run supervised finetuning
 config = RLHFConfig(base_model_path="mistralai/Mistral-7B-Instruct-v0.1",
@@ -47,7 +34,7 @@ config = RLHFConfig(base_model_path="mistralai/Mistral-7B-Instruct-v0.1",
                         bias="none",
                         task_type="CAUSAL_LM"
                     ),
-                    data_collator="DataCollatorForCompletionOnlyLM",
+                    data_collator=DataCollatorForCompletionOnlyLM,
                     no_evaluation=True,
                     prepare_text="d2l",
                     split = "train[:10%]"

@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from accelerate import Accelerator
 from peft import LoraConfig, TaskType
-# TODO: DH:    num_train_epochs=20,
+import transformers
 
 
 @dataclass
@@ -184,9 +184,9 @@ class RLHFConfig:
         ),
         metadata={"help": "LoRA configuration."},
     )
-    data_collator: Optional[str] = field(
+    data_collator: Optional[transformers.DataCollator] = field(
         default=None,
-        metadata={"help": "The name of data collator to use for training."},
+        metadata={"help": "The data collator to use for training."},
     )
     no_evaluation: Optional[bool] = field(
         default=False,
