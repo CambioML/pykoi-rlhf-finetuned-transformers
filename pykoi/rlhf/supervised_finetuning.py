@@ -19,7 +19,6 @@ from pykoi.rlhf.config import RLHFConfig
 from pykoi.telemetry.events import SFTStartEvent, SFTStopEvent
 from pykoi.telemetry.telemetry import Telemetry
 from trl import DataCollatorForCompletionOnlyLM
-# from pykoi.rlhf.customize_data_collator import DataCollatorForCompletionOnlyLM
 
 
 class SupervisedFinetuning:
@@ -96,13 +95,13 @@ class SupervisedFinetuning:
         )
         # resize the token embeddings to include the added special tokens
         self.model.resize_token_embeddings(len(self.tokenizer))
-        data_collator = None
-        if self._rlhf_config.data_collator == "DataCollatorForCompletionOnlyLM":
-            # dh: try the customized data collator that only predicts the
-            # answer part
+        if self._rlhf_config.data_collator.__name__ == "DataCollatorForCompletionOnlyLM":
+            # data collator that only predicts the answer part
             response_template = RESPONSE_KEY
-            data_collator = DataCollatorForCompletionOnlyLM(response_template,
+            data_collator = self._rlhf_config.data_collator(response_template,
                 tokenizer=self.tokenizer)
+        else:
+            data_collator = None
 
         self.trainer = SFTTrainer(
             model=self.model,
@@ -113,7 +112,8 @@ class SupervisedFinetuning:
             # TODO: DH: LoraConfig MAY BE IGNORED IF USING FROM_PRETRAINED
             packing=False,  # required for compatibility with the completiononly data collator
             data_collator=data_collator,
-            dataset_text_field="text",
+            formatting_func=self.prepare_text,
+            dataset_text_field=None,
             max_seq_length=self._rlhf_config.max_seq_length,
         )
 
@@ -191,7 +191,7 @@ class SupervisedFinetuning:
             f"    Answer: {example[self._rlhf_config.answer_title]}")
         return text
 
-    def prepare_d2l_text(self, example):
+    def prepare_blurb_qa_text(self, example):
         """Prepare the text from a sample of the d2l dataset ."""
         INTRO_BLURB = (
             "Below is an instruction that describes a task. Write a response that appropriately completes the request."
@@ -240,19 +240,26 @@ class SupervisedFinetuning:
             response="{response}",
             end_key=END_KEY,
         )
-
-        context = example.get("context")
-        if context:
-            text = PROMPT_WITH_INPUT_FORMAT.format(
-                instruction=example["instruction"],
-                response=example["response"],
-                input=context)
+        if "context" in example:
+            context = example["context"]
         else:
-            text = PROMPT_NO_INPUT_FORMAT.format(
-                instruction=example["instruction"],
-                response=example["instruction"])
+            context = None
+        output_texts = []
+        for i in range(len(example["instruction"])):
+            if context:
+                text = PROMPT_WITH_INPUT_FORMAT.format(
+                    instruction=example["instruction"][i],
+                    response=example["response"][i],
+                    input=context)
+            else:
+                text = PROMPT_NO_INPUT_FORMAT.format(
+                    instruction=example["instruction"][i],
+                    response=example["response"][i])
+        
+        output_texts.append(text)
+        return output_texts
 
-        return text
+
 
     def create_datasets(self, tokenizer, args):
         if args.dataset_type == "local_db":
@@ -297,7 +304,7 @@ class SupervisedFinetuning:
             )
 
         if args.prepare_text == "d2l":
-            self.prepare_text = self.prepare_d2l_text
+            self.prepare_text = self.prepare_blurb_qa_text
         else:
             self.prepare_text = self.prepare_sample_text
         # No test set during training
