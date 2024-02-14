@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from accelerate import Accelerator
 from peft import LoraConfig, TaskType
+import transformers
 
 
 @dataclass
@@ -119,6 +120,7 @@ class RLHFConfig:
         default="./rlhf_checkpoints",
         metadata={"help": "Output directory for all model weights."},
     )
+    num_train_epochs: Optional[int] = field(default=5, metadata={"help": "supervised fine tuning training epochs"})
     log_freq: Optional[int] = field(default=1, metadata={"help": "Logging frequency."})
     eval_freq: Optional[int] = field(
         default=1000, metadata={"help": "Evaluation frequency."}
@@ -181,6 +183,18 @@ class RLHFConfig:
             task_type=TaskType.CAUSAL_LM,
         ),
         metadata={"help": "LoRA configuration."},
+    )
+    data_collator: Optional[transformers.DataCollator] = field(
+        default=None,
+        metadata={"help": "The data collator to use for training."},
+    )
+    no_evaluation: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether to disable evaluations during training."},
+    )
+    prepare_text: Optional[str] = field(
+        default="sample",
+        metadata={"help": "How to prepare the text for the model."},
     )
 
     # Step 2 reward modeling parameters
