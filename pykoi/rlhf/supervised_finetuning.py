@@ -256,7 +256,7 @@ class SupervisedFinetuning:
                     instruction=example["instruction"][i],
                     response=example["response"][i])
         
-        output_texts.append(text)
+            output_texts.append(text)
         return output_texts
 
 
