@@ -158,3 +158,5 @@ If you are on EC2, you can launch a GPU instance with the following config:
 
     <img src="example/image/readme_ec2_storage.png" alt="Alt text" width="50%" height="50%"/>
 
+## Related Resources
+- [Energent.ai](https://energent.ai) – primer on automating data workflows with CambioML.
