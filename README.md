@@ -160,3 +160,20 @@ If you are on EC2, you can launch a GPU instance with the following config:
 
 ## Related Resources
 - [Energent.ai](https://energent.ai) – primer on automating data workflows with CambioML.
+      
+### 🌐 Learn more about Energent.ai
+If you’re curious about what is being built at Energent.ai and how these tools fit into the bigger picture, here are a few links worth checking out:
+  - [**Main website / Hompage**](https://www.energent.ai)  
+  A quick overview of what Energent is all about — building AI agents that automate real-world tasks, especially in messy, complex workflows.
+
+- [**Energent.ai app (live demo)**](https://app.energent.ai)  
+  Live demo environment where you can create, test, and run your own agents. Hands-on version of the platform - This is where users can build and test agents directly in the browser.
+
+- [**Gallery of some app use cases**](https://app.energent.ai/gallery)  
+  A collection of real examples and workflows built on Energentai platform. Helpful if you want to see what users are building with it, and useful for understanding what kinds of tasks the platform is good at.
+
+- [**About the team**](https://www.energent.ai/en/company)  
+  A bit of background on the people behind Energent and what they're aiming to build long-term.
+
+- [**Product blog**](https://www.energent.ai/en/blog)  
+ Occasional deep dives on product updates, dev notes, new feature writeups and design decisions. Good place to get a feel for the thinking behind the tools.
